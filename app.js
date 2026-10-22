@@ -10,8 +10,24 @@ var ui={q:"",statut:"all",loc:"all"};
 var OKEY="electro-open";
 var openG=(function(){try{return JSON.parse(localStorage.getItem(OKEY)||"{}")||{};}catch(e){return {};}})();
 function saveOpen(){try{localStorage.setItem(OKEY,JSON.stringify(openG));}catch(e){}}
-function filtering(){return !!(ui.q.trim()||ui.statut!=="all"||ui.loc!=="all");}
-var admin={on:false,token:"",draft:null,busy:false,msg:"",ok:""};
+function filtering(){return !!(ui.q.trim()||ui.statut!=="all"||ui.loc!=="all"||(invOn()&&INV.onlyTodo));}
+var IKEY="electro-inv";
+var INV=(function(){try{return JSON.parse(localStorage.getItem(IKEY)||"null");}catch(e){return null;}})();
+function saveInv(){try{if(INV)localStorage.setItem(IKEY,JSON.stringify(INV));else localStorage.removeItem(IKEY);}catch(e){}}
+function invOn(){return !!(admin.on&&INV);}
+function frToday(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
+function invStats(){var n=0,s=0;cur().items.forEach(function(i){n++;if(INV.seen[i.id])s++;});return {n:n,s:s};}
+function endInventory(){
+ ensureDraft();var found=0,miss=0;
+ admin.draft.items.forEach(function(i){
+  if(INV.seen[i.id]){found++;if(i.statut==="verifier"||i.statut==="introuvable"||i.statut==="sorti")i.statut="dispo";}
+  else if(i.statut==="dispo"){i.statut="verifier";miss++;}
+ });
+ admin.draft.config.inventaire=frToday();touch();
+ INV=null;saveInv();saveDraft();admin.arm="";
+ admin.ok="Inventaire terminé : "+found+" ligne"+(found>1?"s":"")+" trouvée"+(found>1?"s":"")+", "+miss+" passée"+(miss>1?"s":"")+" en « À vérifier ». Contrôlez puis touchez « Publier pour l'équipe ».";
+}
+var admin={on:false,token:"",draft:null,busy:false,msg:"",ok:"",arm:""};
 var sheet=null;
 var app=document.getElementById("app");
 
@@ -53,6 +69,7 @@ function frDate(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"
 function filtered(){
  var q=norm(ui.q).split(/\s+/).filter(Boolean);
  return cur().items.filter(function(i){
+  if(invOn()&&INV.onlyTodo&&INV.seen[i.id])return false;
   if(ui.statut!=="all"&&i.statut!==ui.statut)return false;
   if(ui.loc!=="all"&&(i.localisation||"")!==ui.loc)return false;
   if(!q.length)return true;
@@ -85,9 +102,18 @@ function render(){
  f.forEach(function(i){var k=i.designation||"Sans désignation";if(!gm[k]){gm[k]={name:k,items:[]};groups.push(gm[k]);}gm[k].items.push(i);});
  var dirty=dirtyIds();
  h+=header(cfg,total)+'<main class="wrap">';
- if(admin.on){
+ if(invOn()){
+  var is=invStats(),pc=is.n?Math.round(is.s*100/is.n):0;
+  h+='<section class="adminbar invbar"><h3>Inventaire en cours</h3><p>Commencé le '+esc(frDate(INV.start))+'. Cochez chaque matériel trouvé. Touchez une ligne pour changer son lieu ou son état. Vous pouvez fermer la page et reprendre plus tard sur ce téléphone.</p>';
+  h+='<div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="'+is.n+'" aria-valuenow="'+is.s+'"><span style="width:'+pc+'%"></span></div><div class="ptext"><b>'+is.s+'</b> / '+is.n+' lignes pointées</div>';
+  h+='<div class="row"><button class="btn'+(INV.onlyTodo?' on':'')+'" id="b-inv-todo" type="button" aria-pressed="'+!!INV.onlyTodo+'">Seulement les non pointés</button><button class="btn" id="b-add" type="button">'+I.plus+'Ajouter</button></div>';
+  if(admin.arm==="end")h+='<div class="notice">Le matériel coché passe en « Disponible ». Le matériel non coché qui était disponible passe en « À vérifier ». Le matériel sorti ou réformé HS non coché ne change pas.</div>';
+  if(admin.arm==="cancel")h+='<div class="notice">Les coches seront effacées. Les modifications de lieu ou d\'état déjà faites restent en brouillon.</div>';
+  h+='<div class="row"><button class="btn primary'+(admin.arm==="end"?' armed':'')+'" id="b-inv-end" type="button">'+(admin.arm==="end"?'Confirmer : terminer':'Terminer l\'inventaire')+'</button><button class="btn danger'+(admin.arm==="cancel"?' armed':'')+'" id="b-inv-cancel" type="button">'+(admin.arm==="cancel"?'Confirmer l\'abandon':'Abandonner')+'</button></div>';
+  h+='</section>';
+ } else if(admin.on){
   h+='<section class="adminbar"><h3>Administration</h3><p>Touchez une ligne pour la modifier. Vos changements restent en brouillon sur cet appareil jusqu\'à ce que vous les publiiez. L\'équipe les voit environ 1 minute après.</p>';
-  h+='<div class="row"><button class="btn primary" id="b-add" type="button">'+I.plus+'Ajouter du matériel</button><button class="btn" id="b-cfg" type="button">Réglages</button><button class="btn" id="b-logout" type="button">Retirer ma clé</button></div>';
+  h+='<div class="row"><button class="btn primary" id="b-add" type="button">'+I.plus+'Ajouter du matériel</button><button class="btn" id="b-inv-start" type="button">Démarrer un inventaire</button><button class="btn" id="b-cfg" type="button">Réglages</button><button class="btn" id="b-logout" type="button">Retirer ma clé</button></div>';
   if(admin.msg)h+='<div class="notice">'+esc(admin.msg)+'</div>';
   if(admin.ok)h+='<div class="notice ok">'+esc(admin.ok)+'</div>';
   h+='</section>';
@@ -105,7 +131,8 @@ function render(){
  groups.forEach(function(g){
   var n=0,ok=0;g.items.forEach(function(i){var c=+i.nb||1;n+=c;if(i.statut==="dispo")ok+=c;});
   var isOpen=filtering()||!!openG[g.name];
-  h+='<section class="group"><button type="button" class="ghead" data-g="'+esc(g.name)+'" aria-expanded="'+isOpen+'"><span class="chev" aria-hidden="true"></span><h2>'+esc(g.name)+'</h2><small><b>'+ok+'</b> dispo / '+n+'</small></button>';
+  var gs=0;if(invOn())g.items.forEach(function(i){if(INV.seen[i.id])gs++;});
+  h+='<section class="group"><button type="button" class="ghead" data-g="'+esc(g.name)+'" aria-expanded="'+isOpen+'"><span class="chev" aria-hidden="true"></span><h2>'+esc(g.name)+'</h2>'+(invOn()?'<small class="'+(gs===g.items.length?'done':'')+'"><b>'+gs+'</b> / '+g.items.length+' pointés</small>':'<small><b>'+ok+'</b> dispo / '+n+'</small>')+'</button>';
   if(!isOpen){h+='</section>';return;}
   h+='<ul class="items">';
   g.items.forEach(function(i){
@@ -115,7 +142,8 @@ function render(){
    if(i.energie)meta.push(esc(i.energie));
    if(i.annee)meta.push(esc(i.annee));
    if(i.serie)meta.push('N° <span class="mono">'+esc(i.serie)+'</span>');
-   h+='<li class="item'+(admin.on?' edit':'')+(dirty[i.id]?' dirty':'')+'" data-id="'+esc(i.id)+'"'+(admin.on?' tabindex="0" role="button"':'')+'><div class="it-main"><div class="it-title">'+title+((+i.nb||1)>1?'<span class="nb">×'+esc(i.nb)+'</span>':'')+'</div>';
+   var seen=invOn()&&!!INV.seen[i.id];
+   h+='<li class="item'+(admin.on?' edit':'')+(invOn()?' inv':'')+(seen?' seen':'')+(dirty[i.id]?' dirty':'')+'" data-id="'+esc(i.id)+'"'+(admin.on?' tabindex="0" role="button"':'')+'>'+(invOn()?'<button type="button" class="chk" data-chk="'+esc(i.id)+'" aria-pressed="'+seen+'" aria-label="'+(seen?'Trouvé':'Marquer comme trouvé')+'"></button>':'')+'<div class="it-main"><div class="it-title">'+title+((+i.nb||1)>1?'<span class="nb">×'+esc(i.nb)+'</span>':'')+'</div>';
    if(meta.length)h+='<div class="it-meta">'+meta.map(function(m){return '<span>'+m+'</span>';}).join("")+'</div>';
    if(i.commentaire)h+='<div class="it-com">'+esc(i.commentaire)+'</div>';
    h+='</div><div class="it-side"><span class="pill p-'+esc(i.statut)+'">'+esc(ST[i.statut]||i.statut)+'</span>'+(i.localisation?'<span class="loc">'+I.pin+esc(i.localisation)+'</span>':'')+'</div></li>';
@@ -266,6 +294,11 @@ app.addEventListener("click",function(e){
   if(!sheet.armed){sheet.armed=true;render();return;}
   ensureDraft();admin.draft.items=admin.draft.items.filter(function(i){return i.id!==sheet.id;});touch();saveDraft();sheet=null;render();return;
  }
+ if(t.dataset&&t.dataset.chk){var cid=t.dataset.chk;if(INV.seen[cid])delete INV.seen[cid];else INV.seen[cid]=1;saveInv();render();var cb=document.querySelector('.chk[data-chk="'+CSS.escape(cid)+'"]');if(cb)cb.focus();return;}
+ if(t.id==="b-inv-start"){INV={start:today(),seen:{},onlyTodo:false};saveInv();admin.ok="";admin.msg="";admin.arm="";render();return;}
+ if(t.id==="b-inv-todo"){INV.onlyTodo=!INV.onlyTodo;saveInv();render();return;}
+ if(t.id==="b-inv-end"){if(admin.arm!=="end"){admin.arm="end";render();return;}endInventory();render();return;}
+ if(t.id==="b-inv-cancel"){if(admin.arm!=="cancel"){admin.arm="cancel";render();return;}INV=null;saveInv();admin.arm="";render();return;}
  if(t.id==="b-discard"){admin.draft=null;lsSet(DKEY,null);admin.msg="";render();return;}
  if(t.id==="b-pub"){publish();return;}
  if(t.classList.contains("item")&&admin.on){sheet={mode:"edit",id:t.dataset.id};render();return;}
@@ -282,7 +315,7 @@ app.addEventListener("submit",function(e){
  if(e.target.id!=="f-item")return;
  var f=readForm();if(!f.designation){focusId("f-designation");return;}
  ensureDraft();
- if(sheet.mode==="add"){f.id=newId();admin.draft.items.push(f);}
+ if(sheet.mode==="add"){f.id=newId();admin.draft.items.push(f);if(INV){INV.seen[f.id]=1;saveInv();}}
  else{admin.draft.items=admin.draft.items.map(function(i){if(i.id!==sheet.id)return i;f.id=i.id;return f;});}
  sortItems(admin.draft.items);touch();saveDraft();sheet=null;render();
 });
