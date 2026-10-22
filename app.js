@@ -7,6 +7,10 @@ var ORDER=["dispo","sorti","verifier","introuvable","hs"];
 var DKEY="electro-draft-v2",TKEY="electro-gh-token";
 var DATA=null,SHA=null,loadErr="";
 var ui={q:"",statut:"all",loc:"all"};
+var OKEY="electro-open";
+var openG=(function(){try{return JSON.parse(localStorage.getItem(OKEY)||"{}")||{};}catch(e){return {};}})();
+function saveOpen(){try{localStorage.setItem(OKEY,JSON.stringify(openG));}catch(e){}}
+function filtering(){return !!(ui.q.trim()||ui.statut!=="all"||ui.loc!=="all");}
 var admin={on:false,token:"",draft:null,busy:false,msg:"",ok:""};
 var sheet=null;
 var app=document.getElementById("app");
@@ -96,11 +100,14 @@ function render(){
  h+='<select id="loc" aria-label="Localisation"><option value="all">Tous les lieux</option>';
  locs().forEach(function(l){h+='<option value="'+esc(l)+'"'+(ui.loc===l?' selected':'')+'>'+esc(l||"Lieu non renseigné")+'</option>';});
  h+='</select></div>';
- h+='<div class="count">'+f.length+' ligne'+(f.length>1?'s':'')+(ui.q||ui.statut!=="all"||ui.loc!=="all"?' affichée'+(f.length>1?'s':'')+' · <a href="#" id="reset">tout afficher</a>':'')+'</div>';
+ h+='<div class="count">'+f.length+' ligne'+(f.length>1?'s':'')+(filtering()?' affichée'+(f.length>1?'s':'')+' · <a href="#" id="reset">tout afficher</a>':' · <a href="#" id="open-all">tout ouvrir</a> · <a href="#" id="close-all">tout fermer</a>')+'</div>';
  if(!groups.length)h+='<div class="empty">Aucun matériel ne correspond à cette recherche.</div>';
  groups.forEach(function(g){
   var n=0,ok=0;g.items.forEach(function(i){var c=+i.nb||1;n+=c;if(i.statut==="dispo")ok+=c;});
-  h+='<section class="group"><div class="ghead"><h2>'+esc(g.name)+'</h2><small><b>'+ok+'</b> dispo / '+n+'</small></div><ul class="items">';
+  var isOpen=filtering()||!!openG[g.name];
+  h+='<section class="group"><button type="button" class="ghead" data-g="'+esc(g.name)+'" aria-expanded="'+isOpen+'"><span class="chev" aria-hidden="true"></span><h2>'+esc(g.name)+'</h2><small><b>'+ok+'</b> dispo / '+n+'</small></button>';
+  if(!isOpen){h+='</section>';return;}
+  h+='<ul class="items">';
   g.items.forEach(function(i){
    var title=[i.marque?'<span>'+esc(i.marque)+'</span>':'',i.ref?'<span class="mono">'+esc(i.ref)+'</span>':''].join("");
    if(!title)title='<span>'+esc(i.designation)+'</span>';
@@ -237,6 +244,9 @@ function restoreDraft(){
 app.addEventListener("click",function(e){
  var t=e.target.closest("button,a,.item,#sheet-bg");if(!t)return;
  if(t.id==="sheet-bg"){if(e.target===t&&!(sheet&&sheet.busy)){sheet=null;render();}return;}
+ if(t.dataset&&t.dataset.g!=null){if(filtering())return;var gname=t.dataset.g;if(openG[gname])delete openG[gname];else openG[gname]=1;saveOpen();render();var gb=document.querySelector('.ghead[data-g="'+CSS.escape(gname)+'"]');if(gb)gb.focus();return;}
+ if(t.id==="open-all"){e.preventDefault();cur().items.forEach(function(i){openG[i.designation||"Sans désignation"]=1;});saveOpen();render();return;}
+ if(t.id==="close-all"){e.preventDefault();openG={};saveOpen();render();return;}
  if(t.id==="reset"){e.preventDefault();ui={q:"",statut:"all",loc:"all"};render();return;}
  if(t.id==="b-retry"){load();return;}
  if(t.id==="b-qr"){sheet={mode:"qr"};render();return;}
