@@ -92,6 +92,6 @@
   {"marque":"","designation":"Théodolite","energie":"","ref":"","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"","commentaire":"Voir avec Charles","id":"m090"},
   {"designation":"Visseuse","marque":"Makita","ref":"DDF845","energie":"Batterie","nb":1,"annee":"01/2022","serie":"345587R","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune \n1/1","id":"m091"},
   {"marque":"Makita","designation":"Visseuse","energie":"Batterie","ref":"DHP484","nb":1,"annee":"03/2022","serie":"1585067Y","statut":"dispo","localisation":"TST","commentaire":"","id":"m092"},
-  {"marque":"Makita","designation":"Visseuse à chocs","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m094"},
+  {"designation":"Visseuse à chocs","marque":"Makita","ref":"DTD152","energie":"Batterie","nb":1,"annee":"07/2024","serie":"1127658R","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune\n1/1","id":"m094"},
   {"designation":"Visseuse d'angle","marque":"Makita","ref":"DDA351RTJ","energie":"Batterie","nb":1,"annee":"2019","serie":"105484E","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 1/1","id":"m093"}
 ]}
