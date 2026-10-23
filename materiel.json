@@ -37,7 +37,7 @@
   {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m034"},
   {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"BTW251","nb":1,"annee":"2008","serie":"38283E","statut":"hs","localisation":"Local sécu","commentaire":"Réformé HS","id":"m035"},
   {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"BTW251","nb":1,"annee":"2008","serie":"38285E","statut":"dispo","localisation":"Local sécu","commentaire":"Carré 3/4","id":"m036"},
-  {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"DTW1001","nb":1,"annee":"06/2024","serie":"98482G","statut":"dispo","localisation":"Local sécu","commentaire":"carré 1/2","id":"m037"},
+  {"designation":"Boulonneuse à choc","marque":"Makita","ref":"DTW1001","energie":"Batterie","nb":1,"annee":"06/2024","serie":"98482G","statut":"dispo","localisation":"Local grillagé","commentaire":"carré 1/2\nColson jaune \n1/6","id":"m037"},
   {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"DTW1001RTJ","nb":1,"annee":"07/2019","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"carré 1/2","id":"m038"},
   {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"DTW1001RTJ","nb":1,"annee":"07/2019","serie":"109831E","statut":"dispo","localisation":"Local sécu","commentaire":"carré 1/2","id":"m039"},
   {"marque":"Makita","designation":"Boulonneuse à choc","energie":"Batterie","ref":"DTW1001RTJ","nb":1,"annee":"04/2023","serie":"70921G","statut":"dispo","localisation":"TST","commentaire":"Carré 1/2","id":"m040"},
