@@ -54,11 +54,11 @@
   {"marque":"Bosch","designation":"Décapeur thermique","energie":"Filaire","ref":"GHG23-66","nb":1,"annee":"08/2021","serie":"128001037","statut":"dispo","localisation":"Local sécu","commentaire":"Local EPI","id":"m058"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA506RTJ","nb":1,"annee":"06/2024","serie":"692291R","statut":"dispo","localisation":"TST","commentaire":"","id":"m051"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA506RTJ","nb":1,"annee":"06/2024","serie":"692292R","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m052"},
-  {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Local sécu","commentaire":"","id":"m053"},
-  {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Local sécu","commentaire":"","id":"m054"},
-  {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Stockage","commentaire":"","id":"m055"},
+  {"designation":"Disqueuse","marque":"Makita","ref":"DGA900","energie":"Batterie","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Stockage","commentaire":"Local consommable","id":"m055"},
   {"designation":"Disqueuse","marque":"Makita","ref":"DGA900","energie":"Batterie","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"TST","commentaire":"","id":"m056"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"DSTM","commentaire":"","id":"m057"},
+  {"designation":"Disqueuse","marque":"Makita","ref":"DGA900","energie":"Batterie","nb":1,"annee":"2024","serie":"0092217Y","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 2/2","id":"m054"},
+  {"designation":"Disqueuse","marque":"Makita","ref":"DGA900","energie":"Batterie","nb":1,"annee":"2024","serie":"0092218Y","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 1/2","id":"m053"},
   {"marque":"Fein","designation":"Fraiseuse magnétique","energie":"Filaire","ref":"KBM","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m059"},
   {"marque":"Fein","designation":"Fraiseuse magnétique","energie":"Filaire","ref":"KBM","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m060"},
   {"marque":"Fein","designation":"Fraiseuse magnétique","energie":"Filaire","ref":"KBU","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m061"},
@@ -94,5 +94,5 @@
   {"marque":"Makita","designation":"Visseuse","energie":"Batterie","ref":"DDF845","nb":1,"annee":"01/2022","serie":"345587R","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m091"},
   {"marque":"Makita","designation":"Visseuse","energie":"Batterie","ref":"DHP484","nb":1,"annee":"03/2022","serie":"1585067Y","statut":"dispo","localisation":"TST","commentaire":"","id":"m092"},
   {"marque":"Makita","designation":"Visseuse à chocs","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m094"},
-  {"marque":"Makita","designation":"Visseuse d'angle","energie":"Batterie","ref":"DDA351RTJ","nb":1,"annee":"2019","serie":"105484E","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m093"}
+  {"designation":"Visseuse d'angle","marque":"Makita","ref":"DDA351RTJ","energie":"Batterie","nb":1,"annee":"2019","serie":"105484E","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 1/1","id":"m093"}
 ]}
