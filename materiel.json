@@ -1,5 +1,5 @@
 {
-"config":{"titre":"Électroportatif","inventaire":"21/10/2026","maj":"2026-10-22"},
+"config":{"titre":"Électroportatif","inventaire":"21/10/2026","maj":"2026-10-23"},
 "items":[
   {"marque":"Kärcher","designation":"Aspirateur","energie":"Filaire","ref":"WD6PS","nb":1,"annee":"2024","serie":"","statut":"dispo","localisation":"Atelier","commentaire":"","id":"m001"},
   {"marque":"Makita","designation":"Aspirateur","energie":"Batterie","ref":"DVC750LZ","nb":1,"annee":"2025","serie":"","statut":"dispo","localisation":"TST","commentaire":"","id":"m002"},
@@ -51,14 +51,14 @@
   {"marque":"Makita","designation":"Chargeur double","energie":"Filaire","ref":"","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Camion Unimog","commentaire":"","id":"m048"},
   {"marque":"Makita","designation":"Chargeur double","energie":"Filaire","ref":"","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Camion MAN","commentaire":"","id":"m049"},
   {"marque":"Makita","designation":"Chargeur simple","energie":"Filaire","ref":"","nb":17,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m050"},
+  {"marque":"Bosch","designation":"Décapeur thermique","energie":"Filaire","ref":"GHG23-66","nb":1,"annee":"08/2021","serie":"128001037","statut":"dispo","localisation":"Local sécu","commentaire":"Local EPI","id":"m058"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA506RTJ","nb":1,"annee":"06/2024","serie":"692291R","statut":"dispo","localisation":"TST","commentaire":"","id":"m051"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA506RTJ","nb":1,"annee":"06/2024","serie":"692292R","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m052"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Local sécu","commentaire":"","id":"m053"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Local sécu","commentaire":"","id":"m054"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Stockage","commentaire":"","id":"m055"},
-  {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"TST","commentaire":"","id":"m056"},
+  {"designation":"Disqueuse","marque":"Makita","ref":"DGA900","energie":"Batterie","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"TST","commentaire":"","id":"m056"},
   {"marque":"Makita","designation":"Disqueuse","energie":"Batterie","ref":"DGA900","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"DSTM","commentaire":"","id":"m057"},
-  {"marque":"Bosch","designation":"Décapeur thermique","energie":"Filaire","ref":"GHG23-66","nb":1,"annee":"08/2021","serie":"128001037","statut":"dispo","localisation":"Local sécu","commentaire":"Local EPI","id":"m058"},
   {"marque":"Fein","designation":"Fraiseuse magnétique","energie":"Filaire","ref":"KBM","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m059"},
   {"marque":"Fein","designation":"Fraiseuse magnétique","energie":"Filaire","ref":"KBM","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m060"},
   {"marque":"Fein","designation":"Fraiseuse magnétique","energie":"Filaire","ref":"KBU","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m061"},
@@ -81,11 +81,11 @@
   {"marque":"Makita","designation":"Radio","energie":"Batterie","ref":"DMR108N","nb":1,"annee":"04/2023","serie":"10126403E","statut":"dispo","localisation":"TST","commentaire":"","id":"m078"},
   {"marque":"Makita","designation":"Riveteuse","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"chez Miguel pendant l'inventaire","id":"m079"},
   {"marque":"Makita","designation":"Riveteuse","energie":"Batterie","ref":"DRV150ZJ","nb":1,"annee":"01/2020","serie":"12301E","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m080"},
+  {"designation":"Scie à ruban","marque":"Makita","ref":"DPB180","energie":"Batterie","nb":1,"annee":"2025","serie":"107766","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 1/2","id":"m085"},
+  {"designation":"Scie à ruban","marque":"Makita","ref":"DPB180","energie":"Batterie","nb":1,"annee":"2025","serie":"107767","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 2/2","id":"m084"},
   {"marque":"Makita","designation":"Scie sabre","energie":"Batterie","ref":"DJR186","nb":1,"annee":"2016","serie":"0028763Y","statut":"introuvable","localisation":"Local sécu","commentaire":"INTROUVABLE ???","id":"m081"},
   {"marque":"Makita","designation":"Scie sabre","energie":"Batterie","ref":"DJR186","nb":1,"annee":"05/2023","serie":"1909832Y","statut":"dispo","localisation":"TST","commentaire":"","id":"m082"},
   {"marque":"Makita","designation":"Scie sabre","energie":"Batterie","ref":"DJR186","nb":1,"annee":"05/2023","serie":"1913553Y","statut":"dispo","localisation":"","commentaire":"","id":"m083"},
-  {"marque":"Makita","designation":"Scie à ruban","energie":"Batterie","ref":"BPB180","nb":1,"annee":"2010","serie":"9190","statut":"introuvable","localisation":"Local sécu","commentaire":"Boite presente mais pas la machine !","id":"m084"},
-  {"marque":"Makita","designation":"Scie à ruban","energie":"Batterie","ref":"BPB180","nb":1,"annee":"2010","serie":"9191","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m085"},
   {"marque":"","designation":"Tensiomètre","energie":"","ref":"Câble inférieur à 570","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m086"},
   {"marque":"","designation":"Tensiomètre","energie":"","ref":"Câble supérieur à 570","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m087"},
   {"marque":"","designation":"Tensiomètre","energie":"","ref":"Câblette / hauban","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m088"},
@@ -93,6 +93,6 @@
   {"marque":"","designation":"Théodolite","energie":"","ref":"","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"","commentaire":"Voir avec Charles","id":"m090"},
   {"marque":"Makita","designation":"Visseuse","energie":"Batterie","ref":"DDF845","nb":1,"annee":"01/2022","serie":"345587R","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m091"},
   {"marque":"Makita","designation":"Visseuse","energie":"Batterie","ref":"DHP484","nb":1,"annee":"03/2022","serie":"1585067Y","statut":"dispo","localisation":"TST","commentaire":"","id":"m092"},
-  {"marque":"Makita","designation":"Visseuse d'angle","energie":"Batterie","ref":"DDA351RTJ","nb":1,"annee":"2019","serie":"105484E","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m093"},
-  {"marque":"Makita","designation":"Visseuse à chocs","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m094"}
+  {"marque":"Makita","designation":"Visseuse à chocs","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m094"},
+  {"marque":"Makita","designation":"Visseuse d'angle","energie":"Batterie","ref":"DDA351RTJ","nb":1,"annee":"2019","serie":"105484E","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m093"}
 ]}
