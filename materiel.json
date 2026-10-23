@@ -71,7 +71,7 @@
   {"marque":"Makita","designation":"Lampe LED","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m068"},
   {"marque":"Makita","designation":"Lampe LED","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m069"},
   {"marque":"Makita","designation":"Lampe LED","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"","commentaire":"","id":"m070"},
-  {"marque":"Makita","designation":"Lampe torche","energie":"Batterie","ref":"DML185","nb":1,"annee":"","serie":"815X22-9","statut":"dispo","localisation":"Local sécu","commentaire":"","id":"m071"},
+  {"designation":"Lampe torche","marque":"Makita","ref":"DML185","energie":"Batterie","nb":1,"annee":"","serie":"815X22-9","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune \n1/1","id":"m071"},
   {"designation":"Perfo / burineur","marque":"Hilti","ref":"TE7","energie":"Filaire","nb":1,"annee":"04/2021","serie":"290383","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m073"},
   {"designation":"Perfo / burineur","marque":"Makita","ref":"DHR171RTJ","energie":"Batterie","nb":1,"annee":"08/2019","serie":"0313319Y","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m074"},
   {"marque":"Makita","designation":"Pompe à graisse","energie":"Batterie","ref":"DGP180RT","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"","commentaire":"","id":"m075"},
