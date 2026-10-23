@@ -78,7 +78,7 @@
   {"marque":"EWM","designation":"Poste à souder","energie":"","ref":"PIOCOMING 220 PULS TKG (S/N 0000850902)","nb":1,"annee":"2025","serie":"","statut":"dispo","localisation":"","commentaire":"CODE ART 090-005680-00502","id":"m076"},
   {"designation":"Radio","marque":"Makita","ref":"DMR108N","energie":"Batterie","nb":1,"annee":"07/2021","serie":"10003493E","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m077"},
   {"marque":"Makita","designation":"Radio","energie":"Batterie","ref":"DMR108N","nb":1,"annee":"04/2023","serie":"10126403E","statut":"dispo","localisation":"TST","commentaire":"","id":"m078"},
-  {"marque":"Makita","designation":"Riveteuse","energie":"Batterie","ref":"","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"Local sécu","commentaire":"chez Miguel pendant l'inventaire","id":"m079"},
+  {"designation":"Riveteuse","marque":"Makita","ref":"","energie":"Batterie","nb":1,"annee":"","serie":"","statut":"verifier","localisation":"Local sécu","commentaire":"chez Miguel pendant l'inventaire","id":"m079"},
   {"designation":"Riveteuse","marque":"Makita","ref":"DRV150ZJ","energie":"Batterie","nb":1,"annee":"01/2020","serie":"12301E","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m080"},
   {"designation":"Scie à ruban","marque":"Makita","ref":"DPB180","energie":"Batterie","nb":1,"annee":"2025","serie":"107766","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 1/2","id":"m085"},
   {"designation":"Scie à ruban","marque":"Makita","ref":"DPB180","energie":"Batterie","nb":1,"annee":"2025","serie":"107767","statut":"dispo","localisation":"Local grillagé","commentaire":"Colson jaune 2/2","id":"m084"},
