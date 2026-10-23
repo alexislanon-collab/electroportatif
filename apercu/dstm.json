@@ -1,4 +1,13 @@
 {
-"config":{"titre":"DSTM","inventaire":"","maj":""},
+"config":{"titre":"DSTM","inventaire":"","maj":"2026-10-23"},
 "items":[
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUX013050A","energie":"500 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"1428","statut":"dispo","localisation":"","commentaire":"Couleur : bleu (M)","id":"d001"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUX013050A","energie":"500 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"F220 ???85","statut":"dispo","localisation":"","commentaire":"Couleur : vert","id":"d002"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUX013050A","energie":"500 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"10229/1086","statut":"dispo","localisation":"","commentaire":"Couleur : bleu (F)","id":"d003"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUX013050A","energie":"500 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"2018/7745","statut":"dispo","localisation":"","commentaire":"Couleur : jaune","id":"d004"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUA13100A","energie":"1000 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"2018/7745","statut":"dispo","localisation":"","commentaire":"Couleur : rouge","id":"d005"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUA613100","energie":"1000 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"13602","statut":"dispo","localisation":"","commentaire":"Couleur : gris","id":"d006"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUA613100","energie":"1000 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"13601","statut":"dispo","localisation":"","commentaire":"Couleur : blanc","id":"d007"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"FUA613100","energie":"1000 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"13600","statut":"dispo","localisation":"","commentaire":"Couleur : noir","id":"d008"},
+  {"designation":"Câblette italienne","marque":"Tesmec","ref":"","energie":"1000 m · Ø 13 · CMU 3T3","nb":1,"annee":"","serie":"","statut":"dispo","localisation":"","commentaire":"N° de série, repère et couleur à compléter","id":"d009"}
 ]}
