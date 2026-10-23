@@ -29,7 +29,7 @@
   {"designation":"Batterie","marque":"Makita","ref":"3ème réédition","energie":"5.0 Ah","nb":1,"annee":"","serie":"19/20","statut":"dispo","localisation":"Local grillagé","commentaire":"présente au 04/10/2024, 2 mes 6/2025","id":"m026"},
   {"designation":"Batterie","marque":"Makita","ref":"4ème réédition","energie":"5.0 Ah","nb":1,"annee":"","serie":"08/20","statut":"dispo","localisation":"Local grillagé","commentaire":"présente au 04/10/2024, 2 mes 6/2025","id":"m027"},
   {"designation":"Batterie portative","marque":"Pramac","ref":"PWB 2400","energie":"Batterie","nb":1,"annee":"12/2025","serie":"DJ2025012311","statut":"dispo","localisation":"Caravane","commentaire":"Colson orange","id":"m100"},
-  {"marque":"Pramac","designation":"Batterie portative","energie":"","ref":"PWB2400","nb":1,"annee":"2025","serie":"","statut":"dispo","localisation":"TST","commentaire":"","id":"m029"},
+  {"designation":"Batterie portative","marque":"Pramac","ref":"PWB2400","energie":"Batterie","nb":1,"annee":"2025","serie":"","statut":"dispo","localisation":"TST","commentaire":"Colson vert","id":"m029"},
   {"designation":"Batterie portative","marque":"Pramac","ref":"PWB2400","energie":"Batterie","nb":1,"annee":"03/2024","serie":"DJ202400380","statut":"dispo","localisation":"Camion MAN","commentaire":"Colson gris","id":"m028"},
   {"designation":"Booster","marque":"KS Tools","ref":"12V / 24V","energie":"","nb":1,"annee":"","serie":"Ultimate boost","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m030"},
   {"designation":"Booster","marque":"Swiss","ref":"24V","energie":"","nb":1,"annee":"","serie":"P-7","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m031"},
