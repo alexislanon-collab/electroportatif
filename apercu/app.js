@@ -31,10 +31,10 @@ var TYPES={
   pdf:[["marque","Marque",24],["ref","Référence",36],["energie","Énergie",20],["serie","N° de série",28],["annee","Année",16],["nb","Qté",10],["$status","État",22],["localisation","Lieu",28],["$com","Commentaire",0]]
  },
  mainta:{
-  title:["description"],group:"ft",groupEmpty:"Sans FT",groupSort:"natural",ok:"conformes",
+  title:["description"],group:"description",groupFn:function(i){var d=String(i.description||"").replace(/\s*(nom\s*)?:.*$/i,"").trim();return d?norm(d).toUpperCase():"SANS DESCRIPTION";},ok:"conformes",
   fields:[
    {k:"description",l:"Description",req:1,full:1,dl:1},
-   {k:"ft",l:"FT",dl:1},
+   {k:"ft",l:"FT",dl:1,meta:1},
    {k:"icb",l:"N° ICB (EALICO)",mono:1,meta:"ICB"},
    {k:"cesar",l:"Code CESAR",meta:"CESAR"},
    {k:"serie",l:"N° de série",meta:"N°"},
@@ -239,7 +239,7 @@ function orderInfo(t,i,d){
  if(auto)return {on:true,note:auto,auto:true};
  return {on:false};
 }
-function groupOf(i){if(!T.group)return T.groupLabel||"Liste";var v=i[T.group];return v===""||v==null?(T.groupEmpty||"Sans désignation"):String(v);}
+function groupOf(i){if(T.groupFn)return T.groupFn(i);if(!T.group)return T.groupLabel||"Liste";var v=i[T.group];return v===""||v==null?(T.groupEmpty||"Sans désignation"):String(v);}
 function titleOf(i){
  var parts=T.title.map(function(k){return i[k]?{k:k,v:i[k]}:null;}).filter(Boolean);
  if(!parts.length&&T.fallback)parts=[{k:T.fallback,v:i[T.fallback]}];
