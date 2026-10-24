@@ -193,11 +193,30 @@ table.hist{border-collapse:collapse;font-size:14px}
 table.hist th{font-family:var(--mono);font-weight:500;color:var(--muted);text-align:left;padding:2px 12px 2px 0}
 table.hist td{font-weight:600;padding:2px 0}
 table.hist td.r-ok{color:var(--ok)}table.hist td.r-warn{color:var(--warn)}table.hist td.r-bad{color:var(--bad)}table.hist td.r-off{color:var(--off)}table.hist td.r-out{color:var(--out)}table.hist td.muted,table.hist td.r-none{color:var(--muted)}
+.tile-camp{border-color:var(--tape);box-shadow:inset 4px 0 0 var(--tape)}
+.camp-head{margin-top:16px;font-size:15px}
+.ctabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:12px 0}
+.ctab{display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;color:var(--ink);min-width:0}
+.ctab span{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.ctab b{font-family:var(--display);font-size:24px;line-height:1.1}
+.ctab small{font-size:11px;color:var(--muted)}
+.ctab.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--bg)}
+@media (max-width:460px){.ctabs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.camp-ctl{margin-top:8px}
+.camp-ctl select,.camp-ctl input{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px;font-size:16px;min-height:42px;min-width:0;flex:1 1 160px}
+.chk[disabled]{opacity:.5}
+.h2{font-family:var(--display);text-transform:uppercase;font-size:20px;margin:24px 0 8px}
+.hist-list{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:6px}
+.guide details{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:10px}
+.guide summary{cursor:pointer;font-weight:700;font-size:16px}
+.guide ol{margin:10px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;line-height:1.45}
+#b-help{font-weight:800;font-size:17px;min-width:42px;justify-content:center}
+dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--ok)}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>

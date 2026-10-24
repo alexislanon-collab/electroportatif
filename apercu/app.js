@@ -67,8 +67,19 @@ var TYPES={
    {k:"commentaire",l:"Commentaire",t:"area",full:1}
   ],
   status:{key:"etat",opts:[["En service","En service","ok"],["En stock","En stock","ok"],["À commander","À commander","warn"],["Réformé","Réformé","off"],["À supprimer","À supprimer","off"],["","Non renseigné","none"]],def:"En stock"},
-  filters:[{k:"ft",l:"Toutes les FT",empty:"Sans FT",sort:"natural"},{k:"categorie",l:"Toutes catégories"},{results:1}],
-  pdf:[["designation","Type de matériel",52],["icb","ICB",26],["ft","FT",14],["longueur","Long.",12],["diametre","Ø",9],["couleur","Couleur",20],["mise_service","Mise en serv.",18],["fabrication","Fabric.",15],["$status","État",20],["$years","",0],["$com","Commentaire",0]]
+  life:function(i){
+   if(i.etat==="Réformé"||i.etat==="À supprimer")return null;
+   var svc=i.etat==="En service",base=parseD(svc?i.mise_service:i.fabrication);
+   if(!base)return {tone:"warn",k:"manq",txt:"Date "+(svc?"de mise en service":"de fabrication")+" manquante",rule:svc?"En service : 2 ans après la mise en service":"En stock : 5 ans après la fabrication"};
+   var end=addM(base,svc?24:60),days=(end-new Date())/864e5,lab=String(end.getMonth()+1).padStart(2,"0")+"/"+end.getFullYear();
+   var rule=svc?"En service : 2 ans après la mise en service ("+i.mise_service+")":"En stock : 5 ans après la fabrication ("+i.fabrication+")";
+   if(days<0)return {tone:"bad",k:"perimee",txt:"Périmée depuis "+lab,lab:lab,rule:rule};
+   if(days<183)return {tone:"warn",k:"bientot",txt:"Fin de vie "+lab,lab:lab,rule:rule};
+   return {tone:"ok",k:"ok",txt:"Fin de vie "+lab,lab:lab,rule:rule};
+  },
+  autoCmd:function(i){var L=TYPES.cordes.life(i);if(!L)return "";if(L.k==="perimee")return "Corde périmée ("+L.lab+")";if(L.k==="bientot")return "Fin de vie "+L.lab;return "";},
+  filters:[{life:1},{k:"ft",l:"Toutes les FT",empty:"Sans FT",sort:"natural"},{k:"categorie",l:"Toutes catégories"},{results:1}],
+  pdf:[["designation","Type de matériel",48],["icb","ICB",24],["ft","FT",13],["longueur","Long.",11],["diametre","Ø",8],["couleur","Couleur",18],["mise_service","Mise en serv.",17],["fabrication","Fabric.",14],["$status","État",18],["$life","Fin de vie",24],["$years","",0],["$com","Commentaire",0]]
  },
  levage:{
   title:["description","carac"],group:"description",ok:"conformes",
@@ -156,10 +167,14 @@ var SECTIONS=[
 ];
 var GROUPS=[{id:"tst",nom:"TST",hint:"Matériel, cordes, camion, consommables, dotation"},{id:"camion",nom:"Camion",parent:"tst",hint:"Levage et outillage"}];
 var HOME=["electroportatif","dstm","gipfs","tst"];
+SECTIONS.push({id:"campagnes",nom:"Campagnes de contrôle",file:"tst-campagnes.json",type:"meta",hidden:1,pre:"z"});
+TYPES.meta={title:[],fields:[],status:null,noInventory:1,pdf:[]};
+var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargement du camion, résultats, réparations"},{id:"aide",nom:"Mode d'emploi",hidden:1}];
+function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
-function childrenOf(gid){var out=[];SECTIONS.forEach(function(s){if(s.parent===gid)out.push(s);});GROUPS.forEach(function(g){if(g.parent===gid)out.push(g);});
- /* ordre d'affichage dans TST */var ord=["tst-materiel","tst-cordes","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
-function sectionsUnder(gid){var out=[];childrenOf(gid).forEach(function(c){if(secById(c.id))out.push(c);else out=out.concat(sectionsUnder(c.id));});return out;}
+function childrenOf(gid){var out=[];SECTIONS.forEach(function(s){if(s.parent===gid&&!s.hidden)out.push(s);});GROUPS.forEach(function(g){if(g.parent===gid)out.push(g);});VIEWS.forEach(function(v){if(v.parent===gid)out.push(v);});
+ /* ordre d'affichage dans TST */var ord=["tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
+function sectionsUnder(gid){var out=[];childrenOf(gid).forEach(function(c){if(secById(c.id))out.push(c);else if(grpById(c.id))out=out.concat(sectionsUnder(c.id));});return out;}
 function secById(id){return SECTIONS.filter(function(s){return s.id===id;})[0]||null;}
 
 var PREVIEW=location.pathname.indexOf("/apercu/")>-1;
@@ -185,7 +200,7 @@ var ui=freshUi();
 var admin={on:false,token:"",draft:null,busy:false,msg:"",ok:"",arm:""};
 var sheet=null;
 var app=document.getElementById("app");
-function freshUi(){return {q:"",st:"all",f:{},ry:"",rv:""};}
+function freshUi(){return {q:"",st:"all",f:{},ry:"",rv:"",lf:"",ct:""};}
 
 function saveCtx(){if(!curSid)return;var s=store[curSid];s.DATA=DATA;s.SHA=SHA;s.draft=admin.draft;s.INV=INV;s.openG=openG;}
 function loadCtx(sid){
@@ -219,6 +234,8 @@ function natCmp(a,b){return String(a).localeCompare(String(b),"fr",{numeric:true
 function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function frToday(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
 function frDate(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"/"+m[2]+"/"+m[1]:(s||"");}
+function parseD(s){s=String(s||"").trim();var m=/^(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[2],+m[1]-1,1);m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return null;}
+function addM(d,n){var x=new Date(d.getTime());x.setMonth(x.getMonth()+n);return x;}
 function focusId(id){var e=document.getElementById(id);if(e)e.focus();}
 function fieldBy(k){return T.fields.filter(function(f){return f.k===k;})[0];}
 function flagLabel(k){var f=T.fields.filter(function(x){return x.t==="flags";})[0];if(!f)return k;var o=f.opts.filter(function(x){return x[0]===k;})[0];return o?o[1]:k;}
@@ -295,7 +312,7 @@ function endInventory(){
 
 /* ---------- filtres ---------- */
 function filtering(){
- if(ui.q.trim()||ui.st!=="all"||ui.rv)return true;
+ if(ui.q.trim()||ui.st!=="all"||ui.rv||ui.lf)return true;
  for(var k in ui.f)if(ui.f[k])return true;
  return !!(invOn()&&INV.onlyTodo);
 }
@@ -312,6 +329,7 @@ function filtered(){
   for(var k in ui.f){var fv=ui.f[k];if(!fv)continue;var fd=fieldBy(k);
    if(fd&&fd.t==="flags"){if((i[k]||[]).indexOf(fv)<0)return false;}
    else if(String(i[k]==null?"":i[k])!==(fv==="$empty"?"":fv))return false;}
+  if(ui.lf){var L=T.life&&T.life(i);if((L?L.k:"none")!==ui.lf)return false;}
   if(ui.rv){var rv=(i.res&&i.res[ry])||"";if(ui.rv==="$empty"?rv!=="":rv!==ui.rv)return false;}
   if(!q.length)return true;
   var h=hay(i),hc=h.replace(/[^a-z0-9]/g,"");return q.every(function(t){var tc=t.replace(/[^a-z0-9]/g,"");return h.indexOf(t)>-1||(tc&&hc.indexOf(tc)>-1);});
@@ -324,7 +342,7 @@ function header(title,sub,isSection,backLabel){
  var h='<header class="top"><div class="wrap">';
  if(backLabel)h+='<button class="back" id="b-home" type="button">'+I.back+esc(backLabel)+'</button>';
  h+='<div class="hrow"><div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div><div class="hbtns">';
- h+='<button class="btn" id="b-qr" type="button">'+I.qr+'QR code</button>';
+ h+='<button class="btn" id="b-help" type="button" aria-label="Mode d\'emploi">?</button><button class="btn" id="b-qr" type="button">'+I.qr+'QR code</button>';
  if(isSection)h+='<button class="btn" id="b-pdf" type="button">'+I.pdf+'PDF</button>';
  h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?'Mode admin':'Admin')+'</button>';
  return h+'</div></div></div><div class="tape" aria-hidden="true"></div></header>';
@@ -334,7 +352,7 @@ function footer(){return '<footer class="wrap">Consultation libre · modificatio
 
 function render(){
  var fa=document.activeElement,fid=fa&&fa.id,ss=fa&&fa.selectionStart;
- if(view==="home")renderHome();else if(grpById(view))renderGroup();else renderSection();
+ if(view==="home")renderHome();else if(grpById(view))renderGroup();else if(view==="campagne")renderCamp();else if(view==="aide")renderHelp();else renderSection();
  afterRender(fid,ss);
 }
 
@@ -350,6 +368,7 @@ function tileStats(secs){
     if(tone==="ok")r.ok+=piecesOf(t,i);
     else if((tone==="warn"||tone==="bad")&&stOpt(t,st)[1]!=="À commander"){var lb=stOpt(t,st)[1];r.tags[lb]=r.tags[lb]||{n:0,tone:tone};r.tags[lb].n++;}}
    if(orderInfo(t,i,d).on)r.cmd++;
+   if(t.life){var L=t.life(i);if(L&&(L.k==="perimee"||L.k==="bientot")){var lb2=L.k==="perimee"?"Périmées":"Fin de vie < 6 mois";r.tags[lb2]=r.tags[lb2]||{n:0,tone:L.tone};r.tags[lb2].n++;}}
   });
   if(s.INV)r.inv=true;if(s.draft&&diffCount(s.DATA,s.draft))r.draft=true;
   if(secs.length===1)r.date=d.config.inventaire||"";
@@ -390,7 +409,7 @@ function renderGroup(){
  saveCtx();
  var g=grpById(view);
  var h=previewBanner()+header(g.nom,"Choisissez une partie",false,g.parent?grpById(g.parent).nom:"Accueil")+'<main class="wrap"><div class="tiles">';
- childrenOf(g.id).forEach(function(c){h+=tileHtml(c.nom,secById(c.id)?[c]:sectionsUnder(c.id),'data-sec="'+c.id+'"',c.hint);});
+ childrenOf(g.id).forEach(function(c){h+=viewById(c.id)?campTile():tileHtml(c.nom,secById(c.id)?[c]:sectionsUnder(c.id),'data-sec="'+c.id+'"',c.hint);});
  h+='</div></main>'+footer();
  if(sheet)h+=renderSheet();
  app.innerHTML=h;
@@ -425,6 +444,12 @@ function adminBar(sec){
 function filterBar(){
  var d=cur(),h='<div class="filters"><div class="search">'+I.search+'<input id="q" type="search" placeholder="Chercher : nom, ICB, FT, référence…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div>';
  (T.filters||[]).forEach(function(fl){
+  if(fl.life){
+   var lc={};d.items.forEach(function(i){var L=T.life(i);var k=L?L.k:"none";lc[k]=(lc[k]||0)+1;});
+   var lo=[["perimee","Périmées"],["bientot","Fin de vie dans moins de 6 mois"],["manq","Date manquante"],["ok","En règle"]];
+   h+='<select id="f-lf" aria-label="Durée de vie"><option value="">Toutes les durées de vie</option>'+lo.filter(function(o){return lc[o[0]];}).map(function(o){return '<option value="'+o[0]+'"'+(ui.lf===o[0]?' selected':'')+'>'+o[1]+' ('+lc[o[0]]+')</option>';}).join("")+'</select>';
+   return;
+  }
   if(fl.results){
    var ys=years(d);if(!ys.length)return;
    var ry=ui.ry||String(ys[ys.length-1]);
@@ -466,6 +491,7 @@ function itemHtml(i,dirty){
   meta.push(esc(lab)+(f.mono?'<span class="mono">'+esc(v)+'</span>':esc(v)+(f.unit&&/^[\d.,]+$/.test(String(v))?f.unit:"")));
  });
  if(i.vu)meta.push("Vu le "+esc(frDate(i.vu)));
+ if(T.life){var LV=T.life(i);if(LV)chips+='<span class="res r-'+LV.tone+'">'+esc(LV.txt)+'</span>';}
  var ff=T.fields.filter(function(f){return f.t==="flags";})[0];
  if(ff&&(i[ff.k]||[]).length)chips+=(i[ff.k]||[]).map(function(x){return '<span class="chip">'+esc(flagLabel(x))+'</span>';}).join("");
  var rf=T.fields.filter(function(f){return f.t==="results";})[0],rh="";
@@ -484,6 +510,7 @@ function itemHtml(i,dirty){
  h+='</div><div class="it-side">';
  if(T.status){var so=stOpt(T,st);h+='<span class="pill p-'+so[2]+'">'+esc(so[1])+'</span>';}
  if(i.localisation)h+='<span class="loc">'+I.pin+esc(i.localisation)+'</span>';
+ var ca=campActive();if(ca&&i.suivi&&i.suivi.c===campKey(ca)&&(i.suivi.e==="camion"||i.suivi.e==="reparation"))h+='<span class="pill p-'+ETAPES[i.suivi.e][1]+'">'+esc(ETAPES[i.suivi.e][0])+'</span>';
  return h+'</div></li>';
 }
 
@@ -566,6 +593,8 @@ function renderSheet(){
   h+='<button type="button" class="choice" id="p-cmd"'+(nc?'':' disabled')+'><b>Liste à commander</b><span>'+(nc?nc+' ligne'+(nc>1?'s':'')+' avec références et note de commande.':'Aucun matériel à commander.')+'</span></button>';
   h+='</div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+(sheet.busy?'<p class="help" style="margin-top:10px">Préparation du PDF…</p>':'');
   h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
+ } else if(sheet.mode==="pdf-camp"){
+  h+='<h3>PDF de la campagne</h3><p class="help">Préparation du PDF…</p>';
  } else if(sheet.mode==="view"){
   var vi=cur().items.filter(function(x){return x.id===sheet.id;})[0]||{};
   h+='<h3 class="vtitle">'+esc(titleText(vi))+'</h3>';
@@ -581,6 +610,8 @@ function renderSheet(){
    h+='<dt>'+esc(f.l)+'</dt><dd'+(f.mono?' class="mono"':'')+'>'+esc(v)+(f.unit&&/^[\d.,]+$/.test(String(v))?f.unit:"")+'</dd>';
   });
   var vo2=orderInfo(T,vi,cur());if(vo2.on)h+='<dt>À commander</dt><dd>'+esc(vo2.note||"Oui")+'</dd>';
+  if(T.life){var LF=T.life(vi);if(LF)h+='<dt>Fin de vie</dt><dd class="r-'+LF.tone+'"><b>'+esc(LF.txt)+'</b><br><small>'+esc(LF.rule)+'</small></dd>';}
+  if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
   h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
  } else if(sheet.mode==="login"){
@@ -669,6 +700,7 @@ function exportPdf(kind){
     if(k==="$years"){years().forEach(function(y){cols.push({h:String(y),w:15.5,g:function(i){return (i.res&&i.res[y])||"";},res:1});});return;}
     if(k==="$status")cols.push({h:p[1],w:p[2],g:function(i){return stOpt(T,statusOf(i))[1];},st:1});
     else if(k==="$flags")cols.push({h:p[1],w:p[2],g:function(i){return (i.ctrl||[]).map(flagLabel).join(", ");}});
+    else if(k==="$life")cols.push({h:p[1],w:p[2],g:function(i){var L=T.life(i);return L?L.txt:"";},life:1});
     else if(k==="$miss")cols.push({h:p[1],w:p[2],g:function(i){var m=Number(i.qte_init)-Number(i.qte);return i.qte===""||i.qte_init===""||isNaN(m)||m<=0?"":String(m);}});
     else if(k==="$com")cols.push({h:p[1],w:0,g:function(i){var c=i.commentaire||"",o=orderInfo(T,i,d);if(o.on)c=(c?c+" · ":"")+"À commander"+(o.note?" : "+o.note:"");if(i.vu)c=(c?c+" · ":"")+"Vu le "+frDate(i.vu);return c;}});
     else cols.push({h:p[1],w:p[2],g:function(i){return i[k];}});
@@ -690,6 +722,7 @@ function exportPdf(kind){
    didParseCell:function(data){
     if(data.section!=="body"||!data.row.raw||!data.row.raw._i)return;var c=cols[data.column.index];if(!c)return;
     if(c.st){var tn=toneOf(T,statusOf(data.row.raw._i));data.cell.styles.textColor=PTONE[tn];data.cell.styles.fontStyle="bold";}
+    if(c.life){var L=T.life(data.row.raw._i);if(L){data.cell.styles.textColor=PTONE[L.tone];if(L.tone!=="ok")data.cell.styles.fontStyle="bold";}}
     if(c.res){var v=data.cell.raw;if(v){data.cell.styles.textColor=PTONE[RTONE[v]||"none"];if(RTONE[v]!=="ok")data.cell.styles.fontStyle="bold";}}
    },
    didDrawPage:function(){doc.setFontSize(8);doc.setTextColor(86,99,112);doc.text(pdfSafe(sec.nom+" · page "+doc.internal.getNumberOfPages()),W-10,doc.internal.pageSize.getHeight()-7,{align:"right"});}
@@ -719,6 +752,29 @@ function ghErr(e){
 function serialize(state){
  var lines=state.items.map(function(i){return "  "+JSON.stringify(i);});
  return '{\n"config":'+JSON.stringify(state.config)+',\n"items":[\n'+lines.join(",\n")+'\n]}\n';
+}
+function publishSec(sid){
+ var s=store[sid],sec=secById(sid),state=clone(s.draft),n=diffCount(s.DATA,s.draft),path=BASE+sec.file;
+ state.config.maj=today();
+ return gh("GET",null,path).then(function(remote){
+  if(s.SHA&&remote.sha!==s.SHA){var e=new Error("conflict");e.status=409;throw e;}
+  return remote.sha;
+ },function(e){if(e.status===404&&!s.SHA)return null;throw e;}).then(function(sha){
+  var body={message:sec.nom+" : mise à jour ("+n+" modification"+(n>1?"s":"")+")",content:b64encode(serialize(state)),branch:REPO.branch};
+  if(sha)body.sha=sha;
+  return gh("PUT",body,path);
+ }).then(function(res){s.DATA=state;s.SHA=res&&res.content?res.content.sha:null;s.draft=null;lsSet(keysFor(sid).d,null);});
+}
+function pendingSecs(){return SECTIONS.filter(function(sc){var st=store[sc.id];return st.draft&&diffCount(st.DATA,st.draft);});}
+function publishAll(){
+ if(admin.busy)return;saveCtx();
+ var list=pendingSecs();if(!list.length)return;
+ admin.busy=true;admin.msg="";admin.ok="";render();
+ list.reduce(function(pr,sc){return pr.then(function(){return publishSec(sc.id);});},Promise.resolve()).then(function(){
+  admin.busy=false;admin.ok="Publié. L'équipe verra la mise à jour d'ici une minute environ.";
+  if(curSid){var st=store[curSid];DATA=st.DATA;SHA=st.SHA;admin.draft=st.draft;}
+  render();
+ }).catch(function(e){admin.busy=false;admin.msg=ghErr(e);if(curSid){var st=store[curSid];DATA=st.DATA;SHA=st.SHA;admin.draft=st.draft;}render();});
 }
 function publish(){
  if(!admin.draft||admin.busy)return;
@@ -756,15 +812,190 @@ function restoreDraftFor(sid){
  try{var d=JSON.parse(raw);if(d&&d.items&&d.config){if(diffCount(s.DATA,d))s.draft=d;else lsSet(keysFor(sid).d,null);}}catch(e){}
 }
 
+
+/* ---------- campagne de contrôle ---------- */
+var CTYPES=[["labo","Labo"],["ldv","Personne qualifiée (LDV)"],["apave","APAVE"],["visuel","Examen visuel"],["metro","Labo métrologie"],["volontaire","Contrôle volontaire"]];
+var CAMP_SECS=["tst-materiel","tst-levage"];
+var ETAPES={"":["À charger","none"],camion:["Dans le camion","out"],atelier:["Revenu à l'atelier","ok"],reparation:["En réparation","warn"],repare:["Réparé, revenu à l'atelier","ok"],reforme:["Réformé","off"]};
+function ctLabel(k){var o=CTYPES.filter(function(x){return x[0]===k;})[0];return o?o[1]:k;}
+function campData(){var s=store.campagnes;return s&&(s.draft||s.DATA);}
+function campActive(){var d=campData();return d&&d.config.active||null;}
+function campKey(a){return a.annee+"-"+a.type;}
+function campLabelKey(k){var m=/^(\d+)-(.+)$/.exec(k||"");return m?ctLabel(m[2])+" "+m[1]:k;}
+function sdata(sid){var s=store[sid];return s&&(s.draft||s.DATA);}
+function campItems(a){
+ var key=campKey(a),out=[];
+ CAMP_SECS.forEach(function(sid){var d=sdata(sid);if(!d)return;d.items.forEach(function(i){
+  if((i.ctrl||[]).indexOf(a.type)>-1||(i.suivi&&i.suivi.c===key))out.push({sid:sid,i:i,e:(i.suivi&&i.suivi.c===key)?(i.suivi.e||""):""});});});
+ out.sort(function(x,y){return natCmp(x.i.description||"",y.i.description||"")||natCmp(x.i.icb||"",y.i.icb||"");});
+ return out;
+}
+function editSec(sid,fnItems,fnCfg){
+ var s=store[sid];if(!s.DATA)return;if(!s.draft)s.draft=clone(s.DATA);
+ if(fnItems)fnItems(s.draft);if(fnCfg)fnCfg(s.draft.config);
+ s.draft.config.maj=today();lsSet(keysFor(sid).d,diffCount(s.DATA,s.draft)?JSON.stringify(s.draft):null);
+}
+function campEdit(sid,id,fn){
+ var a=campActive();if(!a)return;var key=campKey(a);
+ editSec(sid,function(d){var it=d.items.filter(function(x){return x.id===id;})[0];if(!it)return;if(!it.suivi||it.suivi.c!==key)it.suivi={c:key,e:""};fn(it);});
+}
+function campLoad(sid,id){
+ campEdit(sid,id,function(i){if(i.suivi.e===""){i.suivi.e="camion";i.suivi.dc=today();}else if(i.suivi.e==="camion"&&!i.suivi.r){i.suivi.e="";delete i.suivi.dc;}});
+ render();var b=document.querySelector('[data-load="'+CSS.escape(id)+'"][data-sid="'+sid+'"]');if(b)b.focus();
+}
+function campResult(sid,id,val){
+ var a=campActive();if(!a)return;
+ campEdit(sid,id,function(i){
+  i.suivi.r=val;i.suivi.dr=val?today():"";
+  var e=i.suivi.e||"camion";
+  if(!val)e="camion";
+  else if(val==="Conforme"||val==="Non présenté")e="atelier";
+  else if(val==="Réformé"||val==="Réforme définitive")e="reforme";
+  else if(val==="À faire réparer"||val==="À envoyer au SERECT")e="reparation";
+  i.suivi.e=e;
+  if(sid==="tst-materiel"){i.res=i.res||{};if(val)i.res[String(a.annee)]=val;else delete i.res[String(a.annee)];}
+  if(sid==="tst-levage"){i.res_vol=val;i.date_ctrl=val?frToday():i.date_ctrl;var mp={"Conforme":"Conforme","Réformé":"Réformé","Réforme définitive":"Réformé","À faire réparer":"À réparer","À envoyer au SERECT":"À réparer"};if(mp[val])i.statut=mp[val];}
+ });
+ if(sid==="tst-materiel")editSec(sid,null,function(c){c.years=c.years||[];if(c.years.indexOf(a.annee)<0){c.years.push(a.annee);c.years.sort();}});
+}
+function campStart(){
+ var y=parseInt(document.getElementById("c-annee").value,10),tp=document.getElementById("c-type").value;
+ if(!y||!tp)return;
+ editSec("campagnes",null,function(c){c.active={annee:y,type:tp,debut:today()};});
+ ui.ct="charger";admin.ok="";render();
+}
+function campClose(){
+ var a=campActive();if(!a)return;var its=campItems(a),c={};its.forEach(function(x){c[x.e]=(c[x.e]||0)+1;});
+ editSec("campagnes",null,function(cf){cf.historique=cf.historique||[];cf.historique.unshift({annee:a.annee,type:a.type,debut:a.debut,fin:today(),total:its.length,bilan:c});cf.active=null;});
+ admin.arm="";admin.ok="Campagne clôturée. Touchez « Publier » pour l'enregistrer.";render();
+}
+function campCounts(its){var c={"":0,camion:0,atelier:0,reparation:0,repare:0,reforme:0};its.forEach(function(x){c[x.e]=(c[x.e]||0)+1;});return c;}
+function campTile(){
+ var a=campActive(),h='<button type="button" class="tile tile-camp" data-sec="campagne"><span class="t-name">Campagne de contrôle</span>';
+ if(!campData())h+='<span class="t-sub">Chargement…</span>';
+ else if(!a)h+='<span class="t-sub">Aucune campagne en cours · chargement du camion, résultats, réparations</span>';
+ else{var its=campItems(a),c=campCounts(its),ch=its.length-c[""];
+  h+='<span class="t-big"><b>'+ch+'</b> chargés / '+its.length+'</span><span class="t-sub">'+esc(ctLabel(a.type))+' '+a.annee+' · lancée le '+esc(frDate(a.debut))+'</span><span class="t-tags">';
+  if(c.camion)h+='<span class="pill p-out">'+c.camion+' dans le camion</span>';
+  if(c.reparation)h+='<span class="pill p-warn">'+c.reparation+' en réparation</span>';
+  h+='</span>';}
+ return h+'<span class="t-go" aria-hidden="true">'+I.arrow+'</span></button>';
+}
+function pubBar(){
+ var n=0;SECTIONS.forEach(function(sc){var st=store[sc.id];if(st.draft)n+=diffCount(st.DATA,st.draft);});
+ if(!admin.on||!n)return "";
+ return '<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+n+' modification'+(n>1?'s':'')+' en brouillon</span><div class="row"><button class="btn ghost" id="c-discard" type="button">Annuler tout</button><button class="btn" id="c-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button></div></div></div>';
+}
+function renderCamp(){
+ var h=previewBanner()+header("Campagne de contrôle","",false,"TST")+'<main class="wrap">';
+ if(admin.msg)h+='<div class="notice" style="margin-top:14px">'+esc(admin.msg)+'</div>';
+ if(admin.ok)h+='<div class="notice ok" style="margin-top:14px">'+esc(admin.ok)+'</div>';
+ var cd=campData(),loaded=CAMP_SECS.every(function(sid){return sdata(sid);});
+ if(!cd||!loaded){h+='<div class="empty">Chargement…</div></main>';app.innerHTML=h;return;}
+ var a=campActive();
+ if(!a){
+  if(admin.on){
+   var cnt={};CAMP_SECS.forEach(function(sid){sdata(sid).items.forEach(function(i){(i.ctrl||[]).forEach(function(k){cnt[k]=(cnt[k]||0)+1;});});});
+   var sel=document.getElementById("c-type"),tv=sel?sel.value:"labo",yv=(document.getElementById("c-annee")||{}).value||new Date().getFullYear();
+   h+='<section class="adminbar"><h3>Lancer une campagne</h3><p>Choisissez le type de contrôle : la liste de chargement reprend automatiquement tout le matériel de Matériel TST et de Levage qui a ce type de contrôle.</p><div class="fgrid">';
+   h+='<div class="field"><label for="c-annee">Année</label><input id="c-annee" type="number" inputmode="numeric" value="'+esc(yv)+'"></div>';
+   h+='<div class="field"><label for="c-type">Type de contrôle</label><select id="c-type">'+CTYPES.filter(function(o){return cnt[o[0]];}).map(function(o){return '<option value="'+o[0]+'"'+(tv===o[0]?' selected':'')+'>'+esc(o[1])+' ('+cnt[o[0]]+' matériels)</option>';}).join("")+'</select></div></div>';
+   h+='<div class="row"><button class="btn primary" id="c-start" type="button">Lancer la campagne</button></div></section>';
+  } else h+='<div class="empty"><p><b>Aucune campagne de contrôle en cours.</b></p><p>Les campagnes sont lancées par l\'administrateur.</p></div>';
+  var hist=cd.config.historique||[];
+  if(hist.length)h+='<h2 class="h2">Campagnes passées</h2><ul class="hist-list">'+hist.map(function(x){return '<li><b>'+esc(ctLabel(x.type))+' '+x.annee+'</b> · '+esc(frDate(x.debut))+' → '+esc(frDate(x.fin))+' · '+x.total+' matériels'+(x.bilan&&x.bilan.reparation?' · '+x.bilan.reparation+' encore en réparation':'')+'</li>';}).join("")+'</ul>';
+  h+='</main>'+footer()+pubBar();app.innerHTML=h;return;
+ }
+ var its=campItems(a),c=campCounts(its);
+ if(!ui.ct)ui.ct=c[""]?"charger":c.camion?"resultats":c.reparation?"reparations":"tout";
+ h+='<div class="camp-head"><b>'+esc(ctLabel(a.type))+' '+a.annee+'</b> · lancée le '+esc(frDate(a.debut))+' · '+its.length+' matériels</div>';
+ var tabs=[["charger","1. Chargement",c[""],"À charger"],["resultats","2. Résultats",c.camion,"Dans le camion"],["reparations","3. Réparations",c.reparation,"En réparation"],["tout","Tout",its.length,"Total"]];
+ h+='<div class="ctabs" role="tablist">'+tabs.map(function(t){return '<button type="button" role="tab" class="ctab'+(ui.ct===t[0]?' on':'')+'" data-ctab="'+t[0]+'" aria-selected="'+(ui.ct===t[0])+'"><span>'+t[1]+'</span><b>'+t[2]+'</b><small>'+t[3]+'</small></button>';}).join("")+'</div>';
+ var done=c.atelier+c.repare,pc=its.length?Math.round((its.length-c[""])*100/its.length):0;
+ h+='<div class="progress"><span style="width:'+pc+'%"></span></div><div class="ptext"><b>'+(its.length-c[""])+'</b> / '+its.length+' chargés · '+done+' revenus à l\'atelier · '+c.reforme+' réformés</div>';
+ h+='<div class="filters"><div class="search">'+I.search+'<input id="q" type="search" placeholder="Chercher : nom, ICB, FT…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div></div>';
+ var q=norm(ui.q).split(/\s+/).filter(Boolean);
+ var list=its.filter(function(x){
+  if(ui.ct==="charger"&&!(x.e===""||(x.e==="camion"&&!(x.i.suivi&&x.i.suivi.r))))return false;
+  if(ui.ct==="resultats"&&!(x.e==="camion"||((x.e==="atelier"||x.e==="reforme"||x.e==="reparation")&&x.i.suivi&&x.i.suivi.dr===today())))return false;
+  if(ui.ct==="reparations"&&!(x.e==="reparation"||x.e==="repare"))return false;
+  if(!q.length)return true;
+  var hh=norm([x.i.description,x.i.carac,x.i.icb,x.i.ft,x.i.cesar,x.i.serie].join(" ")),hc=hh.replace(/[^a-z0-9]/g,"");
+  return q.every(function(t){var tc=t.replace(/[^a-z0-9]/g,"");return hh.indexOf(t)>-1||(tc&&hc.indexOf(tc)>-1);});
+ });
+ var help={charger:"Cochez chaque matériel au moment où il monte dans le camion.",resultats:"Au retour du contrôle, choisissez le résultat de chaque matériel. Conforme : retour à l'atelier. À réparer ou SERECT : passe en réparation. Réformé : sort de la dotation.",reparations:"Indiquez où le matériel est parti et la date de retour prévue. Touchez « Revenu à l'atelier » à son retour.",tout:"Vue d'ensemble de la campagne."}[ui.ct];
+ h+='<p class="help">'+esc(help)+(admin.on?'':' (lecture seule : mode admin nécessaire pour pointer)')+'</p>';
+ if(!list.length)h+='<div class="empty">Rien à afficher dans cet onglet.</div>';
+ h+='<ul class="items camp">';
+ list.forEach(function(x){
+  var i=x.i,su=i.suivi&&i.suivi.c===campKey(a)?i.suivi:{},et=ETAPES[x.e]||ETAPES[""],sec=secById(x.sid);
+  var meta=[esc(sec.nom)];if(i.ft)meta.push(esc(i.ft));if(i.icb)meta.push('ICB <span class="mono">'+esc(i.icb)+'</span>');if(i.carac)meta.push(esc(i.carac));
+  h+='<li class="item'+(ui.ct==="charger"&&admin.on?' inv':'')+'">';
+  if(ui.ct==="charger"&&admin.on){var on=x.e!=="";h+='<button type="button" class="chk" data-load="'+esc(i.id)+'" data-sid="'+x.sid+'" aria-pressed="'+on+'" aria-label="'+(on?'Chargé':'Marquer comme chargé')+'"'+(su.r?' disabled':'')+'></button>';}
+  h+='<div class="it-main"><div class="it-title"><span>'+esc(i.description||"—")+'</span></div><div class="it-meta">'+meta.map(function(m){return '<span>'+m+'</span>';}).join("")+'</div>';
+  if(su.dc)h+='<div class="it-meta"><span>Chargé le '+esc(frDate(su.dc))+'</span>'+(su.r?'<span>Résultat : '+esc(su.r)+'</span>':'')+(su.dret?'<span>Revenu le '+esc(frDate(su.dret))+'</span>':'')+'</div>';
+  if(admin.on&&ui.ct==="resultats"){var ro=RESULTS.map(function(r){return r[0];});h+='<div class="row camp-ctl"><select data-resu="'+esc(i.id)+'" data-sid="'+x.sid+'" aria-label="Résultat du contrôle"><option value="">Résultat…</option>'+ro.map(function(o){return '<option value="'+esc(o)+'"'+(su.r===o?' selected':'')+'>'+esc(o)+'</option>';}).join("")+'</select></div>';}
+  if(admin.on&&ui.ct==="reparations"&&x.e==="reparation")h+='<div class="row camp-ctl"><input data-dest="'+esc(i.id)+'" data-sid="'+x.sid+'" value="'+esc(su.dest||"")+'" placeholder="Envoyé à (SERECT, fabricant…)" aria-label="Envoyé à"><input type="date" data-ret="'+esc(i.id)+'" data-sid="'+x.sid+'" value="'+esc(su.ret||"")+'" aria-label="Retour prévu"><button type="button" class="btn primary" data-back="'+esc(i.id)+'" data-sid="'+x.sid+'">Revenu à l\'atelier</button></div>';
+  else if(su.dest||su.ret)h+='<div class="it-meta">'+(su.dest?'<span>Envoyé à '+esc(su.dest)+'</span>':'')+(su.ret?'<span>Retour prévu '+esc(frDate(su.ret))+'</span>':'')+'</div>';
+  h+='</div><div class="it-side"><span class="pill p-'+et[1]+'">'+esc(et[0])+'</span></div></li>';
+ });
+ h+='</ul>';
+ h+='<div class="row" style="margin-top:16px"><button class="btn" id="c-pdf" type="button">'+I.pdf+'PDF de la campagne</button>';
+ if(admin.on)h+='<button class="btn danger'+(admin.arm==="close"?' armed':'')+'" id="c-close" type="button">'+(admin.arm==="close"?'Confirmer la clôture':'Clôturer la campagne')+'</button>';
+ h+='</div>';
+ if(admin.arm==="close")h+='<div class="notice" style="margin-top:10px">La campagne passera dans l\'historique. Les résultats saisis restent dans les fiches du matériel.'+(c.camion||c.reparation?' Attention : '+(c.camion?c.camion+' matériel(s) encore dans le camion. ':'')+(c.reparation?c.reparation+' en réparation.':''):'')+'</div>';
+ h+='</main>'+footer()+pubBar();
+ if(sheet)h+=renderSheet();
+ app.innerHTML=h;
+}
+function campPdf(){
+ var a=campActive();if(!a)return;var its=campItems(a),c=campCounts(its);
+ sheet={mode:"pdf-camp",busy:true};render();
+ loadPdf().then(function(){
+  var J=window.jspdf.jsPDF,doc=new J({orientation:"landscape",unit:"mm",format:"a4"}),W=doc.internal.pageSize.getWidth();
+  doc.setFillColor(242,194,48);doc.rect(0,0,W,4,"F");
+  doc.setFont("helvetica","bold");doc.setFontSize(18);doc.setTextColor(20,32,43);
+  doc.text(pdfSafe("Campagne de contrôle – "+ctLabel(a.type)+" "+a.annee),10,16);
+  doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.setTextColor(86,99,112);
+  doc.text(pdfSafe("Édité le "+frToday()+"  ·  lancée le "+frDate(a.debut)+"  ·  "+its.length+" matériels  ·  À charger : "+c[""]+"  ·  Dans le camion : "+c.camion+"  ·  En réparation : "+c.reparation+"  ·  Revenus à l'atelier : "+(c.atelier+c.repare)+"  ·  Réformés : "+c.reforme),10,22);
+  var body=its.map(function(x){var su=x.i.suivi&&x.i.suivi.c===campKey(a)?x.i.suivi:{};return [secById(x.sid).nom,x.i.description||"",x.i.carac||"",x.i.ft||"",x.i.icb||"",su.dc?frDate(su.dc):"",su.r||"",ETAPES[x.e][0],[su.dest?"Envoyé à "+su.dest:"",su.ret?"retour prévu "+frDate(su.ret):"",su.dret?"revenu le "+frDate(su.dret):""].filter(Boolean).join(", "),""].map(pdfSafe);});
+  doc.autoTable({head:[["Partie","Description","Caract.","FT","ICB","Chargé le","Résultat","Étape","Réparation","Visa"]],body:body,startY:27,margin:{left:10,right:10,bottom:14},theme:"grid",
+   styles:{font:"helvetica",fontSize:7.6,cellPadding:1.4,lineColor:[211,218,225],lineWidth:0.2,textColor:[20,32,43]},headStyles:{fillColor:[20,32,43],textColor:[255,255,255]},
+   columnStyles:{0:{cellWidth:22},1:{cellWidth:72},2:{cellWidth:20},3:{cellWidth:13},4:{cellWidth:26},5:{cellWidth:17},6:{cellWidth:24},7:{cellWidth:28},9:{cellWidth:14}},
+   didDrawPage:function(){doc.setFontSize(8);doc.setTextColor(86,99,112);doc.text(pdfSafe("Campagne "+ctLabel(a.type)+" "+a.annee+" · page "+doc.internal.getNumberOfPages()),W-10,doc.internal.pageSize.getHeight()-7,{align:"right"});}});
+  doc.save("campagne-"+a.type+"-"+a.annee+"-"+today()+".pdf");sheet=null;render();
+ }).catch(function(){sheet=null;admin.msg="Le PDF n'a pas pu être créé. Vérifiez la connexion internet.";render();});
+}
+
+/* ---------- mode d'emploi ---------- */
+function renderHelp(){
+ var G=[
+  ["Consulter le matériel",["Scannez le QR code ou ouvrez le lien, puis choisissez une section (Électroportatif, DSTM, GIPFS, TST…).","Tapez dans la barre de recherche un nom, une FT, une référence ou seulement quelques chiffres d'un numéro ICB (par exemple les 4 derniers).","Touchez une ligne pour ouvrir sa fiche complète : historique des contrôles année par année, dates, commentaires.","Les menus déroulants (par type de matériel) s'ouvrent d'un appui. Les filtres en haut permettent de trier par FT, type de contrôle, résultat d'une année, durée de vie…"]],
+  ["Passer en mode admin (une seule fois par téléphone)",["Touchez « Admin » en haut de la page.","Collez votre clé GitHub (elle commence par github_pat_) puis « Valider ».","Le bouton devient jaune « Mode admin » : vous pouvez modifier. Retouchez-le pour revenir en simple consultation."]],
+  ["Ajouter du matériel",["Allez dans la bonne partie, en mode admin.","Touchez « + Ajouter », remplissez la fiche puis « Enregistrer ».","Pour plusieurs matériels identiques : ouvrez le premier et touchez « Dupliquer », il ne reste qu'à changer l'ICB ou le n° de série.","Touchez « Publier pour l'équipe » en bas de l'écran quand vous avez fini."]],
+  ["Modifier ou supprimer",["En mode admin, touchez la ligne : la fiche s'ouvre en modification.","Changez ce qu'il faut puis « Enregistrer ». « Supprimer » demande une confirmation.","Tant que vous n'avez pas touché « Publier pour l'équipe », rien n'est visible par les autres : « Annuler tout » efface le brouillon."]],
+  ["Faire un inventaire",["Dans une partie, en mode admin, touchez « Démarrer un inventaire ».","Une case apparaît devant chaque ligne : cochez ce que vous trouvez. « Seulement les non pointés » montre ce qu'il reste.","Vous pouvez fermer la page et reprendre plus tard sur le même téléphone.","Touchez « Terminer l'inventaire » puis confirmez : chaque matériel coché reçoit la date « vu le » du jour. Publiez, puis sortez le PDF si besoin."]],
+  ["Campagne de contrôle (camion atelier)",["TST → « Campagne de contrôle », en mode admin : choisissez l'année et le type de contrôle (Labo, APAVE…), puis « Lancer la campagne ». La liste reprend tout le matériel concerné.","Onglet 1 « Chargement » : cochez chaque matériel au moment où il monte dans le camion.","Onglet 2 « Résultats » : au retour, choisissez le résultat. Conforme → retour atelier. À faire réparer / SERECT → passe en réparation. Réformé → sort de la dotation. Le résultat s'inscrit automatiquement dans l'historique de l'année.","Onglet 3 « Réparations » : notez où le matériel est parti et le retour prévu, puis « Revenu à l'atelier » à son retour.","Publiez régulièrement. En fin de campagne : « PDF de la campagne » puis « Clôturer la campagne »."]],
+  ["Retours labo saisis à la main",["Si besoin, en mode admin dans Matériel TST : « Nouvelle campagne 2027 » ajoute la colonne de l'année.","Touchez une ligne et choisissez le résultat dans la case de l'année."]],
+  ["Cordes : durée de vie",["Une corde en service est à remplacer 2 ans après sa mise en service ; en stock, 5 ans après sa fabrication.","La date de fin de vie s'affiche sur chaque corde (rouge = périmée, orange = moins de 6 mois). Le filtre « Durée de vie » les liste, et elles passent automatiquement « À commander ».","Pensez à remplir la date de mise en service quand une corde sort du stock, et à passer son état « En service »."]],
+  ["Commandes et PDF",["Cochez « À commander » dans la fiche d'un matériel (avec une note). Les manquants du camion, les ruptures de consommables et les cordes en fin de vie y passent tout seuls.","Bouton « PDF » : liste complète, seulement ce qui est filtré à l'écran, ou liste à commander avec les références."]],
+  ["QR codes",["Le bouton « QR code » donne le code de la page affichée : accueil, TST, ou une partie précise. Imprimez-le et collez-le à l'endroit du matériel."]]
+ ];
+ var h=previewBanner()+header("Mode d'emploi","",false,"Retour")+'<main class="wrap guide">';
+ G.forEach(function(g,n){h+='<details'+(n===0?' open':'')+'><summary>'+esc(g[0])+'</summary><ol>'+g[1].map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ol></details>';});
+ h+='</main>'+footer();app.innerHTML=h;
+}
+
 /* ---------- navigation ---------- */
 function show(target){
  sheet=null;ui=freshUi();admin.msg="";admin.ok="";admin.arm="";
  if(target&&secById(target)){loadCtx(target);view=target;openG={};saveOpen();}
- else if(target&&grpById(target)){saveCtx();view=target;}
+ else if(target&&(grpById(target)||viewById(target))){saveCtx();curSid=null;T=null;view=target;}
  else{saveCtx();view="home";}
  render();window.scrollTo(0,0);
 }
-function route(){var h=(location.hash||"").replace(/^#/,"");show(secById(h)||grpById(h)?h:null);}
+var lastView="home";
+function route(){var h=(location.hash||"").replace(/^#/,"");if(h!=="aide")lastView=h||"home";show((secById(h)&&!secById(h).hidden)||grpById(h)||viewById(h)?h:null);}
 function goTo(sid){
  if(sid){if(location.hash==="#"+sid)route();else location.hash=sid;}
  else{try{history.pushState(null,"",location.pathname+location.search);}catch(e){}show(null);}
@@ -778,7 +1009,16 @@ app.addEventListener("click",function(e){
  if(t.classList.contains("it-link"))return;
  if(t.id==="sheet-bg"){if(e.target===t&&!(sheet&&sheet.busy)){sheet=null;render();}return;}
  if(t.dataset&&t.dataset.sec){goTo(t.dataset.sec);return;}
- if(t.id==="b-home"){var cs=secById(view)||grpById(view);goTo(cs&&cs.parent?cs.parent:null);return;}
+ if(t.id==="b-home"){if(view==="aide"){goTo(lastView==="home"?null:lastView);return;}var cs=secById(view)||grpById(view)||viewById(view);goTo(cs&&cs.parent?cs.parent:null);return;}
+ if(t.id==="b-help"){goTo("aide");return;}
+ if(t.dataset&&t.dataset.load){campLoad(t.dataset.sid,t.dataset.load);return;}
+ if(t.dataset&&t.dataset.back){campEdit(t.dataset.sid,t.dataset.back,function(i){i.suivi.e="repare";i.suivi.dret=today();});render();return;}
+ if(t.dataset&&t.dataset.ctab){ui.ct=t.dataset.ctab;render();return;}
+ if(t.id==="c-start"){campStart();return;}
+ if(t.id==="c-close"){if(admin.arm!=="close"){admin.arm="close";render();return;}campClose();return;}
+ if(t.id==="c-pub"){publishAll();return;}
+ if(t.id==="c-discard"){SECTIONS.forEach(function(sc){var st=store[sc.id];st.draft=null;lsSet(keysFor(sc.id).d,null);});render();return;}
+ if(t.id==="c-pdf"){campPdf();return;}
  if(t.dataset&&t.dataset.g!=null){if(filtering())return;var gname=t.dataset.g;if(openG[gname])delete openG[gname];else openG[gname]=1;saveOpen();render();var gb=document.querySelector('.ghead[data-g="'+CSS.escape(gname)+'"]');if(gb)gb.focus();return;}
  if(t.id==="open-all"){e.preventDefault();cur().items.forEach(function(i){openG[groupOf(i)]=1;});saveOpen();render();return;}
  if(t.id==="close-all"){e.preventDefault();openG={};saveOpen();render();return;}
@@ -816,11 +1056,11 @@ app.addEventListener("click",function(e){
  if(t.id==="b-inv-cancel"){if(admin.arm!=="cancel"){admin.arm="cancel";render();return;}INV=null;saveInv();admin.arm="";render();return;}
  if(t.id==="b-discard"){admin.draft=null;lsSet(DKEY,null);admin.msg="";render();return;}
  if(t.id==="b-pub"){publish();return;}
- if(t.classList.contains("item")){sheet={mode:admin.on?"edit":"view",id:t.dataset.id};render();return;}
+ if(t.classList.contains("item")&&t.dataset.id&&T){sheet={mode:admin.on?"edit":"view",id:t.dataset.id};render();return;}
 });
 app.addEventListener("keydown",function(e){
  if(e.key==="Escape"&&sheet&&!sheet.busy){sheet=null;render();return;}
- var t=e.target;if((e.key==="Enter"||e.key===" ")&&t.classList&&t.classList.contains("item")){e.preventDefault();sheet={mode:admin.on?"edit":"view",id:t.dataset.id};render();}
+ var t=e.target;if((e.key==="Enter"||e.key===" ")&&t.classList&&t.classList.contains("item")&&t.dataset.id&&T){e.preventDefault();sheet={mode:admin.on?"edit":"view",id:t.dataset.id};render();}
 });
 app.addEventListener("input",function(e){if(e.target.id==="q"){ui.q=e.target.value;render();}});
 app.addEventListener("change",function(e){
@@ -828,6 +1068,10 @@ app.addEventListener("change",function(e){
  if(t.classList.contains("fsel")){ui.f[t.dataset.f]=t.value;render();return;}
  if(t.id==="f-ry"){ui.ry=t.value;ui.rv="";render();return;}
  if(t.id==="f-rv"){ui.rv=t.value;render();return;}
+ if(t.id==="f-lf"){ui.lf=t.value;render();return;}
+ if(t.dataset&&t.dataset.dest!=null){campEdit(t.dataset.sid,t.dataset.dest,function(i){i.suivi.dest=t.value.trim();});render();return;}
+ if(t.dataset&&t.dataset.ret!=null){campEdit(t.dataset.sid,t.dataset.ret,function(i){i.suivi.ret=t.value;});render();return;}
+ if(t.dataset&&t.dataset.resu!=null){campResult(t.dataset.sid,t.dataset.resu,t.value);render();return;}
 });
 app.addEventListener("submit",function(e){
  e.preventDefault();
