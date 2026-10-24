@@ -1,0 +1,9 @@
+{
+"config":{"titre":"Container orange","inventaire":"","maj":"2026-10-24","ref":"","taille":"10 pieds","poids":"6 t","equipement":["Palan à chaîne","Chariot porte-touret","Touret de hauban","Caisse grillagée"]},
+"items":[
+  {"designation":"Tirfor","diametre":"","cmu":"","longueur":"","qte_init":"","qte":"","icb":"","ref":"","commentaire":"Quantité à compléter","id":"or001"},
+  {"designation":"Câblette de Tirfor","diametre":"","cmu":"","longueur":"","qte_init":"","qte":"","icb":"","ref":"","commentaire":"Quantité à compléter","id":"or002"},
+  {"designation":"Hauban 80 m","diametre":"","cmu":"","longueur":"80 m","qte_init":"","qte":"","icb":"","ref":"","commentaire":"Quantité à compléter","id":"or003"},
+  {"designation":"Hauban 100 m","diametre":"","cmu":"","longueur":"100 m","qte_init":"","qte":"","icb":"","ref":"","commentaire":"Quantité à compléter","id":"or004"},
+  {"designation":"Manche de Tirfor","diametre":"","cmu":"","longueur":"","qte_init":"","qte":"","icb":"","ref":"","commentaire":"Quantité à compléter","id":"or005"}
+]}
