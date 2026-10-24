@@ -136,6 +136,28 @@ var TYPES={
   pieces:"qte_init",
   pdf:[["designation","Désignation",48],["qte_init","Prévu",14],["qte","Présent",14],["$miss","Manque",14],["ref_facom","Réf. FACOM",30],["ref_dc","Réf. D&C",34],["$status","État",22],["$com","Commentaire",0]]
  },
+ conteneur:{
+  title:["designation"],group:"groupe",groupSort:"first",ok:"complets",
+  fields:[
+   {k:"designation",l:"Désignation",req:1,full:1,dl:1},
+   {k:"groupe",l:"Container",dl:1},
+   {k:"diametre",l:"Diamètre (mm)",meta:"Ø",unit:" mm"},
+   {k:"cmu",l:"CMU",meta:"CMU"},
+   {k:"longueur",l:"Longueur",meta:"L"},
+   {k:"qte_init",l:"Quantité prévue",t:"num"},
+   {k:"qte",l:"Quantité présente",t:"num"},
+   {k:"icb",l:"N° ICB (si suivi à la pièce)",mono:1,meta:"ICB"},
+   {k:"ref",l:"Référence / devis",meta:1},
+   {k:"commentaire",l:"Commentaire",t:"area",full:1}
+  ],
+  status:{derived:function(i){if(i.qte_init===""||i.qte_init==null)return "À compléter";if(i.qte===""||i.qte==null)return "Non compté";return Number(i.qte)>=Number(i.qte_init)?"Complet":"Manquant";},
+   opts:[["Complet","Complet","ok"],["Manquant","Manquant","bad"],["Non compté","Non compté","warn"],["À compléter","Quantité à compléter","none"]]},
+  autoCmd:function(i,st){return st==="Manquant"?"Manque "+(Number(i.qte_init)-Number(i.qte)):"";},
+  qty:function(i){return (i.qte===""?"?":i.qte)+(i.qte_init!==""?" / "+i.qte_init:"");},
+  pieces:"qte_init",
+  filters:[{k:"designation",l:"Tout le matériel"}],
+  pdf:[["designation","Désignation",60],["diametre","Ø (mm)",16],["cmu","CMU",18],["longueur","Longueur",18],["qte_init","Prévu",14],["qte","Présent",14],["$miss","Manque",14],["$status","État",26],["$com","Commentaire",0]]
+ },
  dotation:{
   title:["agent"],group:null,groupLabel:"Agents",noInventory:1,ok:"",
   fields:[
@@ -157,7 +179,7 @@ var TYPES={
 var SECTIONS=[
  {id:"electroportatif",nom:"Électroportatif",file:"materiel.json",type:"outil",pre:"m",hint:"Machines, batteries, chargeurs…"},
  {id:"dstm",nom:"DSTM",file:"dstm.json",type:"outil",pre:"d",hint:"Matériel DSTM"},
- {id:"gipfs",nom:"GIPFS",file:"gipfs.json",type:"outil",pre:"g",hint:"Matériel GIPFS"},
+ {id:"gipfs",nom:"GIPFS",file:"gipfs.json",type:"conteneur",pre:"g",hint:"6 containers : noir, jaune, orange, gris, violet, blanc"},
  {id:"tst-materiel",nom:"Matériel TST",parent:"tst",file:"tst-materiel.json",type:"mainta",pre:"t",hint:"Toutes les FT · contrôles et retours labo"},
  {id:"tst-cordes",nom:"Cordes, filins et butées à billes",parent:"tst",file:"tst-cordes.json",type:"cordes",pre:"r",hint:"Cordes, filins, butées · contrôles"},
  {id:"tst-levage",nom:"Levage",parent:"camion",file:"tst-levage.json",type:"levage",pre:"l",hint:"Estropes, manilles, poulies, palans"},
