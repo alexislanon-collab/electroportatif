@@ -576,6 +576,11 @@ function formField(f,it){
  if(f.t==="results"){var ys=years().slice().reverse();
   return '<div class="'+cls+'"><span class="flabel">'+esc(f.l)+'</span><div class="resgrid">'+ys.map(function(y){var rv=(v&&v[y])||"",ro=RESULTS.map(function(r){return r[0];});if(rv&&ro.indexOf(rv)<0)ro.push(rv);
    return '<label class="ry"><span>'+y+'</span><select data-res="'+y+'"><option value="">—</option>'+ro.map(function(o){return '<option value="'+esc(o)+'"'+(rv===o?' selected':'')+'>'+esc(o)+'</option>';}).join("")+'</select></label>';}).join("")+'</div></div>';}
+ if(f.k==="icb"){
+  var pc={};cur().items.forEach(function(x){var m=/^(.*-)\d+$/.exec(String(x.icb||""));if(m){var k=m[1].toUpperCase();pc[k]=(pc[k]||0)+1;}});
+  var pre=Object.keys(pc).sort(function(a,b){return pc[b]-pc[a];}).slice(0,6);
+  return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><div class="icbrow"><input id="'+id+'" inputmode="numeric" autocapitalize="characters" autocomplete="off" spellcheck="false" value="'+esc(v==null?"":v)+'" placeholder="Ex. : DIB1-0047800"><button type="button" class="btn kb" id="icb-kb" aria-pressed="false">ABC</button></div>'+(pre.length?'<div class="prechips">'+pre.map(function(x){return '<button type="button" class="chip prechip" data-pre="'+esc(x)+'">'+esc(x)+'</button>';}).join("")+'</div>':'')+'</div>';
+ }
  var type=f.t==="num"?'type="number" inputmode="decimal"':f.t==="url"?'type="url" inputmode="url"':'';
  return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><input id="'+id+'" '+type+' value="'+esc(v==null?"":v)+'"'+(f.dl?' list="dl-'+f.k+'"':'')+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+(f.req?' required':'')+'></div>';
 }
@@ -1011,6 +1016,8 @@ app.addEventListener("click",function(e){
  if(t.dataset&&t.dataset.sec){goTo(t.dataset.sec);return;}
  if(t.id==="b-home"){if(view==="aide"){goTo(lastView==="home"?null:lastView);return;}var cs=secById(view)||grpById(view)||viewById(view);goTo(cs&&cs.parent?cs.parent:null);return;}
  if(t.id==="b-help"){goTo("aide");return;}
+ if(t.dataset&&t.dataset.pre!=null){var ic=document.getElementById("f-icb");if(ic){var rest=ic.value.replace(/^.*-/,"").replace(/\D/g,"");ic.value=t.dataset.pre+rest;ic.setAttribute("inputmode","numeric");var kb=document.getElementById("icb-kb");if(kb){kb.textContent="ABC";kb.setAttribute("aria-pressed","false");}ic.blur();ic.focus();try{ic.setSelectionRange(ic.value.length,ic.value.length);}catch(er){}}return;}
+ if(t.id==="icb-kb"){var ic2=document.getElementById("f-icb");if(ic2){var num=ic2.getAttribute("inputmode")==="numeric";ic2.setAttribute("inputmode",num?"text":"numeric");t.textContent=num?"123":"ABC";t.setAttribute("aria-pressed",String(num));ic2.blur();ic2.focus();}return;}
  if(t.dataset&&t.dataset.load){campLoad(t.dataset.sid,t.dataset.load);return;}
  if(t.dataset&&t.dataset.back){campEdit(t.dataset.sid,t.dataset.back,function(i){i.suivi.e="repare";i.suivi.dret=today();});render();return;}
  if(t.dataset&&t.dataset.ctab){ui.ct=t.dataset.ctab;render();return;}
