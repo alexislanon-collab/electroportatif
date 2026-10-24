@@ -100,6 +100,29 @@ var TYPES={
   filters:[{k:"ctrl",l:"Tous les contrôles",flags:1}],
   pdf:[["icb","ICB",30],["description","Description",62],["carac","Caract.",24],["serie","N° série",22],["cesar","CESAR",14],["date_ctrl","Date contrôle",20],["$flags","Contrôle",26],["$status","Statut",22],["$com","Commentaire",0]]
  },
+ dstmconso:{
+  title:["designation"],group:"famille",groupSort:"first",ok:"dispo",
+  fields:[
+   {k:"designation",l:"Désignation",req:1,full:1,dl:1},
+   {k:"famille",l:"Famille",dl:1},
+   {k:"marque",l:"Marque",dl:1,meta:1},
+   {k:"ref",l:"Référence",mono:1,meta:"Réf."},
+   {k:"icb",l:"N° ICB (EALICO)",mono:1,meta:"ICB"},
+   {k:"serie",l:"N° de série",mono:1,meta:"N°"},
+   {k:"tonnage",l:"Tonnage (CRA / CMU)",meta:1},
+   {k:"cable",l:"Type de câble",meta:"Câble"},
+   {k:"diametre",l:"Plage de diamètre (mm)",meta:"Ø"},
+   {k:"longueur",l:"Longueur (m)",meta:"L",unit:" m"},
+   {k:"nb",l:"Quantité",t:"num",def:1},
+   {k:"statut",l:"État",t:"status"},
+   {k:"commentaire",l:"Commentaire",t:"area",full:1}
+  ],
+  status:{key:"statut",opts:[["dispo","Disponible","ok"],["verifier","À vérifier","warn"],["introuvable","Introuvable","bad"],["hs","Réformé HS","off"]],def:"dispo"},
+  inv:{found:"dispo",missing:"verifier",from:["dispo"],reset:["verifier","introuvable"]},
+  filters:[{k:"famille",l:"Toutes les familles"},{k:"marque",l:"Toutes les marques"}],
+  pieces:"nb",
+  pdf:[["famille","Famille",24],["designation","Désignation",48],["marque","Marque",22],["ref","Référence",22],["tonnage","Tonnage",22],["nb","Qté",10],["$status","État",22],["$com","Commentaire",0]]
+ },
  conso:{
   title:["designation"],group:"groupe",groupSort:"first",ok:"en stock",
   fields:[
@@ -197,6 +220,7 @@ var SECTIONS=[
  {id:"upk-machoires",nom:"Mâchoires",parent:"upk",file:"upk-machoires.json",type:"upk",pre:"um",hint:"Mâchoires par taille de câble"},
  {id:"upk-fourreaux",nom:"Fourreaux",parent:"upk",file:"upk-fourreaux.json",type:"upk",pre:"uf",hint:"Fourreaux par taille de câble"},
  {id:"dstm-cablette",nom:"Câblette italienne",parent:"dstm",file:"dstm.json",type:"outil",pre:"d",hint:"Câblettes italiennes Tesmec"},
+ {id:"dstm-conso",nom:"Consommables",parent:"dstm",file:"dstm-conso.json",type:"dstmconso",pre:"dc",hint:"Émerillons, noix, chaussettes"},
  {id:"gipfs-noir",nom:"Container noir",parent:"gipfs",file:"gipfs-noir.json",type:"conteneur",pre:"no"},
  {id:"gipfs-jaune",nom:"Container jaune",parent:"gipfs",file:"gipfs-jaune.json",type:"conteneur",pre:"ja"},
  {id:"gipfs-orange",nom:"Container orange",parent:"gipfs",file:"gipfs-orange.json",type:"conteneur",pre:"or"},
@@ -215,7 +239,7 @@ var GROUPS=[
  {id:"upk",nom:"UPK",parent:"materiel",hint:"Mâchoires et fourreaux"},
  {id:"tst",nom:"TST",hint:"Matériel, cordes, camion, consommables, dotation"},
  {id:"gipfs",nom:"GIPFS",hint:"6 containers : noir, jaune, orange, gris, violet, blanc"},
- {id:"dstm",nom:"DSTM",hint:"Câblette italienne"},
+ {id:"dstm",nom:"DSTM",hint:"Câblettes italiennes et consommables"},
  {id:"camion",nom:"Camion",parent:"tst",hint:"Levage et outillage"}
 ];
 var HOME=["materiel","tst","gipfs","dstm"];
@@ -225,7 +249,7 @@ var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargem
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
 function childrenOf(gid){var out=[];SECTIONS.forEach(function(s){if(s.parent===gid&&!s.hidden)out.push(s);});GROUPS.forEach(function(g){if(g.parent===gid)out.push(g);});VIEWS.forEach(function(v){if(v.parent===gid)out.push(v);});
- /* ordre d'affichage dans TST */var ord=["electroportatif","upk","upk-machoires","upk-fourreaux","dstm-cablette","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
+ /* ordre d'affichage dans TST */var ord=["electroportatif","upk","upk-machoires","upk-fourreaux","dstm-cablette","dstm-conso","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
 function sectionsUnder(gid){var out=[];childrenOf(gid).forEach(function(c){if(secById(c.id))out.push(c);else if(grpById(c.id))out=out.concat(sectionsUnder(c.id));});return out;}
 function secById(id){return SECTIONS.filter(function(s){return s.id===id;})[0]||null;}
 
