@@ -190,7 +190,8 @@ dl.fiche{display:grid;grid-template-columns:minmax(110px,auto) 1fr;gap:6px 14px;
 dl.fiche dt{color:var(--muted);font-size:13px;font-weight:600;padding-top:2px}
 dl.fiche dd{margin:0;min-width:0;overflow-wrap:anywhere}
 table.hist{border-collapse:collapse;font-size:14px}
-table.hist th{font-family:var(--mono);font-weight:500;color:var(--muted);text-align:left;padding:2px 12px 2px 0}
+table.hist th{font-family:var(--mono);font-weight:500;color:var(--muted);text-align:left;padding:2px 12px 2px 0;white-space:nowrap;vertical-align:top}
+table.hist td{padding:2px 10px 2px 0;vertical-align:top}
 table.hist td{font-weight:600;padding:2px 0}
 table.hist td.r-ok{color:var(--ok)}table.hist td.r-warn{color:var(--warn)}table.hist td.r-bad{color:var(--bad)}table.hist td.r-off{color:var(--off)}table.hist td.r-out{color:var(--out)}table.hist td.muted,table.hist td.r-none{color:var(--muted)}
 .tile-camp{border-color:var(--tape);box-shadow:inset 4px 0 0 var(--tape)}
@@ -234,6 +235,6 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=10"></script>
+<script src="app.js?v=11"></script>
 </body>
 </html>

@@ -157,6 +157,23 @@ var TYPES={
   filters:[{missing:"icb",l:"Tous les ICB",lm:"ICB à saisir"}],
   pdf:[["designation","Désignation",62],["icb","ICB",28],["cmu","CMU",16],["qte_init","Prévu",13],["qte","Présent",13],["$miss","Manque",13],["$status","État",24],["$com","Commentaire",0]]
  },
+ upk:{
+  title:["designation"],group:"cable",groupEmpty:"Sans réf. câble",groupSort:"natural",ok:"conformes",
+  fields:[
+   {k:"designation",l:"Désignation (mâchoire / fourreau)",req:1,full:1,dl:1},
+   {k:"cable",l:"Référence câble",dl:1,meta:1},
+   {k:"icb",l:"N° ICB (EALICO / MAINTA)",mono:1,meta:"ICB"},
+   {k:"frappe",l:"Référence frappée sur l'outil",mono:1,meta:"Frappé"},
+   {k:"cesar",l:"Code CESAR",meta:"CESAR"},
+   {k:"date_ctrl",l:"Date du dernier contrôle",meta:"Contrôle"},
+   {k:"statut",l:"Conformité",t:"status"},
+   {k:"commentaire",l:"Observations",t:"area",full:1},
+   {k:"history",l:"Historique des contrôles",t:"history",full:1}
+  ],
+  status:{key:"statut",opts:[["Conforme","Conforme","ok"],["Non conforme","Non conforme","bad"],["À contrôler","À contrôler","warn"],["Détruit","Détruit","off"],["","Non renseigné","none"]],def:"À contrôler"},
+  filters:[{k:"cable",l:"Toutes les réf. câble",sort:"natural"},{missing:"icb",l:"Tous les ICB",lm:"ICB à saisir"}],
+  pdf:[["designation","Désignation",34],["cable","Réf. câble",24],["icb","ICB",28],["frappe","Frappé",18],["cesar","CESAR",12],["date_ctrl","Contrôle",18],["$status","Conformité",24],["$com","Observations",0]]
+ },
  dotation:{
   title:["agent"],group:null,groupLabel:"Agents",noInventory:1,ok:"",
   fields:[
@@ -176,8 +193,9 @@ var TYPES={
 
 /* ---------- sections ---------- */
 var SECTIONS=[
- {id:"electroportatif",nom:"Électroportatif",file:"materiel.json",type:"outil",pre:"m",hint:"Machines, batteries, chargeurs…"},
- {id:"dstm",nom:"DSTM",file:"dstm.json",type:"outil",pre:"d",hint:"Matériel DSTM"},
+ {id:"electroportatif",nom:"Électroportatif",parent:"materiel",file:"materiel.json",type:"outil",pre:"m",hint:"Machines, batteries, chargeurs…"},
+ {id:"upk",nom:"UPK",parent:"materiel",file:"upk.json",type:"upk",pre:"u",hint:"Mâchoires et fourreaux · contrôle par réf. câble"},
+ {id:"dstm-cablette",nom:"Câblette italienne",parent:"dstm",file:"dstm.json",type:"outil",pre:"d",hint:"Câblettes italiennes Tesmec"},
  {id:"gipfs-noir",nom:"Container noir",parent:"gipfs",file:"gipfs-noir.json",type:"conteneur",pre:"no"},
  {id:"gipfs-jaune",nom:"Container jaune",parent:"gipfs",file:"gipfs-jaune.json",type:"conteneur",pre:"ja"},
  {id:"gipfs-orange",nom:"Container orange",parent:"gipfs",file:"gipfs-orange.json",type:"conteneur",pre:"or"},
@@ -191,15 +209,21 @@ var SECTIONS=[
  {id:"tst-camion",nom:"Outillage / inventaire",parent:"camion",file:"tst-camion.json",type:"camion",pre:"k",hint:"Douilles, clés, pinces, marteaux…"},
  {id:"tst-dotation",nom:"Dotation par agent",parent:"tst",file:"tst-dotation.json",type:"dotation",pre:"a",hint:"Tailles et pointures"}
 ];
-var GROUPS=[{id:"gipfs",nom:"GIPFS",hint:"6 containers : noir, jaune, orange, gris, violet, blanc"},{id:"tst",nom:"TST",hint:"Matériel, cordes, camion, consommables, dotation"},{id:"camion",nom:"Camion",parent:"tst",hint:"Levage et outillage"}];
-var HOME=["electroportatif","dstm","gipfs","tst"];
+var GROUPS=[
+ {id:"materiel",nom:"Matériel",hint:"Électroportatif et UPK"},
+ {id:"tst",nom:"TST",hint:"Matériel, cordes, camion, consommables, dotation"},
+ {id:"gipfs",nom:"GIPFS",hint:"6 containers : noir, jaune, orange, gris, violet, blanc"},
+ {id:"dstm",nom:"DSTM",hint:"Câblette italienne"},
+ {id:"camion",nom:"Camion",parent:"tst",hint:"Levage et outillage"}
+];
+var HOME=["materiel","tst","gipfs","dstm"];
 SECTIONS.push({id:"campagnes",nom:"Campagnes de contrôle",file:"tst-campagnes.json",type:"meta",hidden:1,pre:"z"});
 TYPES.meta={title:[],fields:[],status:null,noInventory:1,pdf:[]};
 var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargement du camion, résultats, réparations"},{id:"aide",nom:"Mode d'emploi",hidden:1}];
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
 function childrenOf(gid){var out=[];SECTIONS.forEach(function(s){if(s.parent===gid&&!s.hidden)out.push(s);});GROUPS.forEach(function(g){if(g.parent===gid)out.push(g);});VIEWS.forEach(function(v){if(v.parent===gid)out.push(v);});
- /* ordre d'affichage dans TST */var ord=["gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
+ /* ordre d'affichage dans TST */var ord=["electroportatif","upk","dstm-cablette","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
 function sectionsUnder(gid){var out=[];childrenOf(gid).forEach(function(c){if(secById(c.id))out.push(c);else if(grpById(c.id))out=out.concat(sectionsUnder(c.id));});return out;}
 function secById(id){return SECTIONS.filter(function(s){return s.id===id;})[0]||null;}
 
@@ -345,7 +369,7 @@ function filtering(){
 }
 function hay(i){
  var p=[];T.fields.forEach(function(f){var v=i[f.k];if(v==null)return;if(f.t==="flags")p.push((v||[]).map(flagLabel).join(" "));else if(f.t==="results")for(var y in v)p.push(v[y]);else p.push(v);});
- p.push(i.cmd_note||"");return norm(p.join(" "));
+ if(i.history)i.history.forEach(function(x){p.push(x.date,x.verif,x.obs);});p.push(i.cmd_note||"");return norm(p.join(" "));
 }
 function filtered(){
  var q=norm(ui.q).split(/\s+/).filter(Boolean),d=cur(),ry=ui.ry||String(years(d).slice(-1)[0]||"");
@@ -601,6 +625,7 @@ function qrUrl(){return PAGE_URL+(view!=="home"?"#"+view:"");}
 
 function formField(f,it){
  var id="f-"+f.k,v=it[f.k],cls='field'+(f.full||f.t==="area"||f.t==="flags"||f.t==="results"?' full':'');
+ if(f.t==="history"){var hh=it[f.k]||[];return '<div class="'+cls+'"><span class="flabel">'+esc(f.l)+'</span>'+(hh.length?'<table class="hist">'+hh.map(function(x){return '<tr><th>'+esc(x.date||"")+'</th><td>'+esc(x.verif||"")+'</td><td>'+esc(x.obs||"")+'</td></tr>';}).join("")+'</table>':'<p class="help">Aucun contrôle enregistré. L\'historisation se fera avec la fiche de contrôle.</p>')+'</div>';}
  if(f.t==="area")return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><textarea id="'+id+'">'+esc(v)+'</textarea></div>';
  if(f.t==="status"){var so=T.status.opts.slice();if(v&&!so.some(function(o){return o[0]===v;}))so.push([v,v]);
   return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><select id="'+id+'">'+so.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(v==null?"":v)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>';}).join("")+'</select></div>';}
@@ -644,6 +669,7 @@ function renderSheet(){
    if(f.t==="results"){var ys=years().slice().reverse();if(!ys.length)return;
     h+='<dt>'+esc(f.l)+'</dt><dd><table class="hist">'+ys.map(function(y){var r=(v&&v[y])||"";return '<tr><th>'+y+'</th><td class="'+(r?'r-'+(RTONE[r]||"none"):'muted')+'">'+esc(r||"—")+'</td></tr>';}).join("")+'</table></dd>';return;}
    if(f.t==="flags"){if(!(v||[]).length)return;h+='<dt>'+esc(f.l)+'</dt><dd>'+(v||[]).map(flagLabel).map(esc).join(", ")+'</dd>';return;}
+   if(f.t==="history"){var hh=v||[];if(!hh.length)return;h+='<dt>'+esc(f.l)+'</dt><dd><table class="hist">'+hh.map(function(x){return '<tr><th>'+esc(x.date||"")+'</th><td>'+esc(x.verif||"")+'</td><td>'+esc(x.obs||"")+'</td></tr>';}).join("")+'</table></dd>';return;}
    if(f.t==="status"||v==null||v==="")return;
    if(f.t==="url"){h+='<dt>'+esc(f.l)+'</dt><dd><a href="'+esc(v)+'" target="_blank" rel="noopener">Ouvrir la fiche produit</a></dd>';return;}
    h+='<dt>'+esc(f.l)+'</dt><dd'+(f.mono?' class="mono"':'')+'>'+esc(v)+(f.unit&&/^[\d.,]+$/.test(String(v))?f.unit:"")+'</dd>';
@@ -678,6 +704,7 @@ function readForm(){
  var o={};
  T.fields.forEach(function(f){
   if(f.t==="flags"){o[f.k]=[].slice.call(document.querySelectorAll('input[data-flag="'+f.k+'"]:checked')).map(function(x){return x.value;});return;}
+  if(f.t==="history"){return;}
   if(f.t==="results"){var r={};[].slice.call(document.querySelectorAll('select[data-res]')).forEach(function(s){if(s.value)r[s.dataset.res]=s.value;});o[f.k]=r;return;}
   var e=document.getElementById("f-"+f.k),v=e?e.value.trim():"";
   if(f.t==="num"&&v!==""){var n=Number(v.replace(",","."));v=isNaN(n)?v:n;}
@@ -1124,7 +1151,7 @@ app.addEventListener("submit",function(e){
  if(k0&&!f[k0.k]){focusId("f-"+k0.k);return;}
  ensureDraft();
  if(sheet.mode==="add"){f.id=newId();admin.draft.items.push(f);if(INV){INV.seen[f.id]=1;saveInv();}}
- else{admin.draft.items=admin.draft.items.map(function(i){if(i.id!==sheet.id)return i;f.id=i.id;if(i.vu)f.vu=i.vu;return f;});}
+ else{admin.draft.items=admin.draft.items.map(function(i){if(i.id!==sheet.id)return i;f.id=i.id;if(i.vu)f.vu=i.vu;if(i.history)f.history=i.history;return f;});}
  sortItems(admin.draft.items);touch();saveDraft();
  if(e.submitter&&e.submitter.id==="s-next"){var nx=clone(f);delete nx.id;delete nx.vu;["icb","serie","cesar"].forEach(function(k){if(k in nx)nx[k]="";});if(nx.qte_init===1)nx.qte="";sheet={mode:"add",seed:nx};admin.ok="";render();var fk=document.getElementById("f-icb")||document.getElementById("f-serie")||document.getElementById("f-"+T.fields[0].k);if(fk)fk.focus();return;}
  sheet=null;render();
