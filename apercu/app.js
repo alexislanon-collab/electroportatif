@@ -365,7 +365,7 @@ function tileStats(secs){
   d.items.forEach(function(i){
    r.lines++;r.pcs+=piecesOf(t,i);
    if(t.status){var st=statusOfT(t,i,d),tone=toneOf(t,st);
-    if(tone==="ok")r.ok+=piecesOf(t,i);
+    if(tone==="ok")r.ok++;
     else if((tone==="warn"||tone==="bad")&&stOpt(t,st)[1]!=="À commander"){var lb=stOpt(t,st)[1];r.tags[lb]=r.tags[lb]||{n:0,tone:tone};r.tags[lb].n++;}}
    if(orderInfo(t,i,d).on)r.cmd++;
    if(t.life){var L=t.life(i);if(L&&(L.k==="perimee"||L.k==="bientot")){var lb2=L.k==="perimee"?"Périmées":"Fin de vie < 6 mois";r.tags[lb2]=r.tags[lb2]||{n:0,tone:L.tone};r.tags[lb2].n++;}}
@@ -395,7 +395,7 @@ function tileHtml(nom,secs,attr,hint){
 }
 function renderHome(){
  saveCtx();
- var h=previewBanner()+header("EEL Basse-Seine","Inventaire matériel · choisissez une section",false,"")+'<main class="wrap"><div class="tiles">';
+ var h=previewBanner()+header("EEL Basse‑Seine","Inventaire matériel · choisissez une section",false,"")+'<main class="wrap"><div class="tiles">';
  HOME.forEach(function(id){
   var g=grpById(id);
   if(g)h+=tileHtml(g.nom,sectionsUnder(g.id),'data-sec="'+g.id+'"',g.hint);
