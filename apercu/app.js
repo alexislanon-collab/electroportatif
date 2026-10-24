@@ -146,17 +146,17 @@ var TYPES={
    {k:"longueur",l:"Longueur",meta:"L"},
    {k:"qte_init",l:"Quantité prévue",t:"num"},
    {k:"qte",l:"Quantité présente",t:"num"},
-   {k:"icb",l:"N° ICB (si suivi à la pièce)",mono:1,meta:"ICB"},
+   {k:"icb",l:"N° ICB (EALICO)",mono:1,meta:"ICB"},
    {k:"ref",l:"Référence / devis",meta:1},
    {k:"commentaire",l:"Commentaire",t:"area",full:1}
   ],
   status:{derived:function(i){if(i.qte_init===""||i.qte_init==null)return "À compléter";if(i.qte===""||i.qte==null)return "Non compté";return Number(i.qte)>=Number(i.qte_init)?"Complet":"Manquant";},
    opts:[["Complet","Complet","ok"],["Manquant","Manquant","bad"],["Non compté","Non compté","warn"],["À compléter","Quantité à compléter","none"]]},
   autoCmd:function(i,st){return st==="Manquant"?"Manque "+(Number(i.qte_init)-Number(i.qte)):"";},
-  qty:function(i){return (i.qte===""?"?":i.qte)+(i.qte_init!==""?" / "+i.qte_init:"");},
-  pieces:"qte_init",
-  filters:[{k:"designation",l:"Tout le matériel"}],
-  pdf:[["designation","Désignation",60],["diametre","Ø (mm)",16],["cmu","CMU",18],["longueur","Longueur",18],["qte_init","Prévu",14],["qte","Présent",14],["$miss","Manque",14],["$status","État",26],["$com","Commentaire",0]]
+  qty:function(i){if(i.qte_init===1)return "";return (i.qte===""?"?":i.qte)+(i.qte_init!==""?" / "+i.qte_init:"");},
+  pieces:"qte_init",invQty:1,
+  filters:[{k:"designation",l:"Tout le matériel"},{missing:"icb",l:"Tous les ICB",lm:"ICB à saisir"}],
+  pdf:[["designation","Désignation",62],["icb","ICB",28],["cmu","CMU",16],["qte_init","Prévu",13],["qte","Présent",13],["$miss","Manque",13],["$status","État",24],["$com","Commentaire",0]]
  },
  dotation:{
   title:["agent"],group:null,groupLabel:"Agents",noInventory:1,ok:"",
@@ -324,6 +324,7 @@ function invStats(){var n=0,s=0;cur().items.forEach(function(i){n++;if(INV.seen[
 function endInventory(){
  ensureDraft();var found=0,miss=0,inv=T.inv,d=today();
  admin.draft.items.forEach(function(i){
+  if(T.invQty){if(INV.seen[i.id]){if(i.qte===""&&i.qte_init!=="")i.qte=i.qte_init;}else if(i.qte_init===1)i.qte=0;}
   if(INV.seen[i.id]){found++;i.vu=d;if(inv&&inv.reset.indexOf(i[T.status.key])>-1)i[T.status.key]=inv.found;}
   else{miss++;if(inv&&inv.from.indexOf(i[T.status.key])>-1)i[T.status.key]=inv.missing;}
  });
@@ -349,6 +350,7 @@ function filtered(){
   if(ui.st==="$cmd"){if(!orderInfo(T,i,d).on)return false;}
   else if(ui.st!=="all"&&statusOf(i)!==ui.st)return false;
   for(var k in ui.f){var fv=ui.f[k];if(!fv)continue;var fd=fieldBy(k);
+   if(k.indexOf("$miss_")===0){if(i[k.slice(6)])return false;continue;}
    if(fd&&fd.t==="flags"){if((i[k]||[]).indexOf(fv)<0)return false;}
    else if(String(i[k]==null?"":i[k])!==(fv==="$empty"?"":fv))return false;}
   if(ui.lf){var L=T.life&&T.life(i);if((L?L.k:"none")!==ui.lf)return false;}
@@ -466,6 +468,8 @@ function adminBar(sec){
 function filterBar(){
  var d=cur(),h='<div class="filters"><div class="search">'+I.search+'<input id="q" class="digits" type="search" autocorrect="off" spellcheck="false" placeholder="Chercher : nom, ICB, FT, référence…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div>';
  (T.filters||[]).forEach(function(fl){
+  if(fl.missing){var nm=d.items.filter(function(i){return !i[fl.missing];}).length;if(!nm&&!ui.f["$miss_"+fl.missing])return;
+   h+='<select class="fsel" data-f="$miss_'+fl.missing+'" aria-label="'+esc(fl.l)+'"><option value="">'+esc(fl.l)+'</option><option value="1"'+(ui.f["$miss_"+fl.missing]?' selected':'')+'>'+esc(fl.lm)+' ('+nm+')</option></select>';return;}
   if(fl.life){
    var lc={};d.items.forEach(function(i){var L=T.life(i);var k=L?L.k:"none";lc[k]=(lc[k]||0)+1;});
    var lo=[["perimee","Périmées"],["bientot","Fin de vie dans moins de 6 mois"],["manq","Date manquante"],["ok","En règle"]];
@@ -513,6 +517,7 @@ function itemHtml(i,dirty){
   meta.push(esc(lab)+(f.mono?'<span class="mono">'+esc(v)+'</span>':esc(v)+(f.unit&&/^[\d.,]+$/.test(String(v))?f.unit:"")));
  });
  if(i.vu)meta.push("Vu le "+esc(frDate(i.vu)));
+ if(T===TYPES.conteneur&&!i.icb&&i.qte_init===1)chips+='<span class="res r-warn">ICB à saisir</span>';
  if(T.life){var LV=T.life(i);if(LV)chips+='<span class="res r-'+LV.tone+'">'+esc(LV.txt)+'</span>';}
  var ff=T.fields.filter(function(f){return f.t==="flags";})[0];
  if(ff&&(i[ff.k]||[]).length)chips+=(i[ff.k]||[]).map(function(x){return '<span class="chip">'+esc(flagLabel(x))+'</span>';}).join("");
@@ -708,7 +713,7 @@ function exportPdf(kind){
   if(kind!=="cmd"){
    if(d.config.inventaire)line+="  ·  Dernier inventaire : "+d.config.inventaire;
    if(T.status){var c={};items.forEach(function(i){var s=stOpt(T,statusOf(i))[1];c[s]=(c[s]||0)+1;});line+="  ·  "+Object.keys(c).map(function(k){return k+" : "+c[k];}).join("  ·  ");}
-   if(kind==="flt"){var fx=[];if(ui.q)fx.push("recherche « "+ui.q+" »");for(var k in ui.f)if(ui.f[k]){var fd=fieldBy(k);fx.push((fd?fd.l:k)+" : "+(fd&&fd.t==="flags"?flagLabel(ui.f[k]):ui.f[k]==="$empty"?"vide":ui.f[k]));}
+   if(kind==="flt"){var fx=[];if(ui.q)fx.push("recherche « "+ui.q+" »");for(var k in ui.f)if(ui.f[k]){if(k.indexOf("$miss_")===0){fx.push("ICB à saisir");continue;}var fd=fieldBy(k);fx.push((fd?fd.l:k)+" : "+(fd&&fd.t==="flags"?flagLabel(ui.f[k]):ui.f[k]==="$empty"?"vide":ui.f[k]));}
     if(ui.rv)fx.push("résultat "+(ui.ry||years().slice(-1)[0])+" : "+(ui.rv==="$empty"?"aucun":ui.rv));if(ui.st!=="all")fx.push("état : "+(ui.st==="$cmd"?"à commander":stOpt(T,ui.st)[1]));
     if(fx.length)line+="  ·  Filtre : "+fx.join(", ");}
    if(withInv){var st=invStats();line+="  ·  Inventaire en cours : "+st.s+"/"+st.n+" pointées";}
