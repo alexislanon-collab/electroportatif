@@ -622,7 +622,22 @@ function renderSection(){
 var CAM={stream:null,loop:0};
 function stopCamera(){if(CAM.stream){CAM.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});CAM.stream=null;}if(CAM.loop){clearInterval(CAM.loop);CAM.loop=0;}}
 var jsqrReady=null;
-function loadJsQR(){if(!jsqrReady)jsqrReady=new Promise(function(res,rej){if(window.jsQR)return res();var sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js";sc.onload=res;sc.onerror=function(){jsqrReady=null;rej(new Error("load"));};document.head.appendChild(sc);});return jsqrReady;}
+var JSQR_URLS=["https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js","https://unpkg.com/jsqr@1.4.0/dist/jsQR.js","https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"];
+function loadJsQR(){
+ if(window.jsQR)return Promise.resolve();
+ if(!jsqrReady)jsqrReady=new Promise(function(res,rej){
+  var i=0;
+  (function tryNext(){
+   if(window.jsQR)return res();
+   if(i>=JSQR_URLS.length){jsqrReady=null;return rej(new Error("load"));}
+   var sc=document.createElement("script");sc.src=JSQR_URLS[i++];
+   sc.onload=function(){window.jsQR?res():tryNext();};
+   sc.onerror=tryNext;
+   document.head.appendChild(sc);
+  })();
+ });
+ return jsqrReady;
+}
 function matchCode(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<3)return null;var r=upkSearch(txt);for(var i=0;i<r.length;i++){if(norm(r[i].i.icb).replace(/[^a-z0-9]/g,"")===qq)return r[i];}return r.length===1?r[0]:(r.length?r[0]:null);}
 function startCamera(){
  if(CAM.stream)return;
