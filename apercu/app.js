@@ -259,6 +259,7 @@ var KP=PREVIEW?"apercu-":"";
 var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main"};
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
+var DEMOKEY="demo-eel";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -273,7 +274,7 @@ var view="home",curSid=null,T=null;
 var DATA=null,SHA=null,INV=null,openG={};
 var DKEY="",IKEY="",OKEY="";
 var ui=freshUi();
-var admin={on:false,token:"",draft:null,busy:false,msg:"",ok:"",arm:""};
+var admin={on:false,demo:false,token:"",draft:null,busy:false,msg:"",ok:"",arm:""};
 var sheet=null;
 var app=document.getElementById("app");
 function freshUi(){return {q:"",st:"all",f:{},ry:"",rv:"",lf:"",ct:""};}
@@ -424,7 +425,7 @@ function header(title,sub,isSection,backLabel){
  h+='<div class="hrow"><div class="htitle">'+(view==="home"?'<img class="hlogo" src="logo.png" alt="" width="58" height="66">':'')+'<div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div></div><div class="hbtns">';
  h+='<button class="btn" id="b-help" type="button" aria-label="Mode d\'emploi">?</button><button class="btn" id="b-qr" type="button">'+I.qr+'QR code</button>';
  if(isSection)h+='<button class="btn" id="b-pdf" type="button">'+I.pdf+'PDF</button>';
- h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?'Mode admin':'Admin')+'</button>';
+ h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?(admin.demo?'Mode démo':'Mode admin'):'Admin')+'</button>';
  return h+'</div></div></div><div class="tape" aria-hidden="true"></div></header>';
 }
 function previewBanner(){return PREVIEW?'<div class="preview"><div class="wrap">Aperçu de la nouvelle version : les données ici sont une copie, la vraie page n\'est pas modifiée.</div></div>':'';}
@@ -639,7 +640,7 @@ function renderSection(){
  }
  h+='</main>'+footer();
  var cc=changeCount();
- if(admin.on&&cc)h+='<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+cc+' modification'+(cc>1?'s':'')+' en brouillon</span><div class="row"><button class="btn ghost" id="b-discard" type="button">Annuler tout</button><button class="btn" id="b-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button></div></div></div>';
+ if(admin.on&&cc)h+='<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+(admin.demo?'Mode démo · '+cc+' modif. (non enregistrée'+(cc>1?'s':'')+')':cc+' modification'+(cc>1?'s':'')+' en brouillon')+'</span><div class="row"><button class="btn ghost" id="b-discard" type="button">Annuler tout</button>'+(admin.demo?'<button class="btn" type="button" disabled>Démo — non enregistré</button>':'<button class="btn" id="b-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button>')+'</div></div></div>';
  if(sheet)h+=renderSheet();
  app.innerHTML=h;
 }
@@ -855,7 +856,7 @@ function renderSheet(){
    h+='<div class="row"><label class="cb"><input type="checkbox" data-opt="__repar"'+(repar?" checked":"")+'> Envoyé en entreprise agréée (réparation)</label></div><div class="row"><label class="cb"><input type="checkbox" data-opt="__detruit"'+(detruit?" checked":"")+'> Matériel détruit</label></div>';}
   h+='<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" id="cf-save" type="button">Enregistrer le contrôle</button></div>';
  } else if(sheet.mode==="login"){
-  h+='<h3>Accès admin</h3><p class="help">Collez votre clé GitHub (elle commence par <span class="mono">github_pat_</span>). Elle reste enregistrée sur ce téléphone uniquement.</p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
+  h+='<h3>Accès admin</h3><p class="help">Collez votre clé GitHub (elle commence par <span class="mono">github_pat_</span>). Elle reste enregistrée sur ce téléphone uniquement.<br>Pour une <b>démonstration</b> sans rien enregistrer, saisissez&nbsp;: <span class="mono">demo-eel</span></p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
  } else if(sheet.mode==="cfg"){
   var cfg=cur().config;
   h+='<h3>Réglages</h3><div class="fgrid"><div class="field full"><label for="c-inv">Date du dernier inventaire</label><input id="c-inv" value="'+esc(cfg.inventaire)+'" placeholder="21/10/2026"></div>';
@@ -1012,6 +1013,7 @@ function publishSec(sid){
 }
 function pendingSecs(){return SECTIONS.filter(function(sc){var st=store[sc.id];return st.draft&&diffCount(st.DATA,st.draft);});}
 function publishAll(){
+ if(admin.demo){admin.ok="Mode démonstration : les modifications ne sont pas enregistrées. Touchez « Annuler tout » pour repartir à zéro.";render();return;}
  if(admin.busy)return;saveCtx();
  var list=pendingSecs();if(!list.length)return;
  admin.busy=true;admin.msg="";admin.ok="";render();
@@ -1022,6 +1024,7 @@ function publishAll(){
  }).catch(function(e){admin.busy=false;admin.msg=ghErr(e);if(curSid){var st=store[curSid];DATA=st.DATA;SHA=st.SHA;admin.draft=st.draft;}render();});
 }
 function publish(){
+ if(admin.demo){admin.ok="Mode démonstration : les modifications ne sont pas enregistrées. Touchez « Annuler tout » pour repartir à zéro.";render();return;}
  if(!admin.draft||admin.busy)return;
  var sec=secById(curSid);
  admin.busy=true;admin.msg="";admin.ok="";render();
@@ -1042,6 +1045,7 @@ function publish(){
  }).catch(function(e){admin.busy=false;admin.msg=ghErr(e);render();});
 }
 function login(token){
+ if(token===DEMOKEY){admin.demo=true;admin.token="";admin.on=true;sheet=null;admin.msg="";admin.ok="Mode démonstration : vous pouvez tout essayer (ajouter, modifier, contrôler). Rien n'est enregistré ni envoyé à l'équipe.";loadAll();return;}
  sheet.busy=true;sheet.err="";render();
  admin.token=token;
  gh("GET",null,BASE+SECTIONS[0].file).then(function(){
@@ -1129,7 +1133,7 @@ function campTile(){
 function pubBar(){
  var n=0;SECTIONS.forEach(function(sc){var st=store[sc.id];if(st.draft)n+=diffCount(st.DATA,st.draft);});
  if(!admin.on||!n)return "";
- return '<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+n+' modification'+(n>1?'s':'')+' en brouillon</span><div class="row"><button class="btn ghost" id="c-discard" type="button">Annuler tout</button><button class="btn" id="c-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button></div></div></div>';
+ return '<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+(admin.demo?'Mode démo · '+n+' modif. (non enregistrée'+(n>1?'s':'')+')':n+' modification'+(n>1?'s':'')+' en brouillon')+'</span><div class="row"><button class="btn ghost" id="c-discard" type="button">Annuler tout</button>'+(admin.demo?'<button class="btn" type="button" disabled>Démo — non enregistré</button>':'<button class="btn" id="c-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button>')+'</div></div></div>';
 }
 function renderCamp(){
  var h=previewBanner()+header("Campagne de contrôle","",false,"TST")+'<main class="wrap">';
@@ -1276,11 +1280,11 @@ app.addEventListener("click",function(e){
  if(t.id==="p-flt"){exportPdf("flt");return;}
  if(t.id==="p-cmd"){exportPdf("cmd");return;}
  if(t.id==="b-admin"){
-  if(admin.on){admin.on=false;render();return;}
+  if(admin.on){admin.on=false;admin.demo=false;admin.ok="";render();return;}
   if(admin.token){admin.on=true;render();return;}
   sheet={mode:"login"};render();focusId("l-token");return;
  }
- if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;render();return;}
+ if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;admin.demo=false;render();return;}
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
@@ -1296,7 +1300,7 @@ app.addEventListener("click",function(e){
   var entry={date:date,verif:verif,obs:obs,statut:statut,reponses:cleanAns(a)};
   var nom=(secItem(csid,sheet.id)||{}).designation||"";
   editItemIn(csid,sheet.id,function(i){i.history=(i.history||[]).concat([entry]);i.statut=statut;i.date_ctrl=date;});
-  if(sheet.fromScan){sheet={mode:"identify",q:"",saved:nom};}else{sheet=null;admin.ok="Contrôle de « "+nom+" » enregistré. Touchez « Publier pour l\'équipe » quand vous avez fini.";}
+  if(sheet.fromScan){sheet={mode:"identify",q:"",saved:nom};}else{sheet=null;admin.ok=admin.demo?"Mode démo : contrôle de « "+nom+" » simulé, rien n'est enregistré.":"Contrôle de « "+nom+" » enregistré. Touchez « Publier pour l\'équipe » quand vous avez fini.";}
   render();return;
  }
  if(t.id==="b-cfg"){sheet={mode:"cfg"};render();return;}
