@@ -341,7 +341,7 @@ function distinct(k){var s={};cur().items.forEach(function(i){var v=i[k];s[v==nu
 function header(title,sub,isSection,backLabel){
  var h='<header class="top"><div class="wrap">';
  if(backLabel)h+='<button class="back" id="b-home" type="button">'+I.back+esc(backLabel)+'</button>';
- h+='<div class="hrow"><div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div><div class="hbtns">';
+ h+='<div class="hrow"><div class="htitle">'+(view==="home"?'<img class="hlogo" src="logo.png" alt="" width="58" height="66">':'')+'<div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div></div><div class="hbtns">';
  h+='<button class="btn" id="b-help" type="button" aria-label="Mode d\'emploi">?</button><button class="btn" id="b-qr" type="button">'+I.qr+'QR code</button>';
  if(isSection)h+='<button class="btn" id="b-pdf" type="button">'+I.pdf+'PDF</button>';
  h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?'Mode admin':'Admin')+'</button>';
