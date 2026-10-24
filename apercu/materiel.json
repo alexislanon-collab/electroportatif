@@ -13,6 +13,8 @@
   {"marque":"Makita","designation":"Batterie","energie":"5.0 Ah","ref":"1ère identification","nb":1,"annee":"","serie":"2/5","statut":"dispo","localisation":"TST","commentaire":"","id":"m010"},
   {"marque":"Makita","designation":"Batterie","energie":"5.0 Ah","ref":"1ère identification","nb":1,"annee":"","serie":"3/5","statut":"dispo","localisation":"TST","commentaire":"","id":"m011"},
   {"marque":"Makita","designation":"Batterie","energie":"5.0 Ah","ref":"1ère identification","nb":1,"annee":"","serie":"4/5","statut":"dispo","localisation":"TST","commentaire":"","id":"m012"},
+  {"designation":"Batterie","marque":"Makita","ref":"1ère identification","energie":"5.0 Ah","nb":1,"annee":"2026","serie":"Végét 1/2","statut":"dispo","localisation":"Local environnement","commentaire":"","id":"m101"},
+  {"designation":"Batterie","marque":"Makita","ref":"1ère identification","energie":"5.0 Ah","nb":1,"annee":"2026","serie":"Veget 2/2","statut":"dispo","localisation":"Local environnement","commentaire":"","id":"m102"},
   {"designation":"Batterie","marque":"Makita","ref":"2ème identification","energie":"5.0 Ah","nb":1,"annee":"","serie":"09/20","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m013"},
   {"designation":"Batterie","marque":"Makita","ref":"2ème identification","energie":"5.0 Ah","nb":1,"annee":"","serie":"10/20","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m014"},
   {"designation":"Batterie","marque":"Makita","ref":"2ème réédition","energie":"5.0 Ah","nb":1,"annee":"","serie":"07/20","statut":"dispo","localisation":"Local grillagé","commentaire":"","id":"m015"},

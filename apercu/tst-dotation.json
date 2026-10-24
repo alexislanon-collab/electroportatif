@@ -1,0 +1,11 @@
+{
+"config":{"titre":"Dotation par agent","inventaire":"","maj":"2026-10-24","dotation_type":["Corde pour le bec – Rouge FT 71 100 m Ø 8","assujetissement – Rouge FT 220 140 m Ø 16","assujetissement – Rouge FT 220 30 m Ø 16","Corde de service – Jaune FT 71 100 m Ø 14","Corde de service – Jaune FT 71 100 m Ø 14","Corde de service – Jaune FT 71 30 m Ø 14","Corde de diam 8 – Rouge FT 71 150 m Ø 8","Corde de diam 8 – Rouge FT 71 150 m Ø 8","Corde paillardet pour le personnel (Epissé) – Rouge / jaune FT 71 200 m Ø 14","Corde paillardet pour matériel (Epissé) – jaune FT 71 170 m Ø 14"]},
+"items":[
+  {"agent":"Miguel","chaussette":"","chaussure":"","combi":"1,76-1,94","sous_combi":"XXL","gants_cond":"10","gants_cuir":"11","commentaire":"","id":"a001"},
+  {"agent":"David","chaussette":"43","chaussure":"43","combi":"1,76-1,94","sous_combi":"XL","gants_cond":"8","gants_cuir":"9","commentaire":"","id":"a002"},
+  {"agent":"Christophe","chaussette":"43","chaussure":"44","combi":"1,52-1,76","sous_combi":"XL","gants_cond":"9","gants_cuir":"10","commentaire":"","id":"a003"},
+  {"agent":"Alexis","chaussette":"45","chaussure":"46","combi":"1,76 - 1,94","sous_combi":"XXL","gants_cond":"10","gants_cuir":"10","commentaire":"","id":"a004"},
+  {"agent":"Rémy","chaussette":"43","chaussure":"43","combi":"1,76 - 1,94","sous_combi":"XL","gants_cond":"8","gants_cuir":"9","commentaire":"","id":"a005"},
+  {"agent":"Fabien","chaussette":"42","chaussure":"42","combi":"1,76 - 1,94","sous_combi":"L","gants_cond":"9","gants_cuir":"9","commentaire":"","id":"a006"},
+  {"agent":"James","chaussette":"43","chaussure":"43","combi":"1,76 - 1,94","sous_combi":"XL","gants_cond":"8","gants_cuir":"9","commentaire":"","id":"a007"}
+]}
