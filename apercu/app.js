@@ -627,7 +627,7 @@ function qrUrl(){return PAGE_URL+(view!=="home"?"#"+view:"");}
 
 function formField(f,it){
  var id="f-"+f.k,v=it[f.k],cls='field'+(f.full||f.t==="area"||f.t==="flags"||f.t==="results"?' full':'');
- if(f.t==="history"){var hh=it[f.k]||[];return '<div class="'+cls+'"><span class="flabel">'+esc(f.l)+'</span>'+(hh.length?'<table class="hist">'+hh.map(function(x){return '<tr><th>'+esc(x.date||"")+'</th><td>'+esc(x.verif||"")+'</td><td>'+esc(x.obs||"")+'</td></tr>';}).join("")+'</table>':'<p class="help">Aucun contrôle enregistré. L\'historisation se fera avec la fiche de contrôle.</p>')+'</div>';}
+ if(f.t==="history"){return '<div class="'+cls+'"><span class="flabel">'+esc(f.l)+'</span>'+histHtml(it[f.k])+'</div>';}
  if(f.t==="area")return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><textarea id="'+id+'">'+esc(v)+'</textarea></div>';
  if(f.t==="status"){var so=T.status.opts.slice();if(v&&!so.some(function(o){return o[0]===v;}))so.push([v,v]);
   return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><select id="'+id+'">'+so.map(function(o){return '<option value="'+esc(o[0])+'"'+(String(v==null?"":v)===o[0]?' selected':'')+'>'+esc(o[1])+'</option>';}).join("")+'</select></div>';}
@@ -646,6 +646,16 @@ function formField(f,it){
  return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><input id="'+id+'" '+type+(/^(serie|cesar|ref|ref_facom|ref_dc|mainta)$/.test(f.k)?' class="digits" autocorrect="off" spellcheck="false"':'')+' value="'+esc(v==null?"":v)+'"'+(f.dl?' list="dl-'+f.k+'"':'')+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+(f.req?' required':'')+'></div>';
 }
 
+function initiales(n){n=String(n||"").trim();if(!n)return "?";var p=n.split(/\s+/);return (p[0][0]+(p.length>1?p[p.length-1][0]:"")).toUpperCase();}
+function histHtml(hh){
+ if(!hh||!hh.length)return '<p class="help">Aucun contrôle enregistré pour l\'instant.</p>';
+ var a=hh.slice().reverse();
+ return '<ol class="timeline">'+a.map(function(x,n){
+  var ras=!x.obs||/^\s*ras\s*$/i.test(x.obs);
+  var obs=ras?'<span class="tl-ras">Rien à signaler</span>':'<span class="tl-obs">'+esc(x.obs)+'</span>';
+  return '<li'+(n===0?' class="now"':'')+'><span class="tl-dot" aria-hidden="true"></span><div class="tl-card"><div class="tl-top"><span class="tl-date">'+esc(x.date||"Date ?")+'</span>'+(x.verif?'<span class="tl-who"><span class="ini">'+esc(initiales(x.verif))+'</span>'+esc(x.verif)+'</span>':'')+'</div>'+obs+'</div></li>';
+ }).join("")+'</ol>';
+}
 function renderSheet(){
  var h='<div class="sheet-bg" id="sheet-bg"><div class="sheet" role="dialog" aria-modal="true">';
  if(sheet.mode==="qr"){
@@ -671,7 +681,7 @@ function renderSheet(){
    if(f.t==="results"){var ys=years().slice().reverse();if(!ys.length)return;
     h+='<dt>'+esc(f.l)+'</dt><dd><table class="hist">'+ys.map(function(y){var r=(v&&v[y])||"";return '<tr><th>'+y+'</th><td class="'+(r?'r-'+(RTONE[r]||"none"):'muted')+'">'+esc(r||"—")+'</td></tr>';}).join("")+'</table></dd>';return;}
    if(f.t==="flags"){if(!(v||[]).length)return;h+='<dt>'+esc(f.l)+'</dt><dd>'+(v||[]).map(flagLabel).map(esc).join(", ")+'</dd>';return;}
-   if(f.t==="history"){var hh=v||[];if(!hh.length)return;h+='<dt>'+esc(f.l)+'</dt><dd><table class="hist">'+hh.map(function(x){return '<tr><th>'+esc(x.date||"")+'</th><td>'+esc(x.verif||"")+'</td><td>'+esc(x.obs||"")+'</td></tr>';}).join("")+'</table></dd>';return;}
+   if(f.t==="history"){if(!v||!v.length)return;h+='<dt class="full-dt">'+esc(f.l)+'</dt><dd class="full-dd">'+histHtml(v)+'</dd>';return;}
    if(f.t==="status"||v==null||v==="")return;
    if(f.t==="url"){h+='<dt>'+esc(f.l)+'</dt><dd><a href="'+esc(v)+'" target="_blank" rel="noopener">Ouvrir la fiche produit</a></dd>';return;}
    h+='<dt>'+esc(f.l)+'</dt><dd'+(f.mono?' class="mono"':'')+'>'+esc(v)+(f.unit&&/^[\d.,]+$/.test(String(v))?f.unit:"")+'</dd>';

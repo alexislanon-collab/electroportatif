@@ -230,11 +230,28 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 .ceq b{color:var(--ink)}
 .dbar-on .sheet-bg{padding-bottom:58px}
 .dbar-on .pub{display:none}
+.timeline{list-style:none;margin:8px 0 0;padding:0;position:relative}
+.timeline:before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.timeline li{position:relative;padding:0 0 12px 26px}
+.timeline li:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:1px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--muted);box-sizing:border-box}
+.timeline li.now .tl-dot{border-color:var(--ok)}
+.tl-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.timeline li.now .tl-card{border-color:var(--ok)}
+.tl-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tl-date{font-family:var(--mono);font-weight:600;font-size:14px}
+.tl-who{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);font-weight:600}
+.tl-who .ini{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--primary);color:var(--on-primary);font-size:11px;font-weight:700}
+.tl-obs{display:block;margin-top:5px;font-size:14px;overflow-wrap:anywhere}
+.tl-ras{display:inline-flex;align-items:center;gap:5px;margin-top:5px;font-size:13px;font-weight:600;color:var(--ok)}
+.tl-ras:before{content:"";width:13px;height:13px;border-radius:50%;background:var(--ok)}
+.full-dt{grid-column:1/-1;margin-top:4px}
+.full-dd{grid-column:1/-1}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=11"></script>
+<script src="app.js?v=12"></script>
 </body>
 </html>
