@@ -273,6 +273,7 @@ var I={
  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
  pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M12 11v6M9 14l3 3 3-3"/></svg>',
  cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
  ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
 };
@@ -646,14 +647,68 @@ function formField(f,it){
  return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><input id="'+id+'" '+type+(/^(serie|cesar|ref|ref_facom|ref_dc|mainta)$/.test(f.k)?' class="digits" autocorrect="off" spellcheck="false"':'')+' value="'+esc(v==null?"":v)+'"'+(f.dl?' list="dl-'+f.k+'"':'')+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+(f.req?' required':'')+'></div>';
 }
 
+var VKEY="electro-verif";
+var QUEST={
+ machoire:{nom:"Mâchoire",items:[
+  {id:"m1",q:"Les inscriptions sur les mâchoires sont lisibles dans leur intégralité.",good:"OUI"},
+  {id:"m2",q:"La vis de desserrage est endommagée.",good:"NON",rep:"La vis a été remplacée ?"},
+  {id:"m3",q:"Le taraudage de la vis de desserrage est endommagé.",good:"NON",rep:"Il a été réparé ?"},
+  {id:"m4",q:"Les vis de presserrage sont endommagées.",good:"NON",rep:"Elles ont été remplacées ?"},
+  {id:"m5",q:"Les taraudages des vis de presserrage sont endommagés.",good:"NON",rep:"Ils ont été réparés ?"},
+  {id:"m6",q:"Les inserts des taraudages des vis de presserrage sont endommagés.",good:"NON"},
+  {id:"m7",q:"L\'état de surface des profils en queue d\'aronde est endommagé.",good:"NON",rep:"Il a été réparé ?"},
+  {id:"m8",q:"La partie interne (striée) est endommagée.",good:"NON"},
+  {id:"m9",q:"Plus de 10% des stries sont usées.",good:"NON"},
+  {id:"m10",q:"Un défaut sur la partie interne peut endommager le câble.",good:"NON",rep:"Il a été éliminé ?"},
+  {id:"m11",q:"Profils en queue d\'aronde recouverts de graisse MOLYKOTE.",type:"action"}
+ ]},
+ fourreau:{nom:"Fourreau",items:[
+  {id:"f1",q:"Les inscriptions sur l\'étiquette de l\'élingue sont lisibles dans leur intégralité.",good:"OUI"},
+  {id:"f2",q:"La cosse arceau est déformée ou absente.",good:"NON"},
+  {id:"f3",q:"Une des cosses cœur est déformée ou absente.",good:"NON"},
+  {id:"f4",q:"Des brins de l\'élingue sont coupés.",good:"NON"},
+  {id:"f5",q:"L\'élingue est déformée (écrasement, traces de chocs…).",good:"NON"},
+  {id:"f6",q:"Il est possible de séparer l\'élingue du corps.",good:"NON"},
+  {id:"f7",q:"Référence du corps",type:"text"},
+  {id:"f8",q:"Inscriptions gravées sur le corps",type:"text"},
+  {id:"f9",q:"Les inscriptions sur le corps sont lisibles dans leur intégralité.",good:"OUI"},
+  {id:"f10",q:"Les 2 parties du corps s\'ouvrent et se ferment correctement, sans point dur ni jeu excessif.",good:"OUI"},
+  {id:"f11",q:"Les charnières présentent des traces de coups.",good:"NON"},
+  {id:"f12",q:"Après fermeture, les 2 demi-parties joignent parfaitement.",good:"OUI"},
+  {id:"f13",q:"L\'examen visuel du corps révèle la présence de fissures.",good:"NON"},
+  {id:"f14",q:"Les points d\'ancrage de l\'élingue sont déformés.",good:"NON"},
+  {id:"f15",q:"Les glissières en queue d\'aronde sont endommagées.",good:"NON",rep:"Elles ont été réparées ?"}
+ ]}
+};
+function questFor(sid){return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
+function controlResult(sid,ans){
+ var ok=true,probs=[];
+ questFor(sid).items.forEach(function(q){
+  if(q.type)return;
+  var a=ans[q.id]||"";
+  if(a&&a!==q.good){if(q.rep&&ans[q.id+"_rep"]==="OUI")return;ok=false;probs.push(q.q);}
+ });
+ return {conforme:ok,probs:probs};
+}
+function syncControl(){
+ if(!sheet||sheet.mode!=="controle")return;var a=sheet.ans;
+ var d=document.getElementById("cf-date");if(d)a.__date=d.value;
+ var v=document.getElementById("cf-verif");if(v)a.__verif=v.value;
+ var o=document.getElementById("cf-obs");if(o)a.__obs=o.value;
+ [].slice.call(document.querySelectorAll(".qtext")).forEach(function(x){a[x.dataset.q]=x.value;});
+}
+function cleanAns(a){var o={};for(var k in a){if(k.indexOf("__")!==0)o[k]=a[k];}return o;}
 function initiales(n){n=String(n||"").trim();if(!n)return "?";var p=n.split(/\s+/);return (p[0][0]+(p.length>1?p[p.length-1][0]:"")).toUpperCase();}
+var STTONE={"Conforme":"ok","Non conforme":"bad","À contrôler":"warn","Détruit":"off"};
 function histHtml(hh){
  if(!hh||!hh.length)return '<p class="help">Aucun contrôle enregistré pour l\'instant.</p>';
  var a=hh.slice().reverse();
  return '<ol class="timeline">'+a.map(function(x,n){
   var ras=!x.obs||/^\s*ras\s*$/i.test(x.obs);
+  var tone=x.statut?(STTONE[x.statut]||"none"):(n===0?"ok":"none");
   var obs=ras?'<span class="tl-ras">Rien à signaler</span>':'<span class="tl-obs">'+esc(x.obs)+'</span>';
-  return '<li'+(n===0?' class="now"':'')+'><span class="tl-dot" aria-hidden="true"></span><div class="tl-card"><div class="tl-top"><span class="tl-date">'+esc(x.date||"Date ?")+'</span>'+(x.verif?'<span class="tl-who"><span class="ini">'+esc(initiales(x.verif))+'</span>'+esc(x.verif)+'</span>':'')+'</div>'+obs+'</div></li>';
+  var pill=x.statut?'<span class="pill p-'+tone+'">'+esc(x.statut)+'</span>':'';
+  return '<li class="t-'+tone+(n===0?' now':'')+'"><span class="tl-dot" aria-hidden="true"></span><div class="tl-card"><div class="tl-top"><span class="tl-date">'+esc(x.date||"Date ?")+'</span>'+(x.verif?'<span class="tl-who"><span class="ini">'+esc(initiales(x.verif))+'</span>'+esc(x.verif)+'</span>':'')+'</div>'+(pill?'<div style="margin-top:5px">'+pill+'</div>':'')+obs+'</div></li>';
  }).join("")+'</ol>';
 }
 function renderSheet(){
@@ -691,6 +746,28 @@ function renderSheet(){
   if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
   h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
+} else if(sheet.mode==="controle"){
+  var it=cur().items.filter(function(x){return x.id===sheet.id;})[0]||{};
+  var qf=questFor(curSid),a=sheet.ans||(sheet.ans={}),res=controlResult(curSid,a);
+  var detruit=a.__detruit==="OUI",repar=a.__repar==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme",tone=detruit?"off":res.conforme?"ok":"bad";
+  h+='<h3 class="vtitle">Contrôle · '+esc(it.designation||"")+'</h3>';
+  h+='<div class="cfid">'+(it.icb?'ICB <span class="mono">'+esc(it.icb)+'</span> · ':'')+(it.cable?esc(it.cable):'')+'</div>';
+  h+='<div class="fgrid"><div class="field"><label for="cf-date">Date du contrôle</label><input id="cf-date" value="'+esc(a.__date||frToday())+'" placeholder="jj/mm/aaaa"></div><div class="field"><label for="cf-verif">Vérificateur</label><input id="cf-verif" value="'+esc(a.__verif||lsGet(VKEY)||"")+'" placeholder="Nom" autocapitalize="words"></div></div>';
+  h+='<ol class="qlist">';
+  qf.items.forEach(function(q){
+   if(q.type==="text"){h+='<li class="qrow"><div class="qlab">'+esc(q.q)+'</div><input class="qtext" data-q="'+q.id+'" value="'+esc(a[q.id]||"")+'"></li>';return;}
+   if(q.type==="action"){var on=a[q.id]==="OUI";h+='<li class="qrow"><label class="cb big"><input type="checkbox" data-act="'+q.id+'"'+(on?" checked":"")+'> '+esc(q.q)+'</label></li>';return;}
+   var av=a[q.id]||"",bad=av&&av!==q.good;
+   h+='<li class="qrow'+(bad?" bad":av?" good":"")+'"><div class="qlab">'+esc(q.q)+'</div><div class="seg" role="group">'+["OUI","NON"].map(function(o){var sel=av===o,cls=sel?(o===q.good?"on-ok":"on-bad"):"";return '<button type="button" class="segb '+cls+'" data-q="'+q.id+'" data-v="'+o+'">'+o+'</button>';}).join("")+'</div>';
+   if(q.rep&&bad){var rv=a[q.id+"_rep"]||"";h+='<div class="qrep"><span>'+esc(q.rep)+'</span><div class="seg">'+["OUI","NON"].map(function(o){var sel=rv===o;return '<button type="button" class="segb '+(sel?(o==="OUI"?"on-ok":"on-bad"):"")+'" data-q="'+q.id+'_rep" data-v="'+o+'">'+o+'</button>';}).join("")+'</div></div>';}
+   h+='</li>';
+  });
+  h+='</ol>';
+  h+='<div class="field full"><label for="cf-obs">Observations</label><textarea id="cf-obs" placeholder="RAS si rien à signaler">'+esc(a.__obs||"")+'</textarea></div>';
+  h+='<div class="verdict v-'+tone+'">'+(detruit?"Matériel détruit":res.conforme?"Conforme — bon pour le service":"NON CONFORME — NE PAS UTILISER")+'</div>';
+  if(!res.conforme&&!detruit){h+='<div class="notice">À faire : attacher une étiquette rouge « NON CONFORME, NE PAS UTILISER ». Pour une mâchoire, les 2 pièces appairées doivent être éliminées.</div>';
+   h+='<div class="row"><label class="cb"><input type="checkbox" data-opt="__repar"'+(repar?" checked":"")+'> Envoyé en entreprise agréée (réparation)</label></div><div class="row"><label class="cb"><input type="checkbox" data-opt="__detruit"'+(detruit?" checked":"")+'> Matériel détruit</label></div>';}
+  h+='<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" id="cf-save" type="button">Enregistrer le contrôle</button></div>';
  } else if(sheet.mode==="login"){
   h+='<h3>Accès admin</h3><p class="help">Collez votre clé GitHub (elle commence par <span class="mono">github_pat_</span>). Elle reste enregistrée sur ce téléphone uniquement.</p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
  } else if(sheet.mode==="cfg"){
@@ -701,7 +778,9 @@ function renderSheet(){
   h+='<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" id="c-save" type="button">Valider</button></div>';
  } else {
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
-  h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3><form id="f-item"><div class="fgrid">';
+  h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
+  if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Nouveau contrôle</button>';
+  h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
   h+='<div class="field full cmdbox"><label class="cb"><input type="checkbox" id="f-commander"'+(it.commander?' checked':'')+'> À commander</label><input id="f-cmd_note" value="'+esc(it.cmd_note)+'" placeholder="Ex. : 2 unités, remplacer la lame…" aria-label="Note de commande"></div>';
   h+='</div>'+T.fields.filter(function(f){return f.dl;}).map(function(f){return dl("dl-"+f.k,uniq(f.k));}).join("");
@@ -1117,6 +1196,17 @@ app.addEventListener("click",function(e){
  }
  if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;render();return;}
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
+ if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,ans:{}};render();return;}
+ if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
+ if(t.id==="cf-save"){
+  syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
+  if(verif)lsSet(VKEY,verif);
+  var res=controlResult(curSid,a),detruit=a.__detruit==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme";
+  var obs=(a.__obs||"").trim();if(!obs)obs=res.conforme?"RAS":(res.probs[0]||"Non conforme");if(a.__repar==="OUI")obs+=" · envoyé en entreprise agréée";
+  var entry={date:date,verif:verif,obs:obs,statut:statut,reponses:cleanAns(a)};
+  ensureDraft();admin.draft.items=admin.draft.items.map(function(i){if(i.id!==sheet.id)return i;i=clone(i);i.history=(i.history||[]).concat([entry]);i.statut=statut;i.date_ctrl=date;return i;});
+  touch();saveDraft();sheet=null;admin.ok="Contrôle enregistré. Touchez « Publier pour l\'équipe » quand vous avez fini.";render();return;
+ }
  if(t.id==="b-cfg"){sheet={mode:"cfg"};render();return;}
  if(t.id==="b-year"){
   if(admin.arm!=="year"){admin.arm="year";render();return;}
@@ -1147,6 +1237,8 @@ app.addEventListener("keydown",function(e){
 app.addEventListener("input",function(e){if(e.target.id==="q"){ui.q=e.target.value;render();}});
 app.addEventListener("change",function(e){
  var t=e.target;
+ if(t.dataset&&t.dataset.act){syncControl();sheet.ans[t.dataset.act]=t.checked?"OUI":"";render();return;}
+ if(t.dataset&&t.dataset.opt){syncControl();sheet.ans[t.dataset.opt]=t.checked?"OUI":"";render();return;}
  if(t.classList.contains("fsel")){ui.f[t.dataset.f]=t.value;render();return;}
  if(t.id==="f-ry"){ui.ry=t.value;ui.rv="";render();return;}
  if(t.id==="f-rv"){ui.rv=t.value;render();return;}

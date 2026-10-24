@@ -247,11 +247,37 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 .tl-ras:before{content:"";width:13px;height:13px;border-radius:50%;background:var(--ok)}
 .full-dt{grid-column:1/-1;margin-top:4px}
 .full-dd{grid-column:1/-1}
+
+.ctrlbtn{width:100%;justify-content:center;margin-bottom:14px}
+.cfid{font-size:14px;color:var(--muted);margin:-4px 0 12px}
+.cfid .mono{color:var(--ink)}
+.qlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.qrow{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.qrow.good{border-color:var(--ok)}
+.qrow.bad{border-color:var(--bad);background:var(--bad-bg)}
+.qlab{font-size:14.5px;margin-bottom:8px;line-height:1.35}
+.seg{display:flex;gap:8px}
+.segb{flex:1;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px;font-weight:700;font-size:15px;min-height:44px;color:var(--muted)}
+.segb.on-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.segb.on-bad{background:var(--bad);border-color:var(--bad);color:#fff}
+.qrep{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.qrep span{font-size:13.5px;font-weight:600;flex:1 1 140px}
+.qrep .seg{flex:0 0 auto;min-width:150px}
+.qtext{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:9px 10px;font-size:16px;min-height:42px}
+.cb.big{font-size:14.5px!important;align-items:flex-start;line-height:1.35}
+.cb.big input{margin-top:1px}
+.verdict{margin-top:14px;border-radius:10px;padding:12px 14px;font-weight:800;font-size:16px;text-align:center}
+.verdict.v-ok{background:var(--ok-bg);color:var(--ok)}
+.verdict.v-bad{background:var(--bad-bg);color:var(--bad)}
+.verdict.v-off{background:var(--off-bg);color:var(--off)}
+.timeline li.t-bad .tl-dot{border-color:var(--bad)}
+.timeline li.t-bad .tl-card{border-color:var(--bad)}
+.timeline li.t-off .tl-dot{border-color:var(--off)}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=12"></script>
+<script src="app.js?v=13"></script>
 </body>
 </html>
