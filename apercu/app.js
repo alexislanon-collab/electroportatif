@@ -194,7 +194,8 @@ var TYPES={
 /* ---------- sections ---------- */
 var SECTIONS=[
  {id:"electroportatif",nom:"Électroportatif",parent:"materiel",file:"materiel.json",type:"outil",pre:"m",hint:"Machines, batteries, chargeurs…"},
- {id:"upk",nom:"UPK",parent:"materiel",file:"upk.json",type:"upk",pre:"u",hint:"Mâchoires et fourreaux · contrôle par réf. câble"},
+ {id:"upk-machoires",nom:"Mâchoires",parent:"upk",file:"upk-machoires.json",type:"upk",pre:"um",hint:"Mâchoires par taille de câble"},
+ {id:"upk-fourreaux",nom:"Fourreaux",parent:"upk",file:"upk-fourreaux.json",type:"upk",pre:"uf",hint:"Fourreaux par taille de câble"},
  {id:"dstm-cablette",nom:"Câblette italienne",parent:"dstm",file:"dstm.json",type:"outil",pre:"d",hint:"Câblettes italiennes Tesmec"},
  {id:"gipfs-noir",nom:"Container noir",parent:"gipfs",file:"gipfs-noir.json",type:"conteneur",pre:"no"},
  {id:"gipfs-jaune",nom:"Container jaune",parent:"gipfs",file:"gipfs-jaune.json",type:"conteneur",pre:"ja"},
@@ -211,6 +212,7 @@ var SECTIONS=[
 ];
 var GROUPS=[
  {id:"materiel",nom:"Matériel",hint:"Électroportatif et UPK"},
+ {id:"upk",nom:"UPK",parent:"materiel",hint:"Mâchoires et fourreaux"},
  {id:"tst",nom:"TST",hint:"Matériel, cordes, camion, consommables, dotation"},
  {id:"gipfs",nom:"GIPFS",hint:"6 containers : noir, jaune, orange, gris, violet, blanc"},
  {id:"dstm",nom:"DSTM",hint:"Câblette italienne"},
@@ -223,7 +225,7 @@ var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargem
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
 function childrenOf(gid){var out=[];SECTIONS.forEach(function(s){if(s.parent===gid&&!s.hidden)out.push(s);});GROUPS.forEach(function(g){if(g.parent===gid)out.push(g);});VIEWS.forEach(function(v){if(v.parent===gid)out.push(v);});
- /* ordre d'affichage dans TST */var ord=["electroportatif","upk","dstm-cablette","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
+ /* ordre d'affichage dans TST */var ord=["electroportatif","upk","upk-machoires","upk-fourreaux","dstm-cablette","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
 function sectionsUnder(gid){var out=[];childrenOf(gid).forEach(function(c){if(secById(c.id))out.push(c);else if(grpById(c.id))out=out.concat(sectionsUnder(c.id));});return out;}
 function secById(id){return SECTIONS.filter(function(s){return s.id===id;})[0]||null;}
 
