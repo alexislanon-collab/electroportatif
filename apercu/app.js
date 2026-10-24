@@ -273,6 +273,7 @@ var I={
  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
  pdf:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M12 11v6M9 14l3 3 3-3"/></svg>',
  cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.5 12h11L21 7H6"/></svg>',
+ cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
  ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
@@ -463,9 +464,11 @@ function renderHome(){
 function renderGroup(){
  saveCtx();
  var g=grpById(view);
- var h=previewBanner()+header(g.nom,"Choisissez une partie",false,g.parent?grpById(g.parent).nom:"Accueil")+'<main class="wrap"><div class="tiles">';
+ var h=previewBanner()+header(g.nom,"Choisissez une partie",false,g.parent?grpById(g.parent).nom:"Accueil")+'<main class="wrap">';
+ if(g.id==="upk")h+='<button type="button" class="btn primary bigctrl" id="b-ctrl-start">'+I.check+'Réaliser un contrôle</button>';
+ h+='<div class="tiles">';
  childrenOf(g.id).forEach(function(c){h+=viewById(c.id)?campTile():tileHtml(c.nom,secById(c.id)?[c]:sectionsUnder(c.id),'data-sec="'+c.id+'"',secHint(c));});
- h+='</div></main>'+footer();
+ h+='</div></main>'+footer()+pubBar();
  if(sheet)h+=renderSheet();
  app.innerHTML=h;
 }
@@ -616,9 +619,35 @@ function renderSection(){
  if(sheet)h+=renderSheet();
  app.innerHTML=h;
 }
+var CAM={stream:null,loop:0};
+function stopCamera(){if(CAM.stream){CAM.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});CAM.stream=null;}if(CAM.loop){clearInterval(CAM.loop);CAM.loop=0;}}
+var jsqrReady=null;
+function loadJsQR(){if(!jsqrReady)jsqrReady=new Promise(function(res,rej){if(window.jsQR)return res();var sc=document.createElement("script");sc.src="https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.min.js";sc.onload=res;sc.onerror=function(){jsqrReady=null;rej(new Error("load"));};document.head.appendChild(sc);});return jsqrReady;}
+function matchCode(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<3)return null;var r=upkSearch(txt);for(var i=0;i<r.length;i++){if(norm(r[i].i.icb).replace(/[^a-z0-9]/g,"")===qq)return r[i];}return r.length===1?r[0]:(r.length?r[0]:null);}
+function startCamera(){
+ if(CAM.stream)return;
+ if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){sheet.camerr="Caméra non disponible sur cet appareil.";render();return;}
+ navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}}).then(function(st){
+  if(!sheet||sheet.mode!=="identify"||!sheet.cam){st.getTracks().forEach(function(t){t.stop();});return;}
+  CAM.stream=st;var vv=document.getElementById("cam-v");if(!vv){stopCamera();return;}vv.srcObject=st;vv.play();
+  try{var tr=st.getVideoTracks()[0],caps=tr.getCapabilities?tr.getCapabilities():{};if(caps&&caps.zoom)tr.applyConstraints({advanced:[{zoom:Math.min(caps.zoom.max,2)}]});}catch(e){}
+  loadJsQR().then(function(){
+   var cv=document.createElement("canvas");
+   CAM.loop=setInterval(function(){
+    var vd=document.getElementById("cam-v");if(!vd||!CAM.stream||!window.jsQR||!vd.videoWidth)return;
+    cv.width=vd.videoWidth;cv.height=vd.videoHeight;var cx=cv.getContext("2d");cx.drawImage(vd,0,0);
+    var img;try{img=cx.getImageData(0,0,cv.width,cv.height);}catch(e){return;}
+    var code=window.jsQR(img.data,cv.width,cv.height);
+    if(code&&code.data){var m=matchCode(code.data);if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}else{sheet.camerr="QR lu : « "+code.data.slice(0,24)+" » — aucun outil correspondant.";render();}}
+   },350);
+  }).catch(function(){sheet.camerr="Lecteur de QR code indisponible (connexion ?).";render();});
+ }).catch(function(err){sheet.camerr=(err&&err.name==="NotAllowedError")?"Accès caméra refusé. Autorisez la caméra puis réessayez.":"Impossible d'ouvrir la caméra.";sheet.cam=false;render();});
+}
 function afterRender(fid,ss){
  if(fid){var el=document.getElementById(fid);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,ss);}catch(e){}}}
  if(sheet&&sheet.mode==="qr")drawQR();
+ if(sheet&&sheet.mode==="identify"&&sheet.cam&&!CAM.stream)startCamera();
+ if(!(sheet&&sheet.mode==="identify"&&sheet.cam)&&CAM.stream)stopCamera();
 }
 
 /* ---------- feuilles (formulaires) ---------- */
@@ -680,6 +709,10 @@ var QUEST={
   {id:"f15",q:"Les glissières en queue d\'aronde sont endommagées.",good:"NON",rep:"Elles ont été réparées ?"}
  ]}
 };
+function secData(sid){var s=store[sid];return s&&(s.draft||s.DATA);}
+function secItem(sid,id){var d=secData(sid);return d?d.items.filter(function(x){return x.id===id;})[0]:null;}
+function editItemIn(sid,id,fn){var s=store[sid];if(!s.DATA)return;if(!s.draft)s.draft=clone(s.DATA);var it=s.draft.items.filter(function(x){return x.id===id;})[0];if(it)fn(it);s.draft.config.maj=today();lsSet(keysFor(sid).d,diffCount(s.DATA,s.draft)?JSON.stringify(s.draft):null);if(curSid===sid){DATA=s.DATA;admin.draft=s.draft;}}
+function upkSearch(q){var qq=norm(q).replace(/[^a-z0-9]/g,"");if(!qq)return [];var out=[];["upk-machoires","upk-fourreaux"].forEach(function(sid){var d=secData(sid);if(!d)return;d.items.forEach(function(i){var hay=(String(i.icb||"")+" "+String(i.frappe||"")+" "+String(i.cesar||"")).toLowerCase().replace(/[^a-z0-9]/g,"");if(hay.indexOf(qq)>-1)out.push({sid:sid,i:i});});});return out;}
 function questFor(sid){return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
 function controlResult(sid,ans){
  var ok=true,probs=[];
@@ -746,9 +779,23 @@ function renderSheet(){
   if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
   h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
-} else if(sheet.mode==="controle"){
-  var it=cur().items.filter(function(x){return x.id===sheet.id;})[0]||{};
-  var qf=questFor(curSid),a=sheet.ans||(sheet.ans={}),res=controlResult(curSid,a);
+} else if(sheet.mode==="identify"){
+  h+='<h3>Réaliser un contrôle</h3>';
+  if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
+  h+='<p class="help">Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.</p>';
+  h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
+  if(sheet.cam)h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le QR code, ou le numéro gravé puis lisez-le</div>')+'</div>';
+  h+='<div class="field full"><label for="id-icb">Numéro ICB / frappé</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="Ex. : DIB1-0019892 ou 8179"></div>';
+  var res2=upkSearch(sheet.q||"");
+  if((sheet.q||"").trim()){
+   if(!res2.length)h+='<div class="empty" style="padding:18px 0">Aucun outil trouvé pour « '+esc(sheet.q)+' ».</div>';
+   else h+='<ul class="idres">'+res2.slice(0,15).map(function(r){var st=stOpt(TYPES.upk,r.i.statut);return '<li><button type="button" class="idrow" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+'</b><span class="idr-sub">ICB '+esc(r.i.icb||"—")+(r.i.frappe?' · frappé '+esc(r.i.frappe):'')+(r.i.cable?' · '+esc(r.i.cable):'')+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
+  }
+  h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
+ } else if(sheet.mode==="controle"){
+  var csid=sheet.sid||curSid;
+  var it=secItem(csid,sheet.id)||{};
+  var qf=questFor(csid),a=sheet.ans||(sheet.ans={}),res=controlResult(csid,a);
   var detruit=a.__detruit==="OUI",repar=a.__repar==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme",tone=detruit?"off":res.conforme?"ok":"bad";
   h+='<h3 class="vtitle">Contrôle · '+esc(it.designation||"")+'</h3>';
   h+='<div class="cfid">'+(it.icb?'ICB <span class="mono">'+esc(it.icb)+'</span> · ':'')+(it.cable?esc(it.cable):'')+'</div>';
@@ -779,7 +826,7 @@ function renderSheet(){
  } else {
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
   h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
-  if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Nouveau contrôle</button>';
+  if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle</button>';
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
   h+='<div class="field full cmdbox"><label class="cb"><input type="checkbox" id="f-commander"'+(it.commander?' checked':'')+'> À commander</label><input id="f-cmd_note" value="'+esc(it.cmd_note)+'" placeholder="Ex. : 2 unités, remplacer la lame…" aria-label="Note de commande"></div>';
@@ -1147,7 +1194,7 @@ function renderHelp(){
 
 /* ---------- navigation ---------- */
 function show(target){
- sheet=null;ui=freshUi();admin.msg="";admin.ok="";admin.arm="";
+ stopCamera();sheet=null;ui=freshUi();admin.msg="";admin.ok="";admin.arm="";
  if(target&&secById(target)){loadCtx(target);view=target;openG={};saveOpen();}
  else if(target&&(grpById(target)||viewById(target))){saveCtx();curSid=null;T=null;view=target;}
  else{saveCtx();view="home";}
@@ -1196,23 +1243,29 @@ app.addEventListener("click",function(e){
  }
  if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;render();return;}
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
- if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,ans:{}};render();return;}
+ if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
+ if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
+ if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;}else{sheet.cam=true;sheet.camerr="";}render();return;}
+ if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
  if(t.id==="cf-save"){
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
   if(verif)lsSet(VKEY,verif);
-  var res=controlResult(curSid,a),detruit=a.__detruit==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme";
+  var csid=sheet.sid||curSid;
+  var res=controlResult(csid,a),detruit=a.__detruit==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme";
   var obs=(a.__obs||"").trim();if(!obs)obs=res.conforme?"RAS":(res.probs[0]||"Non conforme");if(a.__repar==="OUI")obs+=" · envoyé en entreprise agréée";
   var entry={date:date,verif:verif,obs:obs,statut:statut,reponses:cleanAns(a)};
-  ensureDraft();admin.draft.items=admin.draft.items.map(function(i){if(i.id!==sheet.id)return i;i=clone(i);i.history=(i.history||[]).concat([entry]);i.statut=statut;i.date_ctrl=date;return i;});
-  touch();saveDraft();sheet=null;admin.ok="Contrôle enregistré. Touchez « Publier pour l\'équipe » quand vous avez fini.";render();return;
+  var nom=(secItem(csid,sheet.id)||{}).designation||"";
+  editItemIn(csid,sheet.id,function(i){i.history=(i.history||[]).concat([entry]);i.statut=statut;i.date_ctrl=date;});
+  if(sheet.fromScan){sheet={mode:"identify",q:"",saved:nom};}else{sheet=null;admin.ok="Contrôle de « "+nom+" » enregistré. Touchez « Publier pour l\'équipe » quand vous avez fini.";}
+  render();return;
  }
  if(t.id==="b-cfg"){sheet={mode:"cfg"};render();return;}
  if(t.id==="b-year"){
   if(admin.arm!=="year"){admin.arm="year";render();return;}
   ensureDraft();var ys=(admin.draft.config.years||[]).slice();ys.push((ys.length?Math.max.apply(null,ys):new Date().getFullYear()-1)+1);admin.draft.config.years=ys;touch();saveDraft();admin.arm="";ui.ry="";admin.ok="Campagne "+ys[ys.length-1]+" ajoutée. Touchez une ligne pour saisir son résultat.";render();return;
  }
- if(t.id==="s-close"){sheet=null;render();return;}
+ if(t.id==="s-close"){stopCamera();sheet=null;render();return;}
  if(t.dataset&&t.dataset.st){ui.st=(ui.st===t.dataset.st?"all":t.dataset.st);render();return;}
  if(t.id==="c-save"){ensureDraft();admin.draft.config.inventaire=document.getElementById("c-inv").value.trim();
   if(document.getElementById("c-ref")){var cf=admin.draft.config;cf.ref=document.getElementById("c-ref").value.trim();cf.taille=document.getElementById("c-taille").value.trim();cf.poids=document.getElementById("c-poids").value.trim();cf.equipement=document.getElementById("c-eq").value.split("\n").map(function(x){return x.trim();}).filter(Boolean);}touch();saveDraft();sheet=null;render();return;}
@@ -1234,7 +1287,10 @@ app.addEventListener("keydown",function(e){
  if(e.key==="Escape"&&sheet&&!sheet.busy){sheet=null;render();return;}
  var t=e.target;if((e.key==="Enter"||e.key===" ")&&t.classList&&t.classList.contains("item")&&t.dataset.id&&T){e.preventDefault();sheet={mode:admin.on?"edit":"view",id:t.dataset.id};render();}
 });
-app.addEventListener("input",function(e){if(e.target.id==="q"){ui.q=e.target.value;render();}});
+app.addEventListener("input",function(e){
+ if(e.target.id==="q"){ui.q=e.target.value;render();return;}
+ if(e.target.id==="id-icb"){sheet.q=e.target.value;render();return;}
+});
 app.addEventListener("change",function(e){
  var t=e.target;
  if(t.dataset&&t.dataset.act){syncControl();sheet.ans[t.dataset.act]=t.checked?"OUI":"";render();return;}

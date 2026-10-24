@@ -273,11 +273,24 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 .timeline li.t-bad .tl-dot{border-color:var(--bad)}
 .timeline li.t-bad .tl-card{border-color:var(--bad)}
 .timeline li.t-off .tl-dot{border-color:var(--off)}
+
+.bigctrl{width:100%;justify-content:center;font-size:17px;min-height:54px;margin-bottom:14px}
+.camwrap{position:relative;margin:10px 0;border-radius:12px;overflow:hidden;background:#000;aspect-ratio:4/3}
+#cam-v{width:100%;height:100%;object-fit:cover;display:block}
+.camframe{position:absolute;left:12%;right:12%;top:30%;bottom:30%;border:3px solid #f2c230;border-radius:10px;box-shadow:0 0 0 2000px rgba(0,0,0,.25);pointer-events:none}
+.camhint,.camerr{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;font-size:13px;font-weight:600;text-align:center;color:#fff;background:rgba(0,0,0,.55)}
+.camerr{background:rgba(180,35,24,.85)}
+.idres{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.idrow{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);min-height:56px}
+.idrow:hover{border-color:var(--ink)}
+.idr-main{display:flex;flex-direction:column;gap:2px;min-width:0}
+.idr-main b{font-size:15px}
+.idr-sub{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=13"></script>
+<script src="app.js?v=14"></script>
 </body>
 </html>
