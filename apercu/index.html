@@ -185,11 +185,19 @@ details.info{background:var(--surface);border:1px solid var(--line);border-radiu
 details.info summary{cursor:pointer;font-weight:600}
 details.info ul{margin:8px 0 0;padding-left:18px;color:var(--muted)}
 .btn.armed-ok{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.vtitle{text-transform:none!important;font-family:var(--body)!important;font-size:20px!important;font-weight:600}
+dl.fiche{display:grid;grid-template-columns:minmax(110px,auto) 1fr;gap:6px 14px;margin:12px 0 0;font-size:15px}
+dl.fiche dt{color:var(--muted);font-size:13px;font-weight:600;padding-top:2px}
+dl.fiche dd{margin:0;min-width:0;overflow-wrap:anywhere}
+table.hist{border-collapse:collapse;font-size:14px}
+table.hist th{font-family:var(--mono);font-weight:500;color:var(--muted);text-align:left;padding:2px 12px 2px 0}
+table.hist td{font-weight:600;padding:2px 0}
+table.hist td.r-ok{color:var(--ok)}table.hist td.r-warn{color:var(--warn)}table.hist td.r-bad{color:var(--bad)}table.hist td.r-off{color:var(--off)}table.hist td.r-out{color:var(--out)}table.hist td.muted,table.hist td.r-none{color:var(--muted)}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=3"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>
