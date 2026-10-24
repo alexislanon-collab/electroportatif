@@ -442,7 +442,7 @@ function adminBar(sec){
 }
 
 function filterBar(){
- var d=cur(),h='<div class="filters"><div class="search">'+I.search+'<input id="q" type="search" placeholder="Chercher : nom, ICB, FT, référence…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div>';
+ var d=cur(),h='<div class="filters"><div class="search">'+I.search+'<input id="q" class="digits" type="search" autocorrect="off" spellcheck="false" placeholder="Chercher : nom, ICB, FT, référence…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div>';
  (T.filters||[]).forEach(function(fl){
   if(fl.life){
    var lc={};d.items.forEach(function(i){var L=T.life(i);var k=L?L.k:"none";lc[k]=(lc[k]||0)+1;});
@@ -582,7 +582,7 @@ function formField(f,it){
   return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><input id="'+id+'" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(v==null?"":v)+'" placeholder="Ex. : DIB1-0047800">'+(pre.length?'<div class="prechips">'+pre.map(function(x){return '<button type="button" class="chip prechip" data-pre="'+esc(x)+'">'+esc(x)+'</button>';}).join("")+'</div>':'')+'</div>';
  }
  var type=f.t==="num"?'type="number" inputmode="decimal"':f.t==="url"?'type="url" inputmode="url"':'';
- return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><input id="'+id+'" '+type+' value="'+esc(v==null?"":v)+'"'+(f.dl?' list="dl-'+f.k+'"':'')+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+(f.req?' required':'')+'></div>';
+ return '<div class="'+cls+'"><label for="'+id+'">'+esc(f.l)+'</label><input id="'+id+'" '+type+(/^(serie|cesar|ref|ref_facom|ref_dc|mainta)$/.test(f.k)?' class="digits" autocorrect="off" spellcheck="false"':'')+' value="'+esc(v==null?"":v)+'"'+(f.dl?' list="dl-'+f.k+'"':'')+(f.ph?' placeholder="'+esc(f.ph)+'"':'')+(f.req?' required':'')+'></div>';
 }
 
 function renderSheet(){
@@ -918,7 +918,7 @@ function renderCamp(){
  h+='<div class="ctabs" role="tablist">'+tabs.map(function(t){return '<button type="button" role="tab" class="ctab'+(ui.ct===t[0]?' on':'')+'" data-ctab="'+t[0]+'" aria-selected="'+(ui.ct===t[0])+'"><span>'+t[1]+'</span><b>'+t[2]+'</b><small>'+t[3]+'</small></button>';}).join("")+'</div>';
  var done=c.atelier+c.repare,pc=its.length?Math.round((its.length-c[""])*100/its.length):0;
  h+='<div class="progress"><span style="width:'+pc+'%"></span></div><div class="ptext"><b>'+(its.length-c[""])+'</b> / '+its.length+' chargés · '+done+' revenus à l\'atelier · '+c.reforme+' réformés</div>';
- h+='<div class="filters"><div class="search">'+I.search+'<input id="q" type="search" placeholder="Chercher : nom, ICB, FT…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div></div>';
+ h+='<div class="filters"><div class="search">'+I.search+'<input id="q" class="digits" type="search" autocorrect="off" spellcheck="false" placeholder="Chercher : nom, ICB, FT…" value="'+esc(ui.q)+'" autocomplete="off" aria-label="Rechercher"></div></div>';
  var q=norm(ui.q).split(/\s+/).filter(Boolean);
  var list=its.filter(function(x){
   if(ui.ct==="charger"&&!(x.e===""||(x.e==="camion"&&!(x.i.suivi&&x.i.suivi.r))))return false;
