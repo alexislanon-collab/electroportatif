@@ -395,7 +395,7 @@ function tileHtml(nom,secs,attr,hint){
 }
 function renderHome(){
  saveCtx();
- var h=previewBanner()+header("Inventaire matériel","Choisissez une section",false,"")+'<main class="wrap"><div class="tiles">';
+ var h=previewBanner()+header("EEL Basse-Seine","Inventaire matériel · choisissez une section",false,"")+'<main class="wrap"><div class="tiles">';
  HOME.forEach(function(id){
   var g=grpById(id);
   if(g)h+=tileHtml(g.nom,sectionsUnder(g.id),'data-sec="'+g.id+'"',g.hint);
