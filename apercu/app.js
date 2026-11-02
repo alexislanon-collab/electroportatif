@@ -161,15 +161,16 @@ var TYPES={
  },
  conteneur:{
   title:["designation"],group:"designation",groupSort:"natural",ok:"complets",
+  groupFn:function(i){var de=String(i.designation||"");return (/strope/i.test(de)&&i.cmu)?("Estropes · CMU "+i.cmu):(de||"Divers");},
   fields:[
    {k:"designation",l:"Désignation",req:1,full:1,dl:1},
-   {k:"diametre",l:"Diamètre (mm)",meta:"Ø",unit:" mm"},
    {k:"cmu",l:"CMU",meta:"CMU"},
-   {k:"longueur",l:"Longueur",meta:"L"},
+   {k:"longueur",l:"Longueur"},
+   {k:"diametre",l:"Diamètre (mm)",unit:" mm"},
    {k:"icb",l:"N° ICB (EALICO)",mono:1,meta:"ICB"},
    {k:"qte_init",l:"Quantité prévue",t:"num",def:1},
    {k:"qte",l:"Quantité présente",t:"num"},
-   {k:"ref",l:"Référence / devis",meta:1},
+   {k:"ref",l:"Référence / devis"},
    {k:"commentaire",l:"Commentaire",t:"area",full:1}
   ],
   status:{derived:function(i){if(i.qte_init===""||i.qte_init==null)return "À compléter";if(i.qte===""||i.qte==null)return "Non compté";return Number(i.qte)>=Number(i.qte_init)?"Complet":"Manquant";},
@@ -328,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="34";
+var APPVER="35";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
