@@ -881,8 +881,9 @@ function renderSheet(){
   h+='<h3>Accès rapide</h3><div class="qrbox"><div class="qr" id="qr"></div><p>Ce QR code ouvre directement '+esc(nm)+'. Scannez-le avec l\'appareil photo du téléphone.</p><code>'+esc(qrUrl())+'</code></div><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
  } else if(sheet.mode==="pdf"){
   var sec=secById(curSid),d=cur(),fl=filtered(),nc=d.items.filter(function(i){return orderInfo(T,i,d).on;}).length;
-  h+='<h3>Exporter en PDF</h3><p class="help">Section '+esc(sec.nom)+(admin.draft?', brouillon compris':'')+'.</p><div class="choices">';
-  h+='<button type="button" class="choice" id="p-inv"><b>Liste complète</b><span>'+d.items.length+' lignes, regroupées'+(T.fields.some(function(x){return x.t==="results";})?', avec les résultats de chaque année':'')+(invOn()?', et la colonne « Pointé » de l\'inventaire en cours':'')+'.</span></button>';
+  var epiT=T===TYPES.epi;
+  h+='<h3>'+(epiT?'Fiche de vie en PDF':'Exporter en PDF')+'</h3><p class="help">'+(sec.parent?esc(grpById(sec.parent).nom)+' · ':'')+esc(sec.nom)+(admin.draft?', brouillon compris':'')+'.</p><div class="choices">';
+  h+='<button type="button" class="choice" id="p-inv"><b>'+(epiT?'Fiche de vie complète':'Liste complète')+'</b><span>'+d.items.length+(epiT?' éléments avec n° de série, conformité et dernier contrôle':' lignes, regroupées')+(T.fields.some(function(x){return x.t==="results";})?', avec les résultats de chaque année':'')+(invOn()?', et la colonne « Pointé » de l\'inventaire en cours':'')+'.</span></button>';
   if(filtering()&&fl.length!==d.items.length)h+='<button type="button" class="choice" id="p-flt"><b>Seulement l\'affichage filtré</b><span>'+fl.length+' lignes correspondant à la recherche et aux filtres en cours.</span></button>';
   h+='<button type="button" class="choice" id="p-cmd"'+(nc?'':' disabled')+'><b>Liste à commander</b><span>'+(nc?nc+' ligne'+(nc>1?'s':'')+' avec références et note de commande.':'Aucun matériel à commander.')+'</span></button>';
   h+='</div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+(sheet.busy?'<p class="help" style="margin-top:10px">Préparation du PDF…</p>':'');
