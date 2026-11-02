@@ -1,0 +1,6 @@
+{
+"config":{"titre":"Rechappe 200m","equipe":"LIGNE","nom":"2 Rechappe 200m avec volant","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"SAFEESCAPE","norme":"EN 1496 EN341","marque":"HONEYWELL MILLER","ref":"rd-p239340","serie":"50006336","fab":"2023","service":"2023","note":"","statut":"","history":[],"id":"e33_001"},
+  {"designation":"CORDE 200M","norme":"EN1891","marque":"honeywell","ref":"DIAMETRE 10,5","serie":"21331418/001","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e33_002"}
+]}

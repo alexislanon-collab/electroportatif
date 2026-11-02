@@ -1,0 +1,17 @@
+{
+"config":{"titre":"JRG — Antichutes à rappel","equipe":"EEL","nom":"JRG","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"6M","serie":"20391856-004","fab":"2010","service":"2010","note":"envoyé","statut":"","history":[],"id":"e35_001"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"6M","serie":"20391856-003","fab":"2010","service":"2010","note":"envoyé","statut":"","history":[],"id":"e35_002"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"6M","serie":"20391856-006","fab":"2010","service":"2010","note":"envoyé","statut":"","history":[],"id":"e35_003"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"6M","serie":"20391856-007","fab":"2010","service":"2010","note":"envoyé","statut":"","history":[],"id":"e35_004"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"10M","serie":"20428227-020","fab":"2011","service":"2011","note":"envoyé","statut":"","history":[],"id":"e35_005"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"10M","serie":"20428227-022","fab":"2011","service":"2011","note":"envoyé","statut":"","history":[],"id":"e35_006"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"10m","serie":"20428227/012","fab":"2011","service":"2011","note":"envoyé","statut":"","history":[],"id":"e35_007"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"6M","serie":"20391856-011","fab":"2010","service":"2010","note":"envoyé","statut":"","history":[],"id":"e35_008"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"FALCON","ref":"6M","serie":"20391856-001","fab":"2010","service":"2010","note":"envoyé","statut":"","history":[],"id":"e35_009"},
+  {"designation":"Antichute a rappel automatique","norme":"en360","marque":"falcon","ref":"10m","serie":"20773198/005","fab":"2017","service":"2017","note":"envoyé","statut":"","history":[],"id":"e35_010"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"falcon","ref":"10m","serie":"21314105/009","fab":"2021","service":"2024","note":"envoyé","statut":"","history":[],"id":"e35_011"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"falcon","ref":"10m","serie":"21322700/018","fab":"2021","service":"2024","note":"envoyé","statut":"","history":[],"id":"e35_012"},
+  {"designation":"Antichute a rappel automatique","norme":"EN360","marque":"falcon","ref":"10m","serie":"21322700/016","fab":"2021","service":"2024","note":"envoyé","statut":"","history":[],"id":"e35_013"}
+]}

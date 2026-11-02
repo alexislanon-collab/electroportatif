@@ -1,0 +1,25 @@
+{
+"config":{"titre":"Candelas","equipe":"Équipe : Équipe entretien ligne","nom":"Candelas","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Harnais","norme":"EN361","marque":"PETZL","ref":"C071BA01","serie":"23E0476945032","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e2_001"},
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52002","serie":"23E0491350353","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e2_002"},
+  {"designation":"Longe Y","norme":"EN355","marque":"PETZL","ref":"L012AA00","serie":"20D0242175054","fab":"2020","service":"2022","note":"","statut":"","history":[],"id":"e2_003"},
+  {"designation":"Connecteur","norme":"EN362","marque":"PETZL","ref":"WILLIAM","serie":"20K0288613491","fab":"2020","service":"2022","note":"","statut":"","history":[],"id":"e2_004"},
+  {"designation":"Connecteur","norme":"EN362","marque":"PETZL","ref":"WILLIAM","serie":"2180311445710","fab":"2021","service":"2022","note":"","statut":"","history":[],"id":"e2_005"},
+  {"designation":"Connecteur","norme":"EN362","marque":"PETZL","ref":"WILLIAM","serie":"20K0288613417","fab":"2020","service":"2022","note":"","statut":"","history":[],"id":"e2_006"},
+  {"designation":"asaps orbeur absorbeur","norme":"EN355","marque":"PETZL","ref":"L071AA00","serie":"19J0214579837","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e2_007"},
+  {"designation":"Antichute","norme":"EN359","marque":"PETZL","ref":"ASAP","serie":"25H0673198935","fab":"2025","service":"2026","note":"","statut":"","history":[],"id":"e2_008"},
+  {"designation":"Antichute","norme":"EN353-2","marque":"PETZL","ref":"ASAP LOCK","serie":"19K0223894600","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e2_009"},
+  {"designation":"Casque","norme":"EN397","marque":"Petzl","ref":"VERTEX ST","serie":"21G0340827693","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e2_010"},
+  {"designation":"Connecteur","norme":"EN362","marque":"PETZL","ref":"TRAIL LOCK","serie":"24C0553389367","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e2_011"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e2_012"},
+  {"designation":"LIGNE DE VIE INDIVIDUEL DE 10M","norme":"","marque":"","ref":"","serie":"","fab":"","service":"","note":"","statut":"","history":[],"id":"e2_013"},
+  {"designation":"asap'sorber axess","norme":"EN 12841","marque":"Petzl","ref":"L071CA00","serie":"18CO124163864","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e2_014"},
+  {"designation":"RING OPEN","norme":"EN362","marque":"Petzl","ref":"RING","serie":"18BO123911080","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e2_015"},
+  {"designation":"RING OPEN","norme":"EN362","marque":"Petzl","ref":"RING","serie":"18BO123911143","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e2_016"},
+  {"designation":"CONNECTEUR","norme":"EN 362","marque":"Petzl","ref":"TRIAL LOCK","serie":"18CO130710555","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e2_017"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"TRIAL LOCK","serie":"18CO130710556","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e2_018"},
+  {"designation":"PUR ANNEAU","norme":"EN 795 EN 566","marque":"Petzl","ref":"C40 60","serie":"23G0503476013","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e2_019"},
+  {"designation":"PUR ANNEAU","norme":"EN 795 EN 566","marque":"Petzl","ref":"C40 60","serie":"23I0513633003","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e2_020"},
+  {"designation":"LIGNE DE VIE DE 10 M","norme":"EN1891","marque":"Petzl","ref":"type A","serie":"21B0323127575","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e2_021"}
+]}

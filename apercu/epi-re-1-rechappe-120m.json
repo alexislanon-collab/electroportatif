@@ -1,0 +1,13 @@
+{
+"config":{"titre":"1 Rechappe 120m","equipe":"LIGNE","nom":"rechappe n1 120m","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"SANGLE 150 CM","norme":"EN 795","marque":"PETZL","ref":"C42 150 CONNEXION FIXE","serie":"17EO078773519","fab":"2017","service":"2018","note":"","statut":"","history":[],"id":"e30_001"},
+  {"designation":"Descendeur","norme":"EN 12841 EN341","marque":"PETZL","ref":"I'D","serie":"17DO074921418","fab":"2017","service":"2018","note":"IL FAUT 200KG","statut":"","history":[],"id":"e30_002"},
+  {"designation":"CONNETEUR ALU","norme":"EN 362","marque":"PETZL","ref":"AM'D","serie":"17DO072559082","fab":"2017","service":"2018","note":"","statut":"","history":[],"id":"e30_003"},
+  {"designation":"CORDE 120M","norme":"EN1891","marque":"PETZL","ref":"DIAMETRE 11","serie":"17EO079207076","fab":"2017","service":"2018","note":"","statut":"","history":[],"id":"e30_004"},
+  {"designation":"CORDE 6 MOUFLE","norme":"EN 567","marque":"PETZL","ref":"JAD TRAXION","serie":"24D0566266884","fab":"2017","service":"2018","note":"","statut":"","history":[],"id":"e30_005"},
+  {"designation":"POULIE MOUFLE","norme":"EN 568","marque":"EN 569","ref":"JAD TRAXION","serie":"24C558103249","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e30_006"},
+  {"designation":"POULIE MOUFLE","norme":"EN 568","marque":"EN 569","ref":"JAD TRAXION","serie":"24C0556618148","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e30_007"},
+  {"designation":"CONNETEUR ALU","norme":"EN 362","marque":"PETZL","ref":"AM'D","serie":"24C0554991065","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e30_008"},
+  {"designation":"CONNETEUR ALU","norme":"EN 362","marque":"PETZL","ref":"AM'D","serie":"24C0554991900","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e30_009"}
+]}

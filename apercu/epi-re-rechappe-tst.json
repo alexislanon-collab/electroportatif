@@ -1,0 +1,6 @@
+{
+"config":{"titre":"Rechappe Tst","equipe":"LIGNE","nom":"2 Rechappe 120m avec volant","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"DEROPE UP","norme":"EN 1496 A 2006 EN341A 1992","marque":"TRACTEL","ref":"196638","serie":"TSA2601","fab":"2026","service":"2026","note":"","statut":"","history":[],"id":"e34_001"},
+  {"designation":"CORDE 120M","norme":"EN1891","marque":"TRACTEL","ref":"DIAMETRE 10,5","serie":"","fab":"","service":"","note":"","statut":"","history":[],"id":"e34_002"}
+]}

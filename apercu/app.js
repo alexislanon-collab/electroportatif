@@ -245,6 +245,74 @@ var GROUPS=[
 var HOME=["materiel","tst","gipfs","dstm"];
 SECTIONS.push({id:"campagnes",nom:"Campagnes de contrôle",file:"tst-campagnes.json",type:"meta",hidden:1,pre:"z"});
 TYPES.meta={title:[],fields:[],status:null,noInventory:1,pdf:[]};
+TYPES.epi={
+ title:["designation"],group:"designation",groupSort:"natural",ok:"conformes",hsLabel:"Réformé",
+ fields:[
+  {k:"designation",l:"Désignation",req:1,full:1,dl:1},
+  {k:"norme",l:"Norme(s)",dl:1,meta:"Norme"},
+  {k:"marque",l:"Marque",dl:1,meta:"Marque"},
+  {k:"ref",l:"Référence",meta:"Réf."},
+  {k:"serie",l:"N° de série",mono:1,meta:"N° série"},
+  {k:"fab",l:"Année de fabrication",meta:"Fab."},
+  {k:"service",l:"Mise en service",meta:"Service"},
+  {k:"date_ctrl",l:"Date du dernier contrôle",meta:"Contrôle"},
+  {k:"statut",l:"Conformité",t:"status"},
+  {k:"note",l:"Observations",t:"area",full:1},
+  {k:"history",l:"Historique des contrôles",t:"history",full:1}
+ ],
+ status:{key:"statut",opts:[["Conforme","Conforme","ok"],["Non conforme","Non conforme","bad"],["À vérifier","À vérifier","warn"],["Réformé","Réformé","off"],["","Non renseigné","none"]],def:"À vérifier"},
+ filters:[{k:"marque",l:"Toutes les marques"},{missing:"serie",l:"Tous les n° de série",lm:"N° de série à saisir"}],
+ pdf:[["designation","Désignation",32],["norme","Norme",20],["marque","Marque",18],["ref","Réf.",20],["serie","N° de série",28],["service","Service",14],["date_ctrl","Contrôle",16],["$status","Conformité",22],["note","Observations",0]]
+};
+/* ----- EPI : groupes, sections, accueil ----- */
+GROUPS.push(
+ {id:"epi",nom:"EPI",hint:"Harnais, lignes de vie, réchappe, JRG, perches"},
+ {id:"epi-harnais",nom:"Harnais",parent:"epi",hint:"Collectifs EEL et harnais par agent"},
+ {id:"epi-eel",nom:"EEL (collectif)",parent:"epi-harnais",hint:"Perche, sacs anti-coupe"},
+ {id:"epi-lignevie",nom:"Ligne de vie",parent:"epi",hint:"Sacs de ligne de vie"},
+ {id:"epi-rechappe",nom:"Réchappe",parent:"epi",hint:"Kits de réchappe / mouflage"},
+ {id:"epi-perche",nom:"Perche à crocher & coulisseau",parent:"epi"}
+);
+SECTIONS.push(
+ {id:"epi-ag-anastasiades",nom:"Anastassiades",parent:"epi-harnais",file:"epi-ag-anastasiades.json",type:"epi",pre:"q1_"},
+ {id:"epi-ag-candelas",nom:"Candelas",parent:"epi-harnais",file:"epi-ag-candelas.json",type:"epi",pre:"q2_"},
+ {id:"epi-ag-crescent",nom:"Crescent",parent:"epi-harnais",file:"epi-ag-crescent.json",type:"epi",pre:"q3_"},
+ {id:"epi-ag-domigues",nom:"Domigues",parent:"epi-harnais",file:"epi-ag-domigues.json",type:"epi",pre:"q4_"},
+ {id:"epi-ag-egasse",nom:"Egasse",parent:"epi-harnais",file:"epi-ag-egasse.json",type:"epi",pre:"q5_"},
+ {id:"epi-ag-grignon",nom:"Grignon",parent:"epi-harnais",file:"epi-ag-grignon.json",type:"epi",pre:"q6_"},
+ {id:"epi-ag-lanon",nom:"Lanon",parent:"epi-harnais",file:"epi-ag-lanon.json",type:"epi",pre:"q7_"},
+ {id:"epi-ag-laurent",nom:"Laurent",parent:"epi-harnais",file:"epi-ag-laurent.json",type:"epi",pre:"q8_"},
+ {id:"epi-ag-lecouillard",nom:"Lecouillard",parent:"epi-harnais",file:"epi-ag-lecouillard.json",type:"epi",pre:"q9_"},
+ {id:"epi-ag-penninck",nom:"Penninck",parent:"epi-harnais",file:"epi-ag-penninck.json",type:"epi",pre:"q10_"},
+ {id:"epi-ag-pesqueux",nom:"Pesqueux",parent:"epi-harnais",file:"epi-ag-pesqueux.json",type:"epi",pre:"q11_"},
+ {id:"epi-ag-quentin",nom:"Quentin",parent:"epi-harnais",file:"epi-ag-quentin.json",type:"epi",pre:"q12_"},
+ {id:"epi-ag-ricart",nom:"Ricart",parent:"epi-harnais",file:"epi-ag-ricart.json",type:"epi",pre:"q13_"},
+ {id:"epi-ag-soligny",nom:"Soligny",parent:"epi-harnais",file:"epi-ag-soligny.json",type:"epi",pre:"q14_"},
+ {id:"epi-ag-tsimanga-mukuna",nom:"Tshimanga-Mukuna",parent:"epi-harnais",file:"epi-ag-tsimanga-mukuna.json",type:"epi",pre:"q15_"},
+ {id:"epi-ag-vauquelin",nom:"Vauquelin",parent:"epi-harnais",file:"epi-ag-vauquelin.json",type:"epi",pre:"q16_"},
+ {id:"epi-ag-wable",nom:"Wable",parent:"epi-harnais",file:"epi-ag-wable.json",type:"epi",pre:"q17_"},
+ {id:"epi-eel-preche-8m",nom:"Perche 8 m",parent:"epi-eel",file:"epi-eel-preche-8m.json",type:"epi",pre:"q18_"},
+ {id:"epi-eel-sac-n1-anti-coupe",nom:"Sac anti-coupe n°1",parent:"epi-eel",file:"epi-eel-sac-n1-anti-coupe.json",type:"epi",pre:"q19_"},
+ {id:"epi-eel-sac-n2-anti-coupe",nom:"Sac anti-coupe n°2",parent:"epi-eel",file:"epi-eel-sac-n2-anti-coupe.json",type:"epi",pre:"q20_"},
+ {id:"epi-lv-ee350ev-bleu",nom:"Bleue — EE350EV",parent:"epi-lignevie",file:"epi-lv-ee350ev-bleu.json",type:"epi",pre:"q24_"},
+ {id:"epi-lv-bf245tp-noir",nom:"Noire — BF245TP",parent:"epi-lignevie",file:"epi-lv-bf245tp-noir.json",type:"epi",pre:"q22_"},
+ {id:"epi-lv-ep533kp-rouge",nom:"Rouge — EP533KP",parent:"epi-lignevie",file:"epi-lv-ep533kp-rouge.json",type:"epi",pre:"q26_"},
+ {id:"epi-lv-by968gs-vert-jaune",nom:"Vert / jaune — BY968GS",parent:"epi-lignevie",file:"epi-lv-by968gs-vert-jaune.json",type:"epi",pre:"q23_"},
+ {id:"epi-lv-fc627gj-blanc",nom:"Blanche — FC627GJ",parent:"epi-lignevie",file:"epi-lv-fc627gj-blanc.json",type:"epi",pre:"q28_"},
+ {id:"epi-lv-jaune-rappel",nom:"Jaune rappel",parent:"epi-lignevie",file:"epi-lv-jaune-rappel.json",type:"epi",pre:"q29_"},
+ {id:"epi-lv-sac-de-sangle-80-cm",nom:"Sac de sangle 80 cm",parent:"epi-lignevie",file:"epi-lv-sac-de-sangle-80-cm.json",type:"epi",pre:"q30_"},
+ {id:"epi-lv-equipe-tst",nom:"Équipe TST",parent:"epi-lignevie",file:"epi-lv-equipe-tst.json",type:"epi",pre:"q27_"},
+ {id:"epi-lv-ee350ev-vole",nom:"EE350EV (volée)",parent:"epi-lignevie",file:"epi-lv-ee350ev-vole.json",type:"epi",pre:"q25_"},
+ {id:"epi-re-1-rechappe-120m",nom:"Réchappe n°1 (120 m)",parent:"epi-rechappe",file:"epi-re-1-rechappe-120m.json",type:"epi",pre:"q33_"},
+ {id:"epi-re-2-rechappe-120m",nom:"Réchappe n°2 (120 m)",parent:"epi-rechappe",file:"epi-re-2-rechappe-120m.json",type:"epi",pre:"q34_"},
+ {id:"epi-re-3-rechappe-120m",nom:"Réchappe n°3 (120 m)",parent:"epi-rechappe",file:"epi-re-3-rechappe-120m.json",type:"epi",pre:"q35_"},
+ {id:"epi-re-rechappe-200m",nom:"Réchappe 200 m",parent:"epi-rechappe",file:"epi-re-rechappe-200m.json",type:"epi",pre:"q36_"},
+ {id:"epi-re-rechappe-tst",nom:"Réchappe TST",parent:"epi-rechappe",file:"epi-re-rechappe-tst.json",type:"epi",pre:"q37_"},
+ {id:"epi-jrg",nom:"JRG — Antichutes à rappel",parent:"epi",file:"epi-jrg.json",type:"epi",pre:"q21_"},
+ {id:"epi-pc-perche-et-crocher",nom:"Perche à crocher",parent:"epi-perche",file:"epi-pc-perche-et-crocher.json",type:"epi",pre:"q32_"},
+ {id:"epi-pc-coulisseau-tst",nom:"Coulisseau TST",parent:"epi-perche",file:"epi-pc-coulisseau-tst.json",type:"epi",pre:"q31_"}
+);
+HOME.push("epi");
 var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargement du camion, résultats, réparations"},{id:"aide",nom:"Mode d'emploi",hidden:1}];
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
@@ -755,7 +823,15 @@ function secData(sid){var s=store[sid];return s&&(s.draft||s.DATA);}
 function secItem(sid,id){var d=secData(sid);return d?d.items.filter(function(x){return x.id===id;})[0]:null;}
 function editItemIn(sid,id,fn){var s=store[sid];if(!s.DATA)return;if(!s.draft)s.draft=clone(s.DATA);var it=s.draft.items.filter(function(x){return x.id===id;})[0];if(it)fn(it);s.draft.config.maj=today();lsSet(keysFor(sid).d,diffCount(s.DATA,s.draft)?JSON.stringify(s.draft):null);if(curSid===sid){DATA=s.DATA;admin.draft=s.draft;}}
 function upkSearch(q){var qq=norm(q).replace(/[^a-z0-9]/g,"");if(!qq)return [];var out=[];["upk-machoires","upk-fourreaux"].forEach(function(sid){var d=secData(sid);if(!d)return;d.items.forEach(function(i){var hay=(String(i.icb||"")+" "+String(i.frappe||"")+" "+String(i.cesar||"")).toLowerCase().replace(/[^a-z0-9]/g,"");if(hay.indexOf(qq)>-1)out.push({sid:sid,i:i});});});return out;}
-function questFor(sid){return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
+QUEST.epi={nom:"EPI",items:[
+ {id:"e1",q:"Le marquage est présent et lisible (norme, n° de série, fabricant).",good:"OUI"},
+ {id:"e2",q:"Sangles, coutures, corde : coupure, usure, brûlure ou trace chimique.",good:"NON"},
+ {id:"e3",q:"Parties métalliques (mousquetons, boucles, descendeur) : corrosion, déformation, fissure.",good:"NON"},
+ {id:"e4",q:"Fonctionnement (ouverture, fermeture, verrouillage, blocage) correct.",good:"OUI"},
+ {id:"e5",q:"Trace de choc, de chute ou de surcharge.",good:"NON"},
+ {id:"e6",q:"Date de péremption / durée de vie fabricant dépassée.",good:"NON"}
+]};
+function questFor(sid){var sec=secById(sid)||{};if(sec.type==="epi")return QUEST.epi;return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
 function controlResult(sid,ans){
  var ok=true,probs=[];
  questFor(sid).items.forEach(function(q){
@@ -774,7 +850,7 @@ function syncControl(){
 }
 function cleanAns(a){var o={};for(var k in a){if(k.indexOf("__")!==0)o[k]=a[k];}return o;}
 function initiales(n){n=String(n||"").trim();if(!n)return "?";var p=n.split(/\s+/);return (p[0][0]+(p.length>1?p[p.length-1][0]:"")).toUpperCase();}
-var STTONE={"Conforme":"ok","Non conforme":"bad","À contrôler":"warn","Détruit":"off"};
+var STTONE={"Conforme":"ok","Non conforme":"bad","À contrôler":"warn","À vérifier":"warn","Détruit":"off","Réformé":"off"};
 function histHtml(hh){
  if(!hh||!hh.length)return '<p class="help">Aucun contrôle enregistré pour l\'instant.</p>';
  var a=hh.slice().reverse();
@@ -838,7 +914,8 @@ function renderSheet(){
   var csid=sheet.sid||curSid;
   var it=secItem(csid,sheet.id)||{};
   var qf=questFor(csid),a=sheet.ans||(sheet.ans={}),res=controlResult(csid,a);
-  var detruit=a.__detruit==="OUI",repar=a.__repar==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme",tone=detruit?"off":res.conforme?"ok":"bad";
+  var CT=TYPES[(secById(csid)||{}).type]||T,hsL=CT.hsLabel||"Détruit";
+  var detruit=a.__detruit==="OUI",repar=a.__repar==="OUI",statut=detruit?hsL:res.conforme?"Conforme":"Non conforme",tone=detruit?"off":res.conforme?"ok":"bad";
   h+='<h3 class="vtitle">Contrôle · '+esc(it.designation||"")+'</h3>';
   h+='<div class="cfid">'+(it.icb?'ICB <span class="mono">'+esc(it.icb)+'</span> · ':'')+(it.cable?esc(it.cable):'')+'</div>';
   h+='<div class="fgrid"><div class="field"><label for="cf-date">Date du contrôle</label><input id="cf-date" value="'+esc(a.__date||frToday())+'" placeholder="jj/mm/aaaa"></div><div class="field"><label for="cf-verif">Vérificateur</label><input id="cf-verif" value="'+esc(a.__verif||lsGet(VKEY)||"")+'" placeholder="Nom" autocapitalize="words"></div></div>';
@@ -853,9 +930,9 @@ function renderSheet(){
   });
   h+='</ol>';
   h+='<div class="field full"><label for="cf-obs">Observations</label><textarea id="cf-obs" placeholder="RAS si rien à signaler">'+esc(a.__obs||"")+'</textarea></div>';
-  h+='<div class="verdict v-'+tone+'">'+(detruit?"Matériel détruit":res.conforme?"Conforme — bon pour le service":"NON CONFORME — NE PAS UTILISER")+'</div>';
-  if(!res.conforme&&!detruit){h+='<div class="notice">À faire : attacher une étiquette rouge « NON CONFORME, NE PAS UTILISER ». Pour une mâchoire, les 2 pièces appairées doivent être éliminées.</div>';
-   h+='<div class="row"><label class="cb"><input type="checkbox" data-opt="__repar"'+(repar?" checked":"")+'> Envoyé en entreprise agréée (réparation)</label></div><div class="row"><label class="cb"><input type="checkbox" data-opt="__detruit"'+(detruit?" checked":"")+'> Matériel détruit</label></div>';}
+  h+='<div class="verdict v-'+tone+'">'+(detruit?"Matériel "+hsL.toLowerCase():res.conforme?"Conforme — bon pour le service":"NON CONFORME — NE PAS UTILISER")+'</div>';
+  if(!res.conforme&&!detruit){h+='<div class="notice">À faire : attacher une étiquette rouge « NON CONFORME, NE PAS UTILISER ».'+(CT===TYPES.upk?' Pour une mâchoire, les 2 pièces appairées doivent être éliminées.':'')+'</div>';
+   h+='<div class="row"><label class="cb"><input type="checkbox" data-opt="__repar"'+(repar?" checked":"")+'> Envoyé en entreprise agréée (réparation)</label></div><div class="row"><label class="cb"><input type="checkbox" data-opt="__detruit"'+(detruit?" checked":"")+'> Matériel '+esc(hsL.toLowerCase())+'</label></div>';}
   h+='<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" id="cf-save" type="button">Enregistrer le contrôle</button></div>';
  } else if(sheet.mode==="login"){
   h+='<h3>Accès admin</h3><p class="help">Collez votre clé GitHub (elle commence par <span class="mono">github_pat_</span>). Elle reste enregistrée sur ce téléphone uniquement.<br>Pour une <b>démonstration</b> sans rien enregistrer, saisissez&nbsp;: <span class="mono">demo-eel</span></p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
@@ -868,7 +945,8 @@ function renderSheet(){
  } else {
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
   h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
-  if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle</button>';
+  if((T===TYPES.upk||T===TYPES.epi)&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle'+(T===TYPES.epi?' de conformité':'')+'</button>';
+  if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
   h+='<div class="field full cmdbox"><label class="cb"><input type="checkbox" id="f-commander"'+(it.commander?' checked':'')+'> À commander</label><input id="f-cmd_note" value="'+esc(it.cmd_note)+'" placeholder="Ex. : 2 unités, remplacer la lame…" aria-label="Note de commande"></div>';
@@ -899,6 +977,22 @@ function newId(){
  var sc=secById(curSid),max=0;cur().items.concat(DATA.items).forEach(function(i){var n=parseInt(String(i.id).replace(/\D/g,""),10);if(n>max)max=n;});
  return sc.pre+String(max+1).padStart(3,"0");
 }
+function newIdIn(sid){var sc=secById(sid),s=store[sid],base=(s.draft||s.DATA),max=0;(base?base.items:[]).concat(s.DATA?s.DATA.items:[]).forEach(function(i){var n=parseInt(String(i.id).replace(/\D/g,""),10);if(n>max)max=n;});return sc.pre+String(max+1).padStart(3,"0");}
+function epiGroupLabel(sec){var g=grpById(sec.parent),gp=g&&g.parent?grpById(g.parent):null;return (gp?gp.nom+" · ":"")+(g?g.nom:"");}
+function epiMoveHtml(curId){
+ var opts=SECTIONS.filter(function(s){return s.type==="epi"&&s.id!==curId;});
+ if(!opts.length)return "";
+ opts.sort(function(a,b){return (epiGroupLabel(a)+a.nom).localeCompare(epiGroupLabel(b)+b.nom);});
+ return '<div class="field full movebox"><label for="f-move">Ranger dans…</label><select id="f-move"><option value="">— Laisser dans « '+esc((secById(curId)||{}).nom||"")+' » —</option>'+opts.map(function(s){return '<option value="'+s.id+'">'+esc(epiGroupLabel(s)+" · "+s.nom)+'</option>';}).join("")+'</select></div>';
+}
+function moveItemInto(tgt,f){
+ var s=store[tgt];if(!s.DATA)return false;
+ if(!s.draft)s.draft=clone(s.DATA);
+ var nf=clone(f);nf.id=newIdIn(tgt);
+ s.draft.items.push(nf);sortItems(s.draft.items);s.draft.config.maj=today();
+ lsSet(keysFor(tgt).d,diffCount(s.DATA,s.draft)?JSON.stringify(s.draft):null);
+ return true;
+}
 function drawQR(){
  var box=document.getElementById("qr");if(!box)return;
  if(typeof qrcode!=="function"){box.innerHTML='<p style="color:#333;margin:0">Le générateur de QR code n\'a pas pu se charger.</p>';return;}
@@ -922,7 +1016,7 @@ function exportPdf(kind){
   if(kind==="cmd")items=items.filter(function(i){return orderInfo(T,i,d).on;});
   doc.setFillColor(242,194,48);doc.rect(0,0,W,4,"F");
   doc.setFont("helvetica","bold");doc.setFontSize(18);doc.setTextColor(20,32,43);
-  var title=(kind==="cmd"?"Matériel à commander – ":"Inventaire – ")+(sec.parent?grpById(sec.parent).nom+" · ":"")+sec.nom;
+  var title=(kind==="cmd"?"Matériel à commander – ":(T===TYPES.epi?"Fiche de vie – ":"Inventaire – "))+(sec.parent?grpById(sec.parent).nom+" · ":"")+sec.nom;
   doc.text(pdfSafe(title),14,16);
   doc.setFont("helvetica","normal");doc.setFontSize(9.5);doc.setTextColor(86,99,112);
   var line="Édité le "+frToday()+"  ·  "+items.length+" ligne"+(items.length>1?"s":"");
@@ -1297,7 +1391,7 @@ app.addEventListener("click",function(e){
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
   if(verif)lsSet(VKEY,verif);
   var csid=sheet.sid||curSid;
-  var res=controlResult(csid,a),detruit=a.__detruit==="OUI",statut=detruit?"Détruit":res.conforme?"Conforme":"Non conforme";
+  var res=controlResult(csid,a),detruit=a.__detruit==="OUI",statut=detruit?((TYPES[(secById(csid)||{}).type]||{}).hsLabel||"Détruit"):res.conforme?"Conforme":"Non conforme";
   var obs=(a.__obs||"").trim();if(!obs)obs=res.conforme?"RAS":(res.probs[0]||"Non conforme");if(a.__repar==="OUI")obs+=" · envoyé en entreprise agréée";
   var entry={date:date,verif:verif,obs:obs,statut:statut,reponses:cleanAns(a)};
   var nom=(secItem(csid,sheet.id)||{}).designation||"";
@@ -1325,7 +1419,7 @@ app.addEventListener("click",function(e){
  if(t.id==="b-inv-end"){if(admin.arm!=="end"){admin.arm="end";render();return;}endInventory();render();return;}
  if(t.id==="b-inv-cancel"){if(admin.arm!=="cancel"){admin.arm="cancel";render();return;}INV=null;saveInv();admin.arm="";render();return;}
  if(t.id==="b-discard"){admin.draft=null;lsSet(DKEY,null);admin.msg="";render();return;}
- if(t.id==="b-pub"){publish();return;}
+ if(t.id==="b-pub"){if(pendingSecs().length>1)publishAll();else publish();return;}
  if(t.classList.contains("item")&&t.dataset.id&&T){sheet={mode:admin.on?"edit":"view",id:t.dataset.id};render();return;}
 });
 app.addEventListener("keydown",function(e){
@@ -1356,7 +1450,18 @@ app.addEventListener("submit",function(e){
  if(k0&&!f[k0.k]){focusId("f-"+k0.k);return;}
  ensureDraft();
  if(sheet.mode==="add"){f.id=newId();admin.draft.items.push(f);if(INV){INV.seen[f.id]=1;saveInv();}}
- else{admin.draft.items=admin.draft.items.map(function(i){if(i.id!==sheet.id)return i;f.id=i.id;if(i.vu)f.vu=i.vu;if(i.history)f.history=i.history;return f;});}
+ else{
+  var mvEl=document.getElementById("f-move"),tgt=mvEl&&mvEl.value;
+  var orig=admin.draft.items.filter(function(i){return i.id===sheet.id;})[0]||{};
+  f.id=sheet.id;if(orig.vu)f.vu=orig.vu;if(orig.history)f.history=orig.history;
+  if(tgt&&tgt!==curSid&&secById(tgt)){
+   admin.draft.items=admin.draft.items.filter(function(i){return i.id!==sheet.id;});
+   touch();saveDraft();moveItemInto(tgt,f);
+   admin.ok="Élément déplacé vers « "+esc(secById(tgt).nom)+" ». Touchez « Publier pour l'équipe » pour enregistrer.";
+   sheet=null;render();return;
+  }
+  admin.draft.items=admin.draft.items.map(function(i){return i.id!==sheet.id?i:f;});
+ }
  sortItems(admin.draft.items);touch();saveDraft();
  if(e.submitter&&e.submitter.id==="s-next"){var nx=clone(f);delete nx.id;delete nx.vu;["icb","serie","cesar"].forEach(function(k){if(k in nx)nx[k]="";});if(nx.qte_init===1)nx.qte="";sheet={mode:"add",seed:nx};admin.ok="";render();var fk=document.getElementById("f-icb")||document.getElementById("f-serie")||document.getElementById("f-"+T.fields[0].k);if(fk)fk.focus();return;}
  sheet=null;render();

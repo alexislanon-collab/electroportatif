@@ -1,0 +1,6 @@
+{
+"config":{"titre":"Perche Et Crocher","equipe":"LIGNE","nom":"perche et crocher","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"perche 8M","norme":"","marque":"honeywell","ref":"1002979","serie":"21241533/001","fab":"22/06/2021","service":"24/08/2021","note":"","statut":"","history":[],"id":"e36_001"},
+  {"designation":"crocher","norme":"EN795:2012","marque":"honeywell","ref":"1002899","serie":"21225580/004","fab":"16/03/2021","service":"24/08/2021","note":"","statut":"","history":[],"id":"e36_002"}
+]}

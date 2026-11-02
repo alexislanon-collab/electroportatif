@@ -1,0 +1,14 @@
+{
+"config":{"titre":"Tshimanga-mukuna","equipe":"Équipe : Équipe entretien bois","nom":"Tshimanga-mukuna","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Harnais","norme":"EN361","marque":"Petzl","ref":"C71 0FN1","serie":"19F0192073578","fab":"2019","service":"2019","note":"","statut":"","history":[],"id":"e14_001"},
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52RH002","serie":"19G0201238544","fab":"2019","service":"2020","note":"","statut":"","history":[],"id":"e14_002"},
+  {"designation":"Longe Y","norme":"EN355:2002","marque":"Petzl","ref":"L64YA80","serie":"19A0174000368","fab":"2019","service":"2020","note":"","statut":"","history":[],"id":"e14_003"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"MGO open 60","serie":"18353J1669","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e14_004"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"MGO open 60","serie":"18353J1509","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e14_005"},
+  {"designation":"ASAP SORBER","norme":"EN355:2002","marque":"PETZL","ref":"ASAP SORBER","serie":"20C0238710163","fab":"2020","service":"2020","note":"","statut":"","history":[],"id":"e14_006"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"PETZL","ref":"WILLIAM","serie":"19A0171790047","fab":"2019","service":"2020","note":"","statut":"","history":[],"id":"e14_007"},
+  {"designation":"ASAP LOCK","norme":"EN12841:2006A","marque":"PETZL","ref":"ASAP LOCK","serie":"20B02433929072","fab":"2020","service":"2020","note":"","statut":"","history":[],"id":"e14_008"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"PETZL","ref":"WILLIAM","serie":"19A0171790011","fab":"2019","service":"2020","note":"","statut":"","history":[],"id":"e14_009"},
+  {"designation":"CASQUE","norme":"","marque":"PETZL","ref":"VERTEX","serie":"20A0233730949","fab":"2020","service":"2020","note":"","statut":"","history":[],"id":"e14_010"}
+]}

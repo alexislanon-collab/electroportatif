@@ -1,0 +1,6 @@
+{
+"config":{"titre":"Preche 8M","equipe":"Équipe : Équipe entretien ligne","nom":"Preche 8M","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"perche 8M","norme":"","marque":"honeywell","ref":"1002979","serie":"21241533/001","fab":"2021","service":"2021","note":"","statut":"","history":[],"id":"e18_001"},
+  {"designation":"crocher","norme":"","marque":"honeywell","ref":"1002899","serie":"21225580/004","fab":"2021","service":"2021","note":"","statut":"","history":[],"id":"e18_002"}
+]}

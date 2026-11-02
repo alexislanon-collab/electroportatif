@@ -1,0 +1,25 @@
+{
+"config":{"titre":"Grignon","equipe":"Équipe : Équipe entretien ligne","nom":"Grignon","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52H002","serie":"23E0491350344","fab":"2023","service":"2023","note":"","statut":"","history":[],"id":"e6_001"},
+  {"designation":"Harnais","norme":"EN361","marque":"Petzl","ref":"C071BA01","serie":"23DO472224046","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e6_002"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"MGO open 60","serie":"23K0526502757","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e6_003"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"MGO open 60","serie":"23K0526502756","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e6_004"},
+  {"designation":"Connecteur","norme":"EN362:2004/B","marque":"Petzl","ref":"WILLIAM","serie":"20H0270782959","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e6_005"},
+  {"designation":"Connecteur","norme":"EN362:2004/B","marque":"Petzl","ref":"WILLIAM","serie":"21C0316884755","fab":"2021","service":"2021","note":"","statut":"","history":[],"id":"e6_006"},
+  {"designation":"Longe absorbeur Y","norme":"EN355","marque":"Petzl","ref":"L64YA80","serie":"24A0534708081","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e6_007"},
+  {"designation":"Antichute","norme":"EN360","marque":"Petzl","ref":"ASAP LOCK","serie":"19K0223894565","fab":"2019","service":"2025","note":"","statut":"","history":[],"id":"e6_008"},
+  {"designation":"ASAP'SORBER 20","norme":"EN355:2002","marque":"Petzl","ref":"L071AA20","serie":"19J0214579828","fab":"2019","service":"2025","note":"","statut":"","history":[],"id":"e6_009"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"25E0648412619","fab":"2025","service":"2025","note":"","statut":"","history":[],"id":"e6_010"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e6_011"},
+  {"designation":"Casque","norme":"EN397 EN50365","marque":"Petzl","ref":"VERTEX","serie":"20A0233730950","fab":"2020","service":"2023","note":"","statut":"","history":[],"id":"e6_012"},
+  {"designation":"LIGNE DE VIE INDIVIDUEL DE 10M","norme":"","marque":"","ref":"","serie":"","fab":"","service":"","note":"","statut":"","history":[],"id":"e6_013"},
+  {"designation":"asap'sorber axess","norme":"EN 12841","marque":"Petzl","ref":"L071CA00","serie":"21B0307829720","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e6_014"},
+  {"designation":"SANGLE","norme":"EN 795 EN 567","marque":"Petzl","ref":"C40 120","serie":"20LO298203789","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e6_015"},
+  {"designation":"SANGLE","norme":"EN 795 EN 567","marque":"Petzl","ref":"C40 120","serie":"20L0298203788","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e6_016"},
+  {"designation":"LIGNE DE VIE DE 10 M","norme":"EN1891","marque":"Petzl","ref":"type A","serie":"20F0257752384","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e6_017"},
+  {"designation":"RING OPEN","norme":"EN362","marque":"Petzl","ref":"","serie":"18K0163276263","fab":"2018","service":"2024","note":"","statut":"","history":[],"id":"e6_018"},
+  {"designation":"RING OPEN","norme":"EN362","marque":"Petzl","ref":"","serie":"18KO163276279","fab":"2018","service":"2024","note":"","statut":"","history":[],"id":"e6_019"},
+  {"designation":"CONNECTEUR","norme":"EN 362","marque":"Petzl","ref":"TRIACT LOCK","serie":"21D0326863787","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e6_020"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"21D0326863853","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e6_021"}
+]}

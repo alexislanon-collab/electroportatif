@@ -1,0 +1,16 @@
+{
+"config":{"titre":"Penninck","equipe":"Équipe : Équipe entretien ligne","nom":"Penninck","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Harnais","norme":"EN361:2002","marque":"Petzl","ref":"C071BA01","serie":"21B0306150512","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e10_001"},
+  {"designation":"Longe Y","norme":"EN354","marque":"Petzl","ref":"L64YA80","serie":"18HO151402385","fab":"2018","service":"2020","note":"","statut":"","history":[],"id":"e10_002"},
+  {"designation":"Connecteur","norme":"EN362:2004/B","marque":"Petzl","ref":"TRIAL LOCK","serie":"24C0553389345","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e10_003"},
+  {"designation":"MGO open 60","norme":"EN362:2004/AT","marque":"Petzl","ref":"MGO open 60","serie":"18082J1018","fab":"2018","service":"2020","note":"","statut":"","history":[],"id":"e10_004"},
+  {"designation":"MGO open 60","norme":"EN362:2004/AT","marque":"Petzl","ref":"MGO open 60","serie":"18082J0949","fab":"2018","service":"2020","note":"","statut":"","history":[],"id":"e10_005"},
+  {"designation":"ASAP LOCK","norme":"EN12841:2006/A","marque":"Petzl","ref":"ASAP LOCK","serie":"18J0161320729","fab":"2018","service":"2020","note":"","statut":"","history":[],"id":"e10_006"},
+  {"designation":"Connecteur","norme":"EN362:2004-B","marque":"Petzl","ref":"AM'D","serie":"15077UM0302","fab":"2015","service":"2020","note":"","statut":"","history":[],"id":"e10_007"},
+  {"designation":"ASAP'SORBER","norme":"EN355:2002","marque":"Petzl","ref":"ASAP 'SORBER","serie":"18I0154163189","fab":"2018","service":"2020","note":"","statut":"","history":[],"id":"e10_008"},
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52RH003","serie":"23L0536730562","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e10_009"},
+  {"designation":"Connecteur","norme":"EN362:2004/B","marque":"Petzl","ref":"VERTIGO","serie":"22295VR3458","fab":"2022","service":"2024","note":"","statut":"","history":[],"id":"e10_010"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e10_011"},
+  {"designation":"Casque","norme":"","marque":"Petzl","ref":"VERTEX ST","serie":"20A0233730926","fab":"2020","service":"2020","note":"","statut":"","history":[],"id":"e10_012"}
+]}

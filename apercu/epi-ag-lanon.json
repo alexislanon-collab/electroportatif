@@ -1,0 +1,15 @@
+{
+"config":{"titre":"Lanon","equipe":"Équipe : Équipe entretien ligne","nom":"Lanon","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"HARNAIS","norme":"EN361","marque":"Petzl","ref":"C71 0FN2","serie":"24A0540416566","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e7_001"},
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52H002","serie":"19A0175158551","fab":"2019","service":"2019","note":"","statut":"","history":[],"id":"e7_002"},
+  {"designation":"Longe ABSORBICA","norme":"EN355","marque":"Petzl","ref":"L64YA80","serie":"19F0197886659","fab":"2019","service":"2019","note":"","statut":"","history":[],"id":"e7_003"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"WILLIAM","serie":"20H0270781930","fab":"2020","service":"2020","note":"","statut":"","history":[],"id":"e7_004"},
+  {"designation":"MGO OPEN 60","norme":"EN362:2004/AT","marque":"Petzl","ref":"MGO OPEN 60","serie":"19115J1169","fab":"2019","service":"2020","note":"","statut":"","history":[],"id":"e7_005"},
+  {"designation":"MGO OPEN 60","norme":"EN355","marque":"Petzl","ref":"MGO OPEN 60","serie":"19115J1092","fab":"2019","service":"2020","note":"","statut":"","history":[],"id":"e7_006"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"25E0648412544","fab":"2025","service":"2025","note":"","statut":"","history":[],"id":"e7_007"},
+  {"designation":"Antichute","norme":"EN359","marque":"Petzl","ref":"ASAP LOCK","serie":"20B0243929087","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e7_008"},
+  {"designation":"ABORBEUR ASAP","norme":"EN360","marque":"PETZL","ref":"ASAP SORBEUR","serie":"20C0238710637","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e7_009"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e7_010"},
+  {"designation":"Casque","norme":"EN50365","marque":"Petzl","ref":"VERTEX ST","serie":"23F042748167","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e7_011"}
+]}

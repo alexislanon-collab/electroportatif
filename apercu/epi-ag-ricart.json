@@ -1,0 +1,25 @@
+{
+"config":{"titre":"Ricart","equipe":"Équipe : Équipe entretien ligne","nom":"Ricart","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Harnais","norme":"EN361","marque":"Petzl","ref":"C071BA02","serie":"23D0476946100","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e12_001"},
+  {"designation":"MGO OPEN 60","norme":"EN358","marque":"Petzl","ref":"MGO","serie":"20190J0645","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e12_002"},
+  {"designation":"MGO OPEN 60","norme":"EN361","marque":"Petzl","ref":"MGO","serie":"20160JOO73","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e12_003"},
+  {"designation":"Connecteur","norme":"EN362:2004/B","marque":"Petzl","ref":"TRIACT LOCK","serie":"21G0344014917","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e12_004"},
+  {"designation":"Connecteur","norme":"EN 362:2004/B","marque":"Petzl","ref":"TRIACT LOCK","serie":"21D0322147785","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e12_005"},
+  {"designation":"Longe de maintien","norme":"EN355","marque":"Petzl","ref":"L52H 002","serie":"25F0658807727","fab":"2025","service":"2025","note":"","statut":"","history":[],"id":"e12_006"},
+  {"designation":"Longe absorbeur y","norme":"EN355","marque":"Petzl","ref":"L012AA00","serie":"21B0306208089","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e12_007"},
+  {"designation":"ASAP","norme":"EN12841","marque":"Petzl","ref":"ASAP","serie":"18J0161320730","fab":"2018","service":"2024","note":"","statut":"","history":[],"id":"e12_008"},
+  {"designation":"ASAP'SORBER 20","norme":"EN 355:2002","marque":"PETZL","ref":"L71AA20","serie":"18I0154163196","fab":"2018","service":"2024","note":"","statut":"","history":[],"id":"e12_009"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"21G0344014969","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e12_010"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e12_011"},
+  {"designation":"Casque","norme":"EN795","marque":"Petzl","ref":"VERTEX","serie":"20AO233730929","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e12_012"},
+  {"designation":"LIGNE DE VIE INDIVIDUEL DE 10M","norme":"","marque":"","ref":"","serie":"","fab":"","service":"","note":"","statut":"","history":[],"id":"e12_013"},
+  {"designation":"asap'sorber axess","norme":"EN 12841","marque":"Petzl","ref":"L071CA00","serie":"25F0647038663","fab":"2025","service":"2025","note":"","statut":"","history":[],"id":"e12_014"},
+  {"designation":"SANGLE","norme":"EN 795 EN 566","marque":"Petzl","ref":"C40 120","serie":"25A0622680624","fab":"2025","service":"2025","note":"","statut":"","history":[],"id":"e12_015"},
+  {"designation":"SANGLE","norme":"EN 795 EN 566","marque":"Petzl","ref":"C40 120","serie":"25A0622680600","fab":"2025","service":"2025","note":"","statut":"","history":[],"id":"e12_016"},
+  {"designation":"LIGNE DE VIE DE 10 M","norme":"EN1891","marque":"Petzl","ref":"type A","serie":"25G0662456535","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e12_017"},
+  {"designation":"RING OPEN","norme":"EN362","marque":"Petzl","ref":"","serie":"24G0581333011","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e12_018"},
+  {"designation":"RING OPEN","norme":"EN362","marque":"Petzl","ref":"","serie":"24G0581333071","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e12_019"},
+  {"designation":"CONNECTEUR","norme":"EN 362","marque":"Petzl","ref":"TRIACT LOCK","serie":"24L0615288869","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e12_020"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"24L0615288872","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e12_021"}
+]}

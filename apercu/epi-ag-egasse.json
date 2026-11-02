@@ -1,0 +1,16 @@
+{
+"config":{"titre":"Egasse","equipe":"Équipe : Équipe entretien ligne","nom":"Egasse","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Harnais","norme":"EN361","marque":"Petzl","ref":"C71AA01","serie":"21H0346236501","fab":"2021","service":"2021","note":"","statut":"","history":[],"id":"e5_001"},
+  {"designation":"Longe absorbeur Y","norme":"EN355","marque":"Petzl","ref":"L012AA00","serie":"20D0242175087","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e5_002"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"21G0344014973","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e5_003"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"WILLAMS","serie":"21A0305289973","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e5_004"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"WILLIAMS","serie":"21O316884720","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e5_005"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"21D0322147753","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e5_006"},
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52002","serie":"19G0201238543","fab":"2019","service":"2021","note":"","statut":"","history":[],"id":"e5_007"},
+  {"designation":"POULIE","norme":"EN795","marque":"DMM","ref":"RAPIDE","serie":"202100090J","fab":"2020","service":"2021","note":"","statut":"","history":[],"id":"e5_008"},
+  {"designation":"CONNECTEUR","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"15206VA1706","fab":"2015","service":"2016","note":"","statut":"","history":[],"id":"e5_009"},
+  {"designation":"Antichute","norme":"EN360","marque":"PETZL","ref":"ASAP","serie":"15266LI0765","fab":"2015","service":"2015","note":"","statut":"","history":[],"id":"e5_010"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e5_011"},
+  {"designation":"Casque","norme":"EN397","marque":"Petzl","ref":"VERTEX","serie":"24D0564824838","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e5_012"}
+]}

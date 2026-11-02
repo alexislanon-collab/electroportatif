@@ -1,0 +1,15 @@
+{
+"config":{"titre":"Soligny","equipe":"Équipe : Équipe entretien ligne","nom":"Soligny","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Harnais","norme":"EN361","marque":"Petzl","ref":"C71 0FN2","serie":"24A0540416603","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e13_001"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"WILLIAM","serie":"19AO172547991","fab":"2019","service":"2019","note":"","statut":"","history":[],"id":"e13_002"},
+  {"designation":"Longe absorbeur","norme":"EN355:2002","marque":"Petzl","ref":"L64YA80","serie":"19A0174000380","fab":"2019","service":"2019","note":"","statut":"","history":[],"id":"e13_003"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"MGO open 60","serie":"18232JO866","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e13_004"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"MGO open 60","serie":"18232J1175","fab":"2018","service":"2019","note":"","statut":"","history":[],"id":"e13_005"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"TRIAL LOCK","serie":"24B0549332466","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e13_006"},
+  {"designation":"Antichute mobile","norme":"EN359","marque":"Petzl","ref":"ASAP","serie":"15266LI1007","fab":"2015","service":"2017","note":"","statut":"","history":[],"id":"e13_007"},
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52H003","serie":"24A0538599147","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e13_008"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e13_009"},
+  {"designation":"Casque","norme":"EN397EN50365","marque":"Petzl","ref":"VERTEX","serie":"20A0233730948","fab":"2020","service":"2021","note":"","statut":"","history":[],"id":"e13_010"},
+  {"designation":"Connecteur","norme":"EN362:2004","marque":"Petzl","ref":"VERTIGO","serie":"22295VR3216","fab":"2022","service":"2024","note":"","statut":"","history":[],"id":"e13_011"}
+]}

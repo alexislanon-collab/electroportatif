@@ -1,0 +1,7 @@
+{
+"config":{"titre":"Jaune Rappel","equipe":"Équipe : Equipe Ligne","nom":"JAUNE RAPPEL","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Ligne de vie 100M","norme":"EN353-2","marque":"Petzl","ref":"A 10,5","serie":"25E0648367502","fab":"2025","service":"2026","note":"","statut":"","history":[],"id":"e24_001"},
+  {"designation":"I'DS","norme":"EN12841:2006C","marque":"Petzl","ref":"I'DS","serie":"25J0685799010","fab":"2025","service":"2026","note":"","statut":"","history":[],"id":"e24_002"},
+  {"designation":"I'DS","norme":"EN12841:2006C","marque":"Petzl","ref":"I'DS","serie":"25J0685799007","fab":"2025","service":"2026","note":"","statut":"","history":[],"id":"e24_003"}
+]}

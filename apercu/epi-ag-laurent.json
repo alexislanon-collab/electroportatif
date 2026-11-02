@@ -1,0 +1,14 @@
+{
+"config":{"titre":"Laurent","equipe":"Équipe : Équipe entretien ligne","nom":"Laurent","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"Longe de maintien","norme":"EN358","marque":"Petzl","ref":"L52200","serie":"19G0201238542","fab":"2019","service":"2021","note":"","statut":"","history":[],"id":"e8_001"},
+  {"designation":"Harnais","norme":"EN361","marque":"PETZL","ref":"C71BA01","serie":"23F0488699109","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e8_002"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"24B0549451322","fab":"2024","service":"2024","note":"","statut":"","history":[],"id":"e8_003"},
+  {"designation":"Longe absorbeur Y","norme":"EN355","marque":"Petzl","ref":"L012AA00","serie":"20DO242175023","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e8_004"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"MGO","serie":"23K0526502754","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e8_005"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"MGO","serie":"23K0526502755","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e8_006"},
+  {"designation":"Connecteur","norme":"EN362","marque":"Petzl","ref":"TRIACT LOCK","serie":"21GO343423771","fab":"2021","service":"2024","note":"","statut":"","history":[],"id":"e8_007"},
+  {"designation":"Antichute mobile","norme":"EN359","marque":"petzl","ref":"asap","serie":"14316lt0861","fab":"2014","service":"2015","note":"","statut":"","history":[],"id":"e8_008"},
+  {"designation":"CASQUETTE COQUET","norme":"EN812-2012","marque":"3M","ref":"","serie":"","fab":"2024","service":"2025","note":"","statut":"","history":[],"id":"e8_009"},
+  {"designation":"Casque","norme":"EN397 EN50365","marque":"Petzl","ref":"VERTEX","serie":"23FO492748168","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e8_010"}
+]}

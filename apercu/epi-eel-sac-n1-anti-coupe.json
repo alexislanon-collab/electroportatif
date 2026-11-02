@@ -1,0 +1,16 @@
+{
+"config":{"titre":"Sac N°1 Anti Coupe","equipe":"Équipe : Équipe entretien ligne","nom":"Sac N°1 Anti Coupe","inventaire":"","maj":"2026-11-02"},
+"items":[
+  {"designation":"ABSORBICA-I VARIO","norme":"EN355:2002","marque":"Petzl","ref":"L016AA00","serie":"20D0248454105","fab":"2020","service":"2021","note":"","statut":"","history":[],"id":"e19_001"},
+  {"designation":"CONNECTEUR","norme":"EN362:2004/B","marque":"Petzl","ref":"WILLIAM","serie":"19A0171790063","fab":"2019","service":"2021","note":"","statut":"","history":[],"id":"e19_002"},
+  {"designation":"CONNECTEUR ACIER","norme":"EN362:2004/B","marque":"TRACTEL","ref":"","serie":"","fab":"","service":"2021","note":"","statut":"","history":[],"id":"e19_003"},
+  {"designation":"ABSORBICA-I VARIO","norme":"EN355:2002","marque":"Petzl","ref":"L016AA00","serie":"20D0248454114","fab":"2020","service":"2021","note":"","statut":"","history":[],"id":"e19_004"},
+  {"designation":"CONNECTEUR","norme":"EN362:2004/B","marque":"Petzl","ref":"WILLIAM","serie":"19A0171790971","fab":"2019","service":"2021","note":"","statut":"","history":[],"id":"e19_005"},
+  {"designation":"CONNECTEUR ACIER","norme":"EN362:2004/B","marque":"TRACTEL","ref":"","serie":"","fab":"","service":"2021","note":"","statut":"","history":[],"id":"e19_006"},
+  {"designation":"MICROGRAB","norme":"EN567:2013","marque":"Petzl","ref":"longe anti coupe","serie":"18L0167538992","fab":"2018","service":"2021","note":"","statut":"","history":[],"id":"e19_007"},
+  {"designation":"CONNECTEUR ACIER","norme":"EN362:2004/B","marque":"","ref":"1018963","serie":"","fab":"","service":"2021","note":"","statut":"","history":[],"id":"e19_008"},
+  {"designation":"CONNECTEUR ACIER","norme":"EN362:2004/B","marque":"","ref":"1018963","serie":"","fab":"","service":"2021","note":"","statut":"","history":[],"id":"e19_009"},
+  {"designation":"MICROGRAB","norme":"EN567:2013","marque":"Petzl","ref":"longe anti coupe","serie":"18L0167538990","fab":"2019","service":"2021","note":"","statut":"","history":[],"id":"e19_010"},
+  {"designation":"CONNECTEUR ACIER","norme":"EN362:2004/B","marque":"","ref":"1018963","serie":"","fab":"","service":"2021","note":"","statut":"","history":[],"id":"e19_011"},
+  {"designation":"CONNECTEUR ACIER","norme":"EN362:2004/B","marque":"","ref":"1018963","serie":"","fab":"","service":"2021","note":"","statut":"","history":[],"id":"e19_012"}
+]}
