@@ -328,7 +328,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="32";
+var APPVER="33";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -762,8 +762,8 @@ function startCamera(){
 function afterRender(fid,ss){
  if(fid){var el=document.getElementById(fid);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,ss);}catch(e){}}}
  if(sheet&&sheet.mode==="qr")drawQR();
- if(sheet&&sheet.mode==="identify"&&sheet.cam&&!CAM.stream)startCamera();
- if(!(sheet&&sheet.mode==="identify"&&sheet.cam)&&CAM.stream)stopCamera();
+ if(sheet&&sheet.mode==="identify"&&sheet.cam&&!sheet.frozen&&!CAM.stream)startCamera();
+ if(!(sheet&&sheet.mode==="identify"&&sheet.cam&&!sheet.frozen)&&CAM.stream)stopCamera();
 }
 
 /* ---------- feuilles (formulaires) ---------- */
@@ -949,7 +949,15 @@ function renderSheet(){
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
   h+='<p class="help">'+(epi?'Scannez le code (Data Matrix ou QR), ou saisissez ce que vous lisez : n° de série même partiel, et/ou le modèle (ex. « pur anneau ») et l\'année (ex. « 2019 »). En combinant ces indices, on retrouve la sangle ou le mousqueton et son sac.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
   h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
-  if(sheet.cam)h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le code de l\'étiquette (QR code ou Data Matrix). Cadrez-le bien, laissez la mise au point se faire.</div>')+'</div>';
+  if(sheet.cam){
+   if(sheet.frozen){
+    h+='<div class="camwrap frozen"><img id="cam-still" src="'+sheet.frozen+'" alt="Image figée"><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Image figée. Lisez le numéro et tapez-le dans le champ ci-dessous.</div>')+'</div>';
+    h+='<button type="button" class="btn ghost cambtn2" id="id-unfreeze">'+I.cam+'Reprendre la caméra</button>';
+   } else {
+    h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le code. S\'il ne se lit pas (étiquette tissu, gravure…), touchez « Figer l\'image » et recopiez le numéro.</div>')+'</div>';
+    h+='<button type="button" class="btn cambtn2" id="id-freeze">❄️ Figer l\'image pour recopier le numéro</button>';
+   }
+  }
   h+='<div class="field full"><label for="id-icb">'+(epi?'N° de série (complet ou partiel)':'Numéro ICB / frappé')+'</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="'+(epi?'Ex. : 24A0540416566 ou 416566':'Ex. : DIB1-0019892 ou 8179')+'"></div>';
   if(epi){
    var re=epiSearch(sheet.q||"");
@@ -1440,7 +1448,17 @@ app.addEventListener("click",function(e){
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-epi-scan"){sheet={mode:"identify",q:"",dom:"epi"};render();focusId("id-icb");return;}
- if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;}else{sheet.cam=true;sheet.camerr="";}render();return;}
+ if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;sheet.frozen=null;}else{sheet.cam=true;sheet.camerr="";sheet.frozen=null;}render();return;}
+ if(t.id==="id-freeze"){var vd=document.getElementById("cam-v");
+  if(vd&&vd.videoWidth){var cv=document.createElement("canvas");cv.width=vd.videoWidth;cv.height=vd.videoHeight;var cx=cv.getContext("2d");cx.drawImage(vd,0,0);
+   try{sheet.frozen=cv.toDataURL("image/jpeg",0.92);}catch(e){sheet.frozen=null;}
+   stopCamera();sheet.camerr="";render();
+   try{var img=cx.getImageData(0,0,cv.width,cv.height);loadZX().then(function(zx){return zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1});}).then(function(res){
+    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){var me=epiMatch(res[0].text);if(me){sheet.found={sid:me.sid,id:me.i.id};sheet.frozen=null;sheet.cam=false;sheet.reformArm=false;render();}else{sheet.q=res[0].text;render();}}
+   }).catch(function(){});}catch(e){}
+  }else{sheet.camerr="Impossible de figer l'image (caméra pas encore prête).";render();}
+  return;}
+ if(t.id==="id-unfreeze"){sheet.frozen=null;sheet.camerr="";render();return;}
  if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
  if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.q="";render();focusId("id-icb");return;}
  if(t.id==="fc-reform"&&sheet.found){
@@ -1493,7 +1511,7 @@ app.addEventListener("keydown",function(e){
 });
 app.addEventListener("input",function(e){
  if(e.target.id==="q"){ui.q=e.target.value;render();return;}
- if(e.target.id==="id-icb"){sheet.q=e.target.value;if(sheet.cam&&e.target.value.trim()){stopCamera();sheet.cam=false;sheet.camerr="";}render();return;}
+ if(e.target.id==="id-icb"){sheet.q=e.target.value;if(sheet.cam&&!sheet.frozen&&e.target.value.trim()){stopCamera();sheet.cam=false;sheet.camerr="";}render();return;}
 });
 app.addEventListener("change",function(e){
  var t=e.target;
