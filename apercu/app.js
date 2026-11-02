@@ -646,24 +646,20 @@ function renderSection(){
 }
 var CAM={stream:null,loop:0};
 function stopCamera(){if(CAM.stream){CAM.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});CAM.stream=null;}if(CAM.loop){clearInterval(CAM.loop);CAM.loop=0;}}
-var jsqrReady=null;
-var JSQR_URLS=["https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js","https://unpkg.com/jsqr@1.4.0/dist/jsQR.js","https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js"];
-function loadJsQR(){
- if(window.jsQR)return Promise.resolve();
- if(!jsqrReady)jsqrReady=new Promise(function(res,rej){
-  var i=0;
-  (function tryNext(){
-   if(window.jsQR)return res();
-   if(i>=JSQR_URLS.length){jsqrReady=null;return rej(new Error("load"));}
-   var sc=document.createElement("script");sc.src=JSQR_URLS[i++];
-   sc.onload=function(){window.jsQR?res():tryNext();};
-   sc.onerror=tryNext;
-   document.head.appendChild(sc);
-  })();
- });
- return jsqrReady;
+/* Lecteur de codes 2D (Data Matrix + QR), moteur zxing-wasm hébergé avec l'appli */
+var ZX=null,zxReady=null;
+function loadZX(){
+ if(ZX)return Promise.resolve(ZX);
+ if(!zxReady)zxReady=import("./zxing/reader/index.js?v=23").then(function(m){
+  if(m.setZXingModuleOverrides)m.setZXingModuleOverrides({locateFile:function(p,prefix){return (""+p).slice(-5)===".wasm"?"./zxing_reader.wasm?v=23":(prefix+p);}});
+  ZX=m;return m;
+ },function(e){zxReady=null;throw e;});
+ return zxReady;
 }
-function matchCode(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<3)return null;var r=upkSearch(txt);for(var i=0;i<r.length;i++){if(norm(r[i].i.icb).replace(/[^a-z0-9]/g,"")===qq)return r[i];}return r.length===1?r[0]:(r.length?r[0]:null);}
+function matchCode(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<3)return null;var r=upkSearch(txt);
+ for(var i=0;i<r.length;i++){if(norm(r[i].i.icb).replace(/[^a-z0-9]/g,"")===qq)return r[i];}
+ for(var j=0;j<r.length;j++){var ic=norm(r[j].i.icb).replace(/[^a-z0-9]/g,"");if(ic&&(qq.indexOf(ic)>-1||ic.indexOf(qq)>-1))return r[j];}
+ return r.length===1?r[0]:null;}
 function startCamera(){
  if(CAM.stream)return;
  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){sheet.camerr="Caméra non disponible sur cet appareil.";render();return;}
@@ -671,16 +667,22 @@ function startCamera(){
   if(!sheet||sheet.mode!=="identify"||!sheet.cam){st.getTracks().forEach(function(t){t.stop();});return;}
   CAM.stream=st;var vv=document.getElementById("cam-v");if(!vv){stopCamera();return;}vv.srcObject=st;vv.play();
   try{var tr=st.getVideoTracks()[0],caps=tr.getCapabilities?tr.getCapabilities():{};if(caps&&caps.zoom)tr.applyConstraints({advanced:[{zoom:Math.min(caps.zoom.max,2)}]});}catch(e){}
-  loadJsQR().then(function(){
-   var cv=document.createElement("canvas");
+  loadZX().then(function(zx){
+   var cv=document.createElement("canvas"),busy=false;
    CAM.loop=setInterval(function(){
-    var vd=document.getElementById("cam-v");if(!vd||!CAM.stream||!window.jsQR||!vd.videoWidth)return;
+    if(busy)return;
+    var vd=document.getElementById("cam-v");if(!vd||!CAM.stream||!vd.videoWidth)return;
     cv.width=vd.videoWidth;cv.height=vd.videoHeight;var cx=cv.getContext("2d");cx.drawImage(vd,0,0);
     var img;try{img=cx.getImageData(0,0,cv.width,cv.height);}catch(e){return;}
-    var code=window.jsQR(img.data,cv.width,cv.height);
-    if(code&&code.data){var m=matchCode(code.data);if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}else{sheet.camerr="QR lu : « "+code.data.slice(0,24)+" » — aucun outil correspondant.";render();}}
-   },350);
-  }).catch(function(){sheet.camerr="Lecteur de QR code indisponible (connexion ?).";render();});
+    busy=true;
+    zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1}).then(function(res){
+     busy=false;if(!CAM.stream||!sheet||sheet.mode!=="identify")return;
+     if(res&&res.length&&res[0].text){var txt=res[0].text,m=matchCode(txt);
+      if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
+      else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun matériel correspondant dans la base.";render();}}
+    },function(){busy=false;});
+   },300);
+  }).catch(function(){sheet.camerr="Lecteur de code indisponible (connexion ?).";render();});
  }).catch(function(err){sheet.camerr=(err&&err.name==="NotAllowedError")?"Accès caméra refusé. Autorisez la caméra puis réessayez.":"Impossible d'ouvrir la caméra.";sheet.cam=false;render();});
 }
 function afterRender(fid,ss){
@@ -824,7 +826,7 @@ function renderSheet(){
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
   h+='<p class="help">Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.</p>';
   h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
-  if(sheet.cam)h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le QR code, ou le numéro gravé puis lisez-le</div>')+'</div>';
+  if(sheet.cam)h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le code de l\'étiquette (QR code ou Data Matrix). Cadrez-le bien, laissez la mise au point se faire.</div>')+'</div>';
   h+='<div class="field full"><label for="id-icb">Numéro ICB / frappé</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="Ex. : DIB1-0019892 ou 8179"></div>';
   var res2=upkSearch(sheet.q||"");
   if((sheet.q||"").trim()){
