@@ -220,7 +220,7 @@ var SECTIONS=[
  {id:"electroportatif",nom:"Électroportatif",parent:"materiel",file:"materiel.json",type:"outil",pre:"m",hint:"Machines, batteries, chargeurs…"},
  {id:"upk-machoires",nom:"Mâchoires",parent:"upk",file:"upk-machoires.json",type:"upk",pre:"um",hint:"Mâchoires par taille de câble"},
  {id:"upk-fourreaux",nom:"Fourreaux",parent:"upk",file:"upk-fourreaux.json",type:"upk",pre:"uf",hint:"Fourreaux par taille de câble"},
- {id:"dstm-cablette",nom:"Câblette italienne",parent:"dstm",file:"dstm.json",type:"outil",pre:"d",hint:"Câblettes italiennes Tesmec"},
+ {id:"dstm-cablette",nom:"Câblettes / Cordes",parent:"dstm",file:"dstm.json",type:"outil",pre:"d",hint:"Câblettes italiennes Tesmec"},
  {id:"dstm-conso",nom:"Consommables",parent:"dstm",file:"dstm-conso.json",type:"dstmconso",pre:"dc",hint:"Émerillons, noix, chaussettes"},
  {id:"gipfs-noir",nom:"Container noir",parent:"gipfs",file:"gipfs-noir.json",type:"conteneur",pre:"no"},
  {id:"gipfs-jaune",nom:"Container jaune",parent:"gipfs",file:"gipfs-jaune.json",type:"conteneur",pre:"ja"},
@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="36";
+var APPVER="37";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -546,7 +546,9 @@ function tileHtml(nom,secs,attr,hint){
 }
 function renderHome(){
  saveCtx();
- var h=previewBanner()+header("EEL Basse‑Seine","Inventaire matériel · choisissez une section",false,"")+'<main class="wrap"><div class="tiles">';
+ var h=previewBanner()+header("EEL Basse‑Seine","Inventaire matériel · choisissez une section",false,"")+'<main class="wrap">';
+ h+='<button type="button" class="btn primary bigctrl" id="b-find-home">'+I.cam+'Scanner / chercher dans tout le matériel</button>';
+ h+='<div class="tiles">';
  HOME.forEach(function(id){
   var g=grpById(id);
   if(g)h+=tileHtml(g.nom,sectionsUnder(g.id),'data-sec="'+g.id+'"',g.hint);
@@ -716,7 +718,7 @@ function renderSection(){
  app.innerHTML=h;
 }
 var CAM={stream:null,loop:0};
-function stopCamera(){if(CAM.stream){CAM.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});CAM.stream=null;}if(CAM.loop){clearInterval(CAM.loop);CAM.loop=0;}}
+function stopCamera(){if(CAM.stream){CAM.stream.getTracks().forEach(function(t){try{t.stop();}catch(e){}});CAM.stream=null;}CAM.track=null;CAM.torch=false;if(CAM.loop){clearInterval(CAM.loop);CAM.loop=0;}}
 /* Lecteur de codes 2D (Data Matrix + QR), moteur zxing-wasm hébergé avec l'appli */
 var ZX=null,zxReady=null;
 function loadZX(){
@@ -737,7 +739,7 @@ function startCamera(){
  navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}}}).then(function(st){
   if(!sheet||sheet.mode!=="identify"||!sheet.cam){st.getTracks().forEach(function(t){t.stop();});return;}
   CAM.stream=st;var vv=document.getElementById("cam-v");if(!vv){stopCamera();return;}vv.srcObject=st;vv.play();
-  try{var tr=st.getVideoTracks()[0],caps=tr.getCapabilities?tr.getCapabilities():{};if(caps&&caps.zoom)tr.applyConstraints({advanced:[{zoom:Math.min(caps.zoom.max,2)}]});}catch(e){}
+  try{var tr=st.getVideoTracks()[0],caps=tr.getCapabilities?tr.getCapabilities():{};CAM.track=tr;CAM.torch=!!(caps&&caps.torch);if(caps&&caps.zoom)tr.applyConstraints({advanced:[{zoom:Math.min(caps.zoom.max,2)}]});if(sheet)sheet._camready=1;}catch(e){}
   loadZX().then(function(zx){
    var cv=document.createElement("canvas"),busy=false;
    CAM.loop=setInterval(function(){
@@ -750,7 +752,8 @@ function startCamera(){
      busy=false;if(!CAM.stream||!sheet||sheet.mode!=="identify")return;
      if(res&&res.length&&res[0].text){var txt=res[0].text;
       if(sheet.dom==="find"){var me=scanMatch(sheet.scope,txt);
-       if(me){stopCamera();sheet.cam=false;sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";render();}
+       if(me){var dd=scanDupes(sheet.scope,me.i);stopCamera();sheet.cam=false;scanFeedback();
+        if(dd.length>1){sheet.q=idValOf(me.i);sheet.camerr="";}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";}render();}
        else{var cand=scanSearch(sheet.scope,txt);stopCamera();sheet.cam=false;sheet.q=txt;sheet.camerr=cand.length?"":"Code lu : « "+txt.slice(0,24)+" » — aucune correspondance. Essayez avec le modèle, l'année ou le n°.";render();}}
       else{var m=matchCode(txt);
        if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
@@ -869,6 +872,13 @@ function scanMatch(sids,txt){var qq=epiStrip(txt);if(qq.length<4)return null;var
  m.sort(function(a,b){return (b.exact-a.exact)||(a.vole-b.vole)||(b.len-a.len);});
  return m[0];}
 function openElement(sid,id){stopCamera();loadCtx(sid);view=sid;openG={};sheet={mode:admin.on?"edit":"view",id:id};render();}
+/* retour sensoriel à la lecture d'un code */
+function scanFeedback(){try{if(navigator.vibrate)navigator.vibrate(60);}catch(e){}
+ try{var AC=window.AudioContext||window.webkitAudioContext;if(AC){var c=scanFeedback.ac||(scanFeedback.ac=new AC());var o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.12,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.start();o.stop(c.currentTime+.18);}}catch(e){}}
+/* items d'un périmètre partageant le même identifiant (doublons) */
+function scanDupes(sids,it){var k=FIND_IDS.filter(function(x){return it[x];})[0];if(!k)return [];var v=epiStrip(it[k]);if(v.length<4)return [];var out=[];
+ (sids||[]).forEach(function(sid){var d=secData(sid);if(!d)return;d.items.forEach(function(i){if(FIND_IDS.some(function(kk){return epiStrip(i[kk])===v;}))out.push({sid:sid,i:i});});});return out;}
+function idValOf(it){var k=FIND_IDS.filter(function(x){return it[x];})[0];return k?it[k]:"";}
 function controlResult(sid,ans){
  var ok=true,probs=[];
  questFor(sid).items.forEach(function(q){
@@ -961,7 +971,7 @@ function renderSheet(){
     h+='<button type="button" class="btn ghost cambtn2" id="id-unfreeze">'+I.cam+'Reprendre la caméra</button>';
    } else {
     h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le code. S\'il ne se lit pas (étiquette tissu, gravure…), touchez « Figer l\'image » et recopiez le numéro.</div>')+'</div>';
-    h+='<button type="button" class="btn cambtn2" id="id-freeze">❄️ Figer l\'image pour recopier le numéro</button>';
+    h+='<div class="row" style="gap:8px"><button type="button" class="btn cambtn2" id="id-torch" style="flex:0 0 auto">'+(sheet.torch?'🔦 Éteindre':'🔦 Lampe')+'</button><button type="button" class="btn cambtn2" id="id-freeze" style="flex:1">❄️ Figer pour recopier</button></div>';
    }
   }
   h+='<div class="field full"><label for="id-icb">'+(epi?'N° de série / ICB / modèle (même partiel)':'Numéro ICB / frappé')+'</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="'+(epi?'Ex. : 416566, DIB1-0019, pur ann 2019…':'Ex. : DIB1-0019892 ou 8179')+'"></div>';
@@ -1454,17 +1464,19 @@ app.addEventListener("click",function(e){
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-find-scan"){var fsc=sectionsUnder(view).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:(grpById(view)||{}).nom||""};render();focusId("id-icb");return;}
+ if(t.id==="b-find-home"){var allsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:allsc,area:"tout le matériel"};render();focusId("id-icb");return;}
  if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;sheet.frozen=null;}else{sheet.cam=true;sheet.camerr="";sheet.frozen=null;}render();return;}
  if(t.id==="id-freeze"){var vd=document.getElementById("cam-v");
   if(vd&&vd.videoWidth){var cv=document.createElement("canvas");cv.width=vd.videoWidth;cv.height=vd.videoHeight;var cx=cv.getContext("2d");cx.drawImage(vd,0,0);
    try{sheet.frozen=cv.toDataURL("image/jpeg",0.92);}catch(e){sheet.frozen=null;}
    stopCamera();sheet.camerr="";render();
    try{var img=cx.getImageData(0,0,cv.width,cv.height);loadZX().then(function(zx){return zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1});}).then(function(res){
-    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){if(sheet.dom==="find"){var me=scanMatch(sheet.scope,res[0].text);if(me){sheet.found={sid:me.sid,id:me.i.id};sheet.frozen=null;sheet.cam=false;sheet.reformArm=false;render();}else{sheet.q=res[0].text;render();}}else{var mu=matchCode(res[0].text);if(mu){stopCamera();sheet={mode:"controle",id:mu.i.id,sid:mu.sid,ans:{},fromScan:true};render();}else{sheet.q=res[0].text;render();}}}
+    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){if(sheet.dom==="find"){var me=scanMatch(sheet.scope,res[0].text);if(me){var dd=scanDupes(sheet.scope,me.i);sheet.frozen=null;sheet.cam=false;scanFeedback();if(dd.length>1){sheet.q=idValOf(me.i);}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;}render();}else{sheet.q=res[0].text;render();}}else{var mu=matchCode(res[0].text);if(mu){stopCamera();sheet={mode:"controle",id:mu.i.id,sid:mu.sid,ans:{},fromScan:true};render();}else{sheet.q=res[0].text;render();}}}
    }).catch(function(){});}catch(e){}
   }else{sheet.camerr="Impossible de figer l'image (caméra pas encore prête).";render();}
   return;}
  if(t.id==="id-unfreeze"){sheet.frozen=null;sheet.camerr="";render();return;}
+ if(t.id==="id-torch"){var tr=CAM.track;if(tr&&tr.applyConstraints){var want=!sheet.torch;tr.applyConstraints({advanced:[{torch:want}]}).then(function(){sheet.torch=want;render();}).catch(function(){sheet.torch=false;sheet.camerr="Lampe non disponible sur cet appareil.";render();});}else{sheet.camerr="Lampe non disponible sur cet appareil.";render();}return;}
  if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
  if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.q="";render();focusId("id-icb");return;}
  if(t.id==="fc-reform"&&sheet.found){
