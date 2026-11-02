@@ -328,7 +328,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="29";
+var APPVER="30";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -750,7 +750,7 @@ function startCamera(){
      if(res&&res.length&&res[0].text){var txt=res[0].text;
       if(sheet.dom==="epi"){var me=epiMatch(txt);
        if(me){stopCamera();sheet.cam=false;sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";render();}
-       else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun n° de série correspondant.";render();}}
+       else{var cand=epiSearch(txt);stopCamera();sheet.cam=false;sheet.q=txt;sheet.camerr=cand.length?"":"Code lu : « "+txt.slice(0,24)+" » — aucune correspondance. Essayez avec le modèle et l'année.";render();}}
       else{var m=matchCode(txt);
        if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
        else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun matériel correspondant dans la base.";render();}}}
@@ -839,7 +839,18 @@ QUEST.epi={nom:"EPI",items:[
 ]};
 function questFor(sid){var sec=secById(sid)||{};if(sec.type==="epi")return QUEST.epi;return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
 function epiSecs(){return SECTIONS.filter(function(s){return s.type==="epi";});}
-function epiSearch(q){var qq=norm(q).replace(/[^a-z0-9]/g,"");if(!qq)return [];var out=[];epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;d.items.forEach(function(i){var hay=(String(i.serie||"")+" "+String(i.ref||"")+" "+String(i.designation||"")+" "+String(i.marque||"")).toLowerCase().replace(/[^a-z0-9]/g,"");if(hay.indexOf(qq)>-1)out.push({sid:s.id,i:i});});});return out;}
+function epiTokens(q){return norm(q).replace(/[^a-z0-9]+/g," ").trim().split(/\s+/).filter(function(t){return t.length>=2;});}
+function epiHay(i){return norm([i.serie,i.ref,i.designation,i.marque,i.norme,i.fab,i.service,i.note].join(" ")).replace(/[^a-z0-9]+/g," ");}
+/* recherche multi-indices : croise modèle (ref/désignation), date (année), n° de série… ; garde les meilleures correspondances */
+function epiSearch(q){var toks=epiTokens(q);if(!toks.length)return [];
+ var out=[],max=0;
+ epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;d.items.forEach(function(i){
+  var hay=epiHay(i),sc=0;toks.forEach(function(t){if(hay.indexOf(t)>-1)sc++;});
+  if(sc>0){out.push({sid:s.id,i:i,score:sc});if(sc>max)max=sc;}
+ });});
+ out=out.filter(function(o){return o.score===max;});
+ out.sort(function(a,b){return norm(a.i.serie||"zzz").localeCompare(norm(b.i.serie||"zzz"));});
+ return out;}
 function epiMatch(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<4)return null;
  var m=[];
  epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;var vole=/vol/.test(s.id)?1:0;d.items.forEach(function(i){
@@ -933,7 +944,7 @@ function renderSheet(){
   var epi=sheet.dom==="epi";
   h+='<h3>'+(epi?'Trouver un n° de série':'Réaliser un contrôle')+'</h3>';
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
-  h+='<p class="help">'+(epi?'Scannez le code de l\'étiquette (Data Matrix ou QR), ou saisissez le n° de série (même partiel). On ouvre la fiche pour la consulter, la contrôler ou la ranger.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
+  h+='<p class="help">'+(epi?'Scannez le code (Data Matrix ou QR), ou saisissez ce que vous lisez : n° de série même partiel, et/ou le modèle (ex. « pur anneau ») et l\'année (ex. « 2019 »). En combinant ces indices, on retrouve la sangle ou le mousqueton et son sac.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
   h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
   if(sheet.cam)h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le code de l\'étiquette (QR code ou Data Matrix). Cadrez-le bien, laissez la mise au point se faire.</div>')+'</div>';
   h+='<div class="field full"><label for="id-icb">'+(epi?'N° de série (complet ou partiel)':'Numéro ICB / frappé')+'</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="'+(epi?'Ex. : 24A0540416566 ou 416566':'Ex. : DIB1-0019892 ou 8179')+'"></div>';
@@ -941,7 +952,7 @@ function renderSheet(){
    var re=epiSearch(sheet.q||"");
    if((sheet.q||"").trim()){
     if(!re.length)h+='<div class="empty" style="padding:18px 0">Aucun élément trouvé pour « '+esc(sheet.q)+' ».</div>';
-    else h+='<ul class="idres">'+re.slice(0,20).map(function(r){var st=stOpt(TYPES.epi,r.i.statut),sec=secById(r.sid);return '<li><button type="button" class="idrow" data-dom="epi" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+'</b><span class="idr-sub">N° '+esc(r.i.serie||"—")+' · '+esc(epiGroupLabel(sec)+" · "+sec.nom)+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
+    else h+='<ul class="idres">'+re.slice(0,25).map(function(r){var st=stOpt(TYPES.epi,r.i.statut),sec=secById(r.sid);var det=[r.i.ref,r.i.fab].filter(Boolean).join(" · ");return '<li><button type="button" class="idrow" data-dom="epi" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+(det?' <span class="idr-det">'+esc(det)+'</span>':'')+'</b><span class="idr-sub">N° '+esc(r.i.serie||"—")+' · '+esc(epiGroupLabel(sec)+" · "+sec.nom)+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
    }
   } else {
    var res2=upkSearch(sheet.q||"");
