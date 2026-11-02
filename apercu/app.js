@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="37";
+var APPVER="38";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -753,7 +753,7 @@ function startCamera(){
      if(res&&res.length&&res[0].text){var txt=res[0].text;
       if(sheet.dom==="find"){var me=scanMatch(sheet.scope,txt);
        if(me){var dd=scanDupes(sheet.scope,me.i);stopCamera();sheet.cam=false;scanFeedback();
-        if(dd.length>1){sheet.q=idValOf(me.i);sheet.camerr="";}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";}render();}
+        if(dd.length>1){sheet.q=idValOf(me.i);sheet.camerr="";}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";}render();}
        else{var cand=scanSearch(sheet.scope,txt);stopCamera();sheet.cam=false;sheet.q=txt;sheet.camerr=cand.length?"":"Code lu : « "+txt.slice(0,24)+" » — aucune correspondance. Essayez avec le modèle, l'année ou le n°.";render();}}
       else{var m=matchCode(txt);
        if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
@@ -955,7 +955,9 @@ function renderSheet(){
   if(fst)h+='<div class="fc-stat"><span class="pill p-'+fst[2]+'">'+esc(fst[1])+'</span>'+(fi.date_ctrl?'<span class="fc-ctrl">dernier contrôle : '+esc(fi.date_ctrl)+'</span>':'')+'</div>';
   if(sheet.reformMsg)h+='<div class="notice ok" style="margin-top:10px">'+esc(sheet.reformMsg)+'</div>';
   if(sheet.reformArm)h+='<div class="notice" style="margin-top:10px">L\'élément passera « Réformé » et sera marqué dans son historique. Touchez encore « Confirmer » pour valider.</div>';
+  if(sheet.presentMsg)h+='<div class="notice ok" style="margin-top:10px">'+esc(sheet.presentMsg)+'</div>';
   h+='</div>';
+  if(admin.on&&(TYPES[fsec.type]&&!TYPES[fsec.type].noInventory))h+='<button class="btn primary" id="fc-present" type="button" style="width:100%;margin-top:10px">✓ Pointer « présent » à l\'inventaire</button>';
   h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button>'+(canReform?'<button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer la réforme':'Réformer')+'</button>':'')+'</div>';
   h+='<button class="btn ghost full" id="fc-new" type="button" style="margin-top:10px;width:100%">Scanner / chercher un autre</button>';
   h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
@@ -1471,14 +1473,23 @@ app.addEventListener("click",function(e){
    try{sheet.frozen=cv.toDataURL("image/jpeg",0.92);}catch(e){sheet.frozen=null;}
    stopCamera();sheet.camerr="";render();
    try{var img=cx.getImageData(0,0,cv.width,cv.height);loadZX().then(function(zx){return zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1});}).then(function(res){
-    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){if(sheet.dom==="find"){var me=scanMatch(sheet.scope,res[0].text);if(me){var dd=scanDupes(sheet.scope,me.i);sheet.frozen=null;sheet.cam=false;scanFeedback();if(dd.length>1){sheet.q=idValOf(me.i);}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;}render();}else{sheet.q=res[0].text;render();}}else{var mu=matchCode(res[0].text);if(mu){stopCamera();sheet={mode:"controle",id:mu.i.id,sid:mu.sid,ans:{},fromScan:true};render();}else{sheet.q=res[0].text;render();}}}
+    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){if(sheet.dom==="find"){var me=scanMatch(sheet.scope,res[0].text);if(me){var dd=scanDupes(sheet.scope,me.i);sheet.frozen=null;sheet.cam=false;scanFeedback();if(dd.length>1){sheet.q=idValOf(me.i);}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.presentMsg="";}render();}else{sheet.q=res[0].text;render();}}else{var mu=matchCode(res[0].text);if(mu){stopCamera();sheet={mode:"controle",id:mu.i.id,sid:mu.sid,ans:{},fromScan:true};render();}else{sheet.q=res[0].text;render();}}}
    }).catch(function(){});}catch(e){}
   }else{sheet.camerr="Impossible de figer l'image (caméra pas encore prête).";render();}
   return;}
  if(t.id==="id-unfreeze"){sheet.frozen=null;sheet.camerr="";render();return;}
  if(t.id==="id-torch"){var tr=CAM.track;if(tr&&tr.applyConstraints){var want=!sheet.torch;tr.applyConstraints({advanced:[{torch:want}]}).then(function(){sheet.torch=want;render();}).catch(function(){sheet.torch=false;sheet.camerr="Lampe non disponible sur cet appareil.";render();});}else{sheet.camerr="Lampe non disponible sur cet appareil.";render();}return;}
  if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
- if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.q="";render();focusId("id-icb");return;}
+ if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";sheet.q="";render();focusId("id-icb");return;}
+ if(t.id==="fc-present"&&sheet.found){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  var psid=sheet.found.sid,pid=sheet.found.id,ps=store[psid];
+  if(!ps.INV)ps.INV={start:today(),seen:{},onlyTodo:false};
+  ps.INV.seen[pid]=1;try{localStorage.setItem(keysFor(psid).i,JSON.stringify(ps.INV));}catch(e){}
+  if(curSid===psid)INV=ps.INV;
+  scanFeedback();var cnt=Object.keys(ps.INV.seen).length;
+  sheet.presentMsg="Pointé présent dans « "+secById(psid).nom+" » ("+cnt+" pointé"+(cnt>1?"s":"")+"). Terminez l'inventaire de cette section pour valider.";
+  render();return;}
  if(t.id==="fc-reform"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
   if(!sheet.reformArm){sheet.reformArm=true;render();return;}
@@ -1486,7 +1497,7 @@ app.addEventListener("click",function(e){
   editItemIn(fsid,fid,function(i){i.statut="Réformé";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"Réformé",statut:"Réformé"}]);});
   openElement(fsid,fid);return;
  }
- if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="find"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
+ if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="find"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
  if(t.id==="cf-save"){
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
