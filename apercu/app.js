@@ -328,7 +328,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="31";
+var APPVER="32";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -1493,7 +1493,7 @@ app.addEventListener("keydown",function(e){
 });
 app.addEventListener("input",function(e){
  if(e.target.id==="q"){ui.q=e.target.value;render();return;}
- if(e.target.id==="id-icb"){sheet.q=e.target.value;render();return;}
+ if(e.target.id==="id-icb"){sheet.q=e.target.value;if(sheet.cam&&e.target.value.trim()){stopCamera();sheet.cam=false;sheet.camerr="";}render();return;}
 });
 app.addEventListener("change",function(e){
  var t=e.target;
