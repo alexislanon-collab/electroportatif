@@ -748,7 +748,7 @@ function startCamera(){
      busy=false;if(!CAM.stream||!sheet||sheet.mode!=="identify")return;
      if(res&&res.length&&res[0].text){var txt=res[0].text;
       if(sheet.dom==="epi"){var me=epiMatch(txt);
-       if(me){openElement(me.sid,me.i.id);}
+       if(me){stopCamera();sheet.cam=false;sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";render();}
        else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun n° de série correspondant.";render();}}
       else{var m=matchCode(txt);
        if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
@@ -910,7 +910,19 @@ function renderSheet(){
   if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
   h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
-} else if(sheet.mode==="identify"){
+} else if(sheet.mode==="identify"&&sheet.dom==="epi"&&sheet.found){
+  var fi=secItem(sheet.found.sid,sheet.found.id)||{},fsec=secById(sheet.found.sid)||{},fst=stOpt(TYPES.epi,fi.statut);
+  h+='<h3>Élément trouvé</h3>';
+  h+='<div class="foundcard"><div class="fc-name">'+esc(fi.designation||"")+'</div><div class="fc-sub">N° de série '+esc(fi.serie||"—")+(fi.marque?' · '+esc(fi.marque):'')+(fi.norme?' · '+esc(fi.norme):'')+'</div>';
+  h+='<div class="fc-range">À ranger dans</div><div class="fc-dest">'+esc(epiGroupLabel(fsec)+' · '+fsec.nom)+'</div>';
+  h+='<div class="fc-stat"><span class="pill p-'+fst[2]+'">'+esc(fst[1])+'</span>'+(fi.date_ctrl?'<span class="fc-ctrl">dernier contrôle : '+esc(fi.date_ctrl)+'</span>':'')+'</div>';
+  if(sheet.reformMsg)h+='<div class="notice ok" style="margin-top:10px">'+esc(sheet.reformMsg)+'</div>';
+  if(sheet.reformArm)h+='<div class="notice" style="margin-top:10px">L\'élément passera « Réformé » et sera marqué dans son historique. Touchez encore « Confirmer » pour valider.</div>';
+  h+='</div>';
+  h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button><button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer la réforme':'Réformer')+'</button></div>';
+  h+='<button class="btn ghost full" id="fc-new" type="button" style="margin-top:10px;width:100%">Scanner / chercher un autre</button>';
+  h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
+ } else if(sheet.mode==="identify"){
   var epi=sheet.dom==="epi";
   h+='<h3>'+(epi?'Trouver un n° de série':'Réaliser un contrôle')+'</h3>';
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
@@ -1408,7 +1420,16 @@ app.addEventListener("click",function(e){
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-epi-scan"){sheet={mode:"identify",q:"",dom:"epi"};render();focusId("id-icb");return;}
  if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;}else{sheet.cam=true;sheet.camerr="";}render();return;}
- if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="epi"){openElement(t.dataset.sid,t.dataset.id);return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
+ if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
+ if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.q="";render();focusId("id-icb");return;}
+ if(t.id==="fc-reform"&&sheet.found){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  if(!sheet.reformArm){sheet.reformArm=true;render();return;}
+  var fsid=sheet.found.sid,fid=sheet.found.id;
+  editItemIn(fsid,fid,function(i){i.statut="Réformé";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"Réformé",statut:"Réformé"}]);});
+  openElement(fsid,fid);return;
+ }
+ if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="epi"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
  if(t.id==="cf-save"){
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
