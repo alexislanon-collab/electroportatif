@@ -559,6 +559,7 @@ function renderGroup(){
  var g=grpById(view);
  var h=previewBanner()+header(g.nom,"Choisissez une partie",false,g.parent?grpById(g.parent).nom:"Accueil")+'<main class="wrap">';
  if(g.id==="upk")h+='<button type="button" class="btn primary bigctrl" id="b-ctrl-start">'+I.check+'Réaliser un contrôle</button>';
+ if(g.id==="epi")h+='<button type="button" class="btn primary bigctrl" id="b-epi-scan">'+I.cam+'Scanner / chercher un n° de série</button>';
  h+='<div class="tiles">';
  childrenOf(g.id).forEach(function(c){h+=viewById(c.id)?campTile():tileHtml(c.nom,secById(c.id)?[c]:sectionsUnder(c.id),'data-sec="'+c.id+'"',secHint(c));});
  h+='</div></main>'+footer()+pubBar();
@@ -745,9 +746,13 @@ function startCamera(){
     busy=true;
     zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1}).then(function(res){
      busy=false;if(!CAM.stream||!sheet||sheet.mode!=="identify")return;
-     if(res&&res.length&&res[0].text){var txt=res[0].text,m=matchCode(txt);
-      if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
-      else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun matériel correspondant dans la base.";render();}}
+     if(res&&res.length&&res[0].text){var txt=res[0].text;
+      if(sheet.dom==="epi"){var me=epiMatch(txt);
+       if(me){openElement(me.sid,me.i.id);}
+       else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun n° de série correspondant.";render();}}
+      else{var m=matchCode(txt);
+       if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
+       else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun matériel correspondant dans la base.";render();}}}
     },function(){busy=false;});
    },300);
   }).catch(function(){sheet.camerr="Lecteur de code indisponible (connexion ?).";render();});
@@ -832,6 +837,13 @@ QUEST.epi={nom:"EPI",items:[
  {id:"e6",q:"Date de péremption / durée de vie fabricant dépassée.",good:"NON"}
 ]};
 function questFor(sid){var sec=secById(sid)||{};if(sec.type==="epi")return QUEST.epi;return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
+function epiSecs(){return SECTIONS.filter(function(s){return s.type==="epi";});}
+function epiSearch(q){var qq=norm(q).replace(/[^a-z0-9]/g,"");if(!qq)return [];var out=[];epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;d.items.forEach(function(i){var hay=(String(i.serie||"")+" "+String(i.ref||"")+" "+String(i.designation||"")+" "+String(i.marque||"")).toLowerCase().replace(/[^a-z0-9]/g,"");if(hay.indexOf(qq)>-1)out.push({sid:s.id,i:i});});});return out;}
+function epiMatch(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<3)return null;var r=epiSearch(txt);
+ for(var i=0;i<r.length;i++){if(norm(r[i].i.serie).replace(/[^a-z0-9]/g,"")===qq)return r[i];}
+ for(var j=0;j<r.length;j++){var sc=norm(r[j].i.serie).replace(/[^a-z0-9]/g,"");if(sc&&(qq.indexOf(sc)>-1||sc.indexOf(qq)>-1))return r[j];}
+ return r.length===1?r[0]:null;}
+function openElement(sid,id){stopCamera();loadCtx(sid);view=sid;openG={};sheet={mode:admin.on?"edit":"view",id:id};render();}
 function controlResult(sid,ans){
  var ok=true,probs=[];
  questFor(sid).items.forEach(function(q){
@@ -898,16 +910,25 @@ function renderSheet(){
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
   h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
 } else if(sheet.mode==="identify"){
-  h+='<h3>Réaliser un contrôle</h3>';
+  var epi=sheet.dom==="epi";
+  h+='<h3>'+(epi?'Trouver un n° de série':'Réaliser un contrôle')+'</h3>';
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
-  h+='<p class="help">Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.</p>';
+  h+='<p class="help">'+(epi?'Scannez le code de l\'étiquette (Data Matrix ou QR), ou saisissez le n° de série (même partiel). On ouvre la fiche pour la consulter, la contrôler ou la ranger.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
   h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
   if(sheet.cam)h+='<div class="camwrap"><video id="cam-v" playsinline muted></video><div class="camframe"></div>'+(sheet.camerr?'<div class="camerr">'+esc(sheet.camerr)+'</div>':'<div class="camhint">Visez le code de l\'étiquette (QR code ou Data Matrix). Cadrez-le bien, laissez la mise au point se faire.</div>')+'</div>';
-  h+='<div class="field full"><label for="id-icb">Numéro ICB / frappé</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="Ex. : DIB1-0019892 ou 8179"></div>';
-  var res2=upkSearch(sheet.q||"");
-  if((sheet.q||"").trim()){
-   if(!res2.length)h+='<div class="empty" style="padding:18px 0">Aucun outil trouvé pour « '+esc(sheet.q)+' ».</div>';
-   else h+='<ul class="idres">'+res2.slice(0,15).map(function(r){var st=stOpt(TYPES.upk,r.i.statut);return '<li><button type="button" class="idrow" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+'</b><span class="idr-sub">ICB '+esc(r.i.icb||"—")+(r.i.frappe?' · frappé '+esc(r.i.frappe):'')+(r.i.cable?' · '+esc(r.i.cable):'')+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
+  h+='<div class="field full"><label for="id-icb">'+(epi?'N° de série (complet ou partiel)':'Numéro ICB / frappé')+'</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="'+(epi?'Ex. : 24A0540416566 ou 416566':'Ex. : DIB1-0019892 ou 8179')+'"></div>';
+  if(epi){
+   var re=epiSearch(sheet.q||"");
+   if((sheet.q||"").trim()){
+    if(!re.length)h+='<div class="empty" style="padding:18px 0">Aucun élément trouvé pour « '+esc(sheet.q)+' ».</div>';
+    else h+='<ul class="idres">'+re.slice(0,20).map(function(r){var st=stOpt(TYPES.epi,r.i.statut),sec=secById(r.sid);return '<li><button type="button" class="idrow" data-dom="epi" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+'</b><span class="idr-sub">N° '+esc(r.i.serie||"—")+' · '+esc(epiGroupLabel(sec)+" · "+sec.nom)+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
+   }
+  } else {
+   var res2=upkSearch(sheet.q||"");
+   if((sheet.q||"").trim()){
+    if(!res2.length)h+='<div class="empty" style="padding:18px 0">Aucun outil trouvé pour « '+esc(sheet.q)+' ».</div>';
+    else h+='<ul class="idres">'+res2.slice(0,15).map(function(r){var st=stOpt(TYPES.upk,r.i.statut);return '<li><button type="button" class="idrow" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+'</b><span class="idr-sub">ICB '+esc(r.i.icb||"—")+(r.i.frappe?' · frappé '+esc(r.i.frappe):'')+(r.i.cable?' · '+esc(r.i.cable):'')+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
+   }
   }
   h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
  } else if(sheet.mode==="controle"){
@@ -1384,8 +1405,9 @@ app.addEventListener("click",function(e){
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
+ if(t.id==="b-epi-scan"){sheet={mode:"identify",q:"",dom:"epi"};render();focusId("id-icb");return;}
  if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;}else{sheet.cam=true;sheet.camerr="";}render();return;}
- if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
+ if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="epi"){openElement(t.dataset.sid,t.dataset.id);return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
  if(t.id==="cf-save"){
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
