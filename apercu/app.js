@@ -328,7 +328,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="30";
+var APPVER="31";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -839,8 +839,11 @@ QUEST.epi={nom:"EPI",items:[
 ]};
 function questFor(sid){var sec=secById(sid)||{};if(sec.type==="epi")return QUEST.epi;return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
 function epiSecs(){return SECTIONS.filter(function(s){return s.type==="epi";});}
-function epiTokens(q){return norm(q).replace(/[^a-z0-9]+/g," ").trim().split(/\s+/).filter(function(t){return t.length>=2;});}
-function epiHay(i){return norm([i.serie,i.ref,i.designation,i.marque,i.norme,i.fab,i.service,i.note].join(" ")).replace(/[^a-z0-9]+/g," ");}
+function epiStrip(s){return norm(s).replace(/[^a-z0-9]+/g,"");}
+/* on coupe la saisie sur espaces, / . , ; (pas sur l'apostrophe) puis on retire le reste : « pur'ann » → « purann », « 02/19 » → « 02 » « 19 » */
+function epiTokens(q){return norm(q).split(/[\s/.,;:_-]+/).map(function(t){return t.replace(/[^a-z0-9]/g,"");}).filter(function(t){return t.length>=2;});}
+/* chaque champ est réduit à un bloc alphanumérique (« PUR'ANNEAU » → « puranneau »), les champs séparés par un espace */
+function epiHay(i){return [i.serie,i.ref,i.designation,i.marque,i.norme,i.fab,i.service,i.note].map(epiStrip).join(" ");}
 /* recherche multi-indices : croise modèle (ref/désignation), date (année), n° de série… ; garde les meilleures correspondances */
 function epiSearch(q){var toks=epiTokens(q);if(!toks.length)return [];
  var out=[],max=0;
