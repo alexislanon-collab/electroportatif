@@ -328,6 +328,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
+var APPVER="29";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -496,8 +497,8 @@ function header(title,sub,isSection,backLabel){
  h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?(admin.demo?'Mode démo':'Mode admin'):'Admin')+'</button>';
  return h+'</div></div></div><div class="tape" aria-hidden="true"></div></header>';
 }
-function previewBanner(){return PREVIEW?'<div class="preview"><div class="wrap">Aperçu de la nouvelle version : les données ici sont une copie, la vraie page n\'est pas modifiée.</div></div>':'';}
-function footer(){return '<footer class="wrap">Consultation libre · modifications réservées aux administrateurs</footer>';}
+function previewBanner(){return PREVIEW?'<div class="preview"><div class="wrap">Aperçu <b>version '+esc(APPVER)+'</b> : les données ici sont une copie, la vraie page n\'est pas modifiée.</div></div>':'';}
+function footer(){return '<footer class="wrap">Consultation libre · modifications réservées aux administrateurs<br><span class="ver">Version '+esc(APPVER)+'</span></footer>';}
 
 function render(){
  var fa=document.activeElement,fid=fa&&fa.id,ss=fa&&fa.selectionStart;
