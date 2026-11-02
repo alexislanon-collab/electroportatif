@@ -839,10 +839,16 @@ QUEST.epi={nom:"EPI",items:[
 function questFor(sid){var sec=secById(sid)||{};if(sec.type==="epi")return QUEST.epi;return sid==="upk-fourreaux"?QUEST.fourreau:QUEST.machoire;}
 function epiSecs(){return SECTIONS.filter(function(s){return s.type==="epi";});}
 function epiSearch(q){var qq=norm(q).replace(/[^a-z0-9]/g,"");if(!qq)return [];var out=[];epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;d.items.forEach(function(i){var hay=(String(i.serie||"")+" "+String(i.ref||"")+" "+String(i.designation||"")+" "+String(i.marque||"")).toLowerCase().replace(/[^a-z0-9]/g,"");if(hay.indexOf(qq)>-1)out.push({sid:s.id,i:i});});});return out;}
-function epiMatch(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<3)return null;var r=epiSearch(txt);
- for(var i=0;i<r.length;i++){if(norm(r[i].i.serie).replace(/[^a-z0-9]/g,"")===qq)return r[i];}
- for(var j=0;j<r.length;j++){var sc=norm(r[j].i.serie).replace(/[^a-z0-9]/g,"");if(sc&&(qq.indexOf(sc)>-1||sc.indexOf(qq)>-1))return r[j];}
- return r.length===1?r[0]:null;}
+function epiMatch(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<4)return null;
+ var m=[];
+ epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;var vole=/vol/.test(s.id)?1:0;d.items.forEach(function(i){
+  var sc=norm(i.serie).replace(/[^a-z0-9]/g,"");if(!sc||sc.length<4)return;
+  if(sc===qq)m.push({sid:s.id,i:i,vole:vole,len:sc.length,exact:1});
+  else if(qq.indexOf(sc)>-1||sc.indexOf(qq)>-1)m.push({sid:s.id,i:i,vole:vole,len:sc.length,exact:0});
+ });});
+ if(!m.length)return null;
+ m.sort(function(a,b){return (b.exact-a.exact)||(a.vole-b.vole)||(b.len-a.len);});
+ return m[0];}
 function openElement(sid,id){stopCamera();loadCtx(sid);view=sid;openG={};sheet={mode:admin.on?"edit":"view",id:id};render();}
 function controlResult(sid,ans){
  var ok=true,probs=[];
