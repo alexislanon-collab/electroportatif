@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="35";
+var APPVER="36";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -561,7 +561,7 @@ function renderGroup(){
  var g=grpById(view);
  var h=previewBanner()+header(g.nom,"Choisissez une partie",false,g.parent?grpById(g.parent).nom:"Accueil")+'<main class="wrap">';
  if(g.id==="upk")h+='<button type="button" class="btn primary bigctrl" id="b-ctrl-start">'+I.check+'Réaliser un contrôle</button>';
- if(g.id==="epi")h+='<button type="button" class="btn primary bigctrl" id="b-epi-scan">'+I.cam+'Scanner / chercher un n° de série</button>';
+ if(["epi","tst","gipfs","dstm"].indexOf(g.id)>-1)h+='<button type="button" class="btn primary bigctrl" id="b-find-scan">'+I.cam+'Scanner / chercher (n° de série, ICB…)</button>';
  h+='<div class="tiles">';
  childrenOf(g.id).forEach(function(c){h+=viewById(c.id)?campTile():tileHtml(c.nom,secById(c.id)?[c]:sectionsUnder(c.id),'data-sec="'+c.id+'"',secHint(c));});
  h+='</div></main>'+footer()+pubBar();
@@ -749,9 +749,9 @@ function startCamera(){
     zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1}).then(function(res){
      busy=false;if(!CAM.stream||!sheet||sheet.mode!=="identify")return;
      if(res&&res.length&&res[0].text){var txt=res[0].text;
-      if(sheet.dom==="epi"){var me=epiMatch(txt);
+      if(sheet.dom==="find"){var me=scanMatch(sheet.scope,txt);
        if(me){stopCamera();sheet.cam=false;sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";render();}
-       else{var cand=epiSearch(txt);stopCamera();sheet.cam=false;sheet.q=txt;sheet.camerr=cand.length?"":"Code lu : « "+txt.slice(0,24)+" » — aucune correspondance. Essayez avec le modèle et l'année.";render();}}
+       else{var cand=scanSearch(sheet.scope,txt);stopCamera();sheet.cam=false;sheet.q=txt;sheet.camerr=cand.length?"":"Code lu : « "+txt.slice(0,24)+" » — aucune correspondance. Essayez avec le modèle, l'année ou le n°.";render();}}
       else{var m=matchCode(txt);
        if(m){stopCamera();sheet={mode:"controle",id:m.i.id,sid:m.sid,ans:{},fromScan:true};render();}
        else{sheet.camerr="Code lu : « "+txt.slice(0,24)+" » — aucun matériel correspondant dans la base.";render();}}}
@@ -842,25 +842,28 @@ function questFor(sid){var sec=secById(sid)||{};if(sec.type==="epi")return QUEST
 function epiSecs(){return SECTIONS.filter(function(s){return s.type==="epi";});}
 function epiStrip(s){return norm(s).replace(/[^a-z0-9]+/g,"");}
 /* on coupe la saisie sur espaces, / . , ; (pas sur l'apostrophe) puis on retire le reste : « pur'ann » → « purann », « 02/19 » → « 02 » « 19 » */
-function epiTokens(q){return norm(q).split(/[\s/.,;:_-]+/).map(function(t){return t.replace(/[^a-z0-9]/g,"");}).filter(function(t){return t.length>=2;});}
-/* chaque champ est réduit à un bloc alphanumérique (« PUR'ANNEAU » → « puranneau »), les champs séparés par un espace */
-function epiHay(i){return [i.serie,i.ref,i.designation,i.marque,i.norme,i.fab,i.service,i.note].map(epiStrip).join(" ");}
-/* recherche multi-indices : croise modèle (ref/désignation), date (année), n° de série… ; garde les meilleures correspondances */
-function epiSearch(q){var toks=epiTokens(q);if(!toks.length)return [];
+function epiTokens(q){return norm(q).split(/[\s/;:_-]+/).map(function(t){return t.replace(/[^a-z0-9]/g,"");}).filter(function(t){return t.length>=2;});}
+/* champs identifiants (pour un match code scanné) et champs de recherche (indices) */
+var FIND_IDS=["icb","frappe","cesar","serie","ref"];
+var FIND_HAY=["icb","frappe","cesar","serie","ref","mainta","designation","description","carac","marque","cmu","norme","fab","service","longueur","diametre","categorie","couleur","note","commentaire"];
+function findIdText(i){var k=FIND_IDS.filter(function(x){return i[x];})[0];return k?((k==="icb"?"ICB ":k==="serie"?"N° ":"")+i[k]):"";}
+function scanHay(i){return FIND_HAY.map(function(k){return epiStrip(i[k]);}).filter(Boolean).join(" ");}
+/* recherche multi-indices sur un périmètre de sections (croise modèle, année, n°…), garde les meilleures correspondances */
+function scanSearch(sids,q){var toks=epiTokens(q);if(!toks.length)return [];
  var out=[],max=0;
- epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;d.items.forEach(function(i){
-  var hay=epiHay(i),sc=0;toks.forEach(function(t){if(hay.indexOf(t)>-1)sc++;});
-  if(sc>0){out.push({sid:s.id,i:i,score:sc});if(sc>max)max=sc;}
+ (sids||[]).forEach(function(sid){var d=secData(sid);if(!d)return;d.items.forEach(function(i){
+  var hay=scanHay(i),sc=0;toks.forEach(function(t){if(hay.indexOf(t)>-1)sc++;});
+  if(sc>0){out.push({sid:sid,i:i,score:sc});if(sc>max)max=sc;}
  });});
  out=out.filter(function(o){return o.score===max;});
- out.sort(function(a,b){return norm(a.i.serie||"zzz").localeCompare(norm(b.i.serie||"zzz"));});
+ out.sort(function(a,b){return natCmp(String(a.i.designation||a.i.description||""),String(b.i.designation||b.i.description||""));});
  return out;}
-function epiMatch(txt){var qq=norm(txt).replace(/[^a-z0-9]/g,"");if(qq.length<4)return null;
- var m=[];
- epiSecs().forEach(function(s){var d=secData(s.id);if(!d)return;var vole=/vol/.test(s.id)?1:0;d.items.forEach(function(i){
-  var sc=norm(i.serie).replace(/[^a-z0-9]/g,"");if(!sc||sc.length<4)return;
-  if(sc===qq)m.push({sid:s.id,i:i,vole:vole,len:sc.length,exact:1});
-  else if(qq.indexOf(sc)>-1||sc.indexOf(qq)>-1)m.push({sid:s.id,i:i,vole:vole,len:sc.length,exact:0});
+/* match d'un code scanné : retrouve un identifiant connu À L'INTÉRIEUR du code lu */
+function scanMatch(sids,txt){var qq=epiStrip(txt);if(qq.length<4)return null;var m=[];
+ (sids||[]).forEach(function(sid){var d=secData(sid);if(!d)return;var vole=/vol/.test(sid)?1:0;d.items.forEach(function(i){
+  FIND_IDS.forEach(function(k){var sc=epiStrip(i[k]);if(!sc||sc.length<4)return;
+   if(sc===qq)m.push({sid:sid,i:i,vole:vole,len:sc.length,exact:1});
+   else if(qq.indexOf(sc)>-1||sc.indexOf(qq)>-1)m.push({sid:sid,i:i,vole:vole,len:sc.length,exact:0});});
  });});
  if(!m.length)return null;
  m.sort(function(a,b){return (b.exact-a.exact)||(a.vole-b.vole)||(b.len-a.len);});
@@ -932,23 +935,25 @@ function renderSheet(){
   if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
   h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
-} else if(sheet.mode==="identify"&&sheet.dom==="epi"&&sheet.found){
-  var fi=secItem(sheet.found.sid,sheet.found.id)||{},fsec=secById(sheet.found.sid)||{},fst=stOpt(TYPES.epi,fi.statut);
+} else if(sheet.mode==="identify"&&sheet.dom==="find"&&sheet.found){
+  var fi=secItem(sheet.found.sid,sheet.found.id)||{},fsec=secById(sheet.found.sid)||{},fT=TYPES[fsec.type]||{};
+  var fst=fT.status?stOpt(fT,statusOfT(fT,fi,secData(fsec.id))):null;
+  var canReform=fsec.type==="epi";
   h+='<h3>Élément trouvé</h3>';
-  h+='<div class="foundcard"><div class="fc-name">'+esc(fi.designation||"")+'</div><div class="fc-sub">N° de série '+esc(fi.serie||"—")+(fi.marque?' · '+esc(fi.marque):'')+(fi.norme?' · '+esc(fi.norme):'')+'</div>';
-  h+='<div class="fc-range">À ranger dans</div><div class="fc-dest">'+esc(epiGroupLabel(fsec)+' · '+fsec.nom)+'</div>';
-  h+='<div class="fc-stat"><span class="pill p-'+fst[2]+'">'+esc(fst[1])+'</span>'+(fi.date_ctrl?'<span class="fc-ctrl">dernier contrôle : '+esc(fi.date_ctrl)+'</span>':'')+'</div>';
+  h+='<div class="foundcard"><div class="fc-name">'+esc(fi.designation||fi.description||"")+'</div><div class="fc-sub">'+esc(findIdText(fi)||"sans n°")+(fi.marque?' · '+esc(fi.marque):'')+(fi.cmu?' · CMU '+esc(fi.cmu):'')+(fi.ft?' · FT '+esc(fi.ft):'')+'</div>';
+  h+='<div class="fc-range">'+(canReform?'À ranger dans':'Emplacement')+'</div><div class="fc-dest">'+esc(epiGroupLabel(fsec)+' · '+fsec.nom)+'</div>';
+  if(fst)h+='<div class="fc-stat"><span class="pill p-'+fst[2]+'">'+esc(fst[1])+'</span>'+(fi.date_ctrl?'<span class="fc-ctrl">dernier contrôle : '+esc(fi.date_ctrl)+'</span>':'')+'</div>';
   if(sheet.reformMsg)h+='<div class="notice ok" style="margin-top:10px">'+esc(sheet.reformMsg)+'</div>';
   if(sheet.reformArm)h+='<div class="notice" style="margin-top:10px">L\'élément passera « Réformé » et sera marqué dans son historique. Touchez encore « Confirmer » pour valider.</div>';
   h+='</div>';
-  h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button><button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer la réforme':'Réformer')+'</button></div>';
+  h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button>'+(canReform?'<button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer la réforme':'Réformer')+'</button>':'')+'</div>';
   h+='<button class="btn ghost full" id="fc-new" type="button" style="margin-top:10px;width:100%">Scanner / chercher un autre</button>';
   h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
  } else if(sheet.mode==="identify"){
-  var epi=sheet.dom==="epi";
-  h+='<h3>'+(epi?'Trouver un n° de série':'Réaliser un contrôle')+'</h3>';
+  var epi=sheet.dom==="find";
+  h+='<h3>'+(epi?'Trouver un matériel'+(sheet.area?' — '+esc(sheet.area):''):'Réaliser un contrôle')+'</h3>';
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
-  h+='<p class="help">'+(epi?'Scannez le code (Data Matrix ou QR), ou saisissez ce que vous lisez : n° de série même partiel, et/ou le modèle (ex. « pur anneau ») et l\'année (ex. « 2019 »). En combinant ces indices, on retrouve la sangle ou le mousqueton et son sac.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
+  h+='<p class="help">'+(epi?'Scannez le code (Data Matrix ou QR), ou saisissez ce que vous lisez : n° de série ou ICB même partiel, et/ou le modèle et l\'année. En combinant ces indices, on retrouve le matériel et son emplacement.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
   h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
   if(sheet.cam){
    if(sheet.frozen){
@@ -959,12 +964,12 @@ function renderSheet(){
     h+='<button type="button" class="btn cambtn2" id="id-freeze">❄️ Figer l\'image pour recopier le numéro</button>';
    }
   }
-  h+='<div class="field full"><label for="id-icb">'+(epi?'N° de série (complet ou partiel)':'Numéro ICB / frappé')+'</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="'+(epi?'Ex. : 24A0540416566 ou 416566':'Ex. : DIB1-0019892 ou 8179')+'"></div>';
+  h+='<div class="field full"><label for="id-icb">'+(epi?'N° de série / ICB / modèle (même partiel)':'Numéro ICB / frappé')+'</label><input id="id-icb" class="digits" inputmode="text" autocapitalize="characters" autocorrect="off" autocomplete="off" spellcheck="false" value="'+esc(sheet.q||"")+'" placeholder="'+(epi?'Ex. : 416566, DIB1-0019, pur ann 2019…':'Ex. : DIB1-0019892 ou 8179')+'"></div>';
   if(epi){
-   var re=epiSearch(sheet.q||"");
+   var re=scanSearch(sheet.scope,sheet.q||"");
    if((sheet.q||"").trim()){
     if(!re.length)h+='<div class="empty" style="padding:18px 0">Aucun élément trouvé pour « '+esc(sheet.q)+' ».</div>';
-    else h+='<ul class="idres">'+re.slice(0,25).map(function(r){var st=stOpt(TYPES.epi,r.i.statut),sec=secById(r.sid);var det=[r.i.ref,r.i.fab].filter(Boolean).join(" · ");return '<li><button type="button" class="idrow" data-dom="epi" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation)+(det?' <span class="idr-det">'+esc(det)+'</span>':'')+'</b><span class="idr-sub">N° '+esc(r.i.serie||"—")+' · '+esc(epiGroupLabel(sec)+" · "+sec.nom)+'</span></span><span class="pill p-'+st[2]+'">'+esc(st[1])+'</span></button></li>';}).join("")+'</ul>';
+    else h+='<ul class="idres">'+re.slice(0,25).map(function(r){var sec=secById(r.sid),rT=TYPES[sec.type]||{};var st=rT.status?stOpt(rT,statusOfT(rT,r.i,secData(r.sid))):null;var det=[r.i.ref,r.i.cmu,r.i.fab].filter(Boolean).slice(0,2).join(" · ");return '<li><button type="button" class="idrow" data-dom="find" data-sid="'+r.sid+'" data-id="'+esc(r.i.id)+'"><span class="idr-main"><b>'+esc(r.i.designation||r.i.description||"")+(det?' <span class="idr-det">'+esc(det)+'</span>':'')+'</b><span class="idr-sub">'+esc((findIdText(r.i)||"sans n°")+" · "+epiGroupLabel(sec)+" · "+sec.nom)+'</span></span>'+(st?'<span class="pill p-'+st[2]+'">'+esc(st[1])+'</span>':'')+'</button></li>';}).join("")+'</ul>';
    }
   } else {
    var res2=upkSearch(sheet.q||"");
@@ -1448,14 +1453,14 @@ app.addEventListener("click",function(e){
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
- if(t.id==="b-epi-scan"){sheet={mode:"identify",q:"",dom:"epi"};render();focusId("id-icb");return;}
+ if(t.id==="b-find-scan"){var fsc=sectionsUnder(view).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:(grpById(view)||{}).nom||""};render();focusId("id-icb");return;}
  if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;sheet.frozen=null;}else{sheet.cam=true;sheet.camerr="";sheet.frozen=null;}render();return;}
  if(t.id==="id-freeze"){var vd=document.getElementById("cam-v");
   if(vd&&vd.videoWidth){var cv=document.createElement("canvas");cv.width=vd.videoWidth;cv.height=vd.videoHeight;var cx=cv.getContext("2d");cx.drawImage(vd,0,0);
    try{sheet.frozen=cv.toDataURL("image/jpeg",0.92);}catch(e){sheet.frozen=null;}
    stopCamera();sheet.camerr="";render();
    try{var img=cx.getImageData(0,0,cv.width,cv.height);loadZX().then(function(zx){return zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1});}).then(function(res){
-    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){var me=epiMatch(res[0].text);if(me){sheet.found={sid:me.sid,id:me.i.id};sheet.frozen=null;sheet.cam=false;sheet.reformArm=false;render();}else{sheet.q=res[0].text;render();}}
+    if(res&&res.length&&res[0].text&&sheet&&sheet.mode==="identify"&&sheet.frozen){if(sheet.dom==="find"){var me=scanMatch(sheet.scope,res[0].text);if(me){sheet.found={sid:me.sid,id:me.i.id};sheet.frozen=null;sheet.cam=false;sheet.reformArm=false;render();}else{sheet.q=res[0].text;render();}}else{var mu=matchCode(res[0].text);if(mu){stopCamera();sheet={mode:"controle",id:mu.i.id,sid:mu.sid,ans:{},fromScan:true};render();}else{sheet.q=res[0].text;render();}}}
    }).catch(function(){});}catch(e){}
   }else{sheet.camerr="Impossible de figer l'image (caméra pas encore prête).";render();}
   return;}
@@ -1469,7 +1474,7 @@ app.addEventListener("click",function(e){
   editItemIn(fsid,fid,function(i){i.statut="Réformé";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"Réformé",statut:"Réformé"}]);});
   openElement(fsid,fid);return;
  }
- if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="epi"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
+ if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="find"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
  if(t.id==="cf-save"){
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
