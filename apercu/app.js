@@ -328,7 +328,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="33";
+var APPVER="34";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
