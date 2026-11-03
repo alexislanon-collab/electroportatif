@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="39";
+var APPVER="40";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -1468,7 +1468,7 @@ app.addEventListener("click",function(e){
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
- if(t.id==="b-find-scan"){var fsc=sectionsUnder(view).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:(grpById(view)||{}).nom||""};render();focusId("id-icb");return;}
+ if(t.id==="b-find-scan"){var fsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:"tout le matériel"};render();focusId("id-icb");return;}
  if(t.id==="b-find-home"){var allsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:allsc,area:"tout le matériel"};render();focusId("id-icb");return;}
  if(t.id==="id-scan"){if(sheet.cam){stopCamera();sheet.cam=false;sheet.frozen=null;}else{sheet.cam=true;sheet.camerr="";sheet.frozen=null;}render();return;}
  if(t.id==="id-freeze"){var vd=document.getElementById("cam-v");
