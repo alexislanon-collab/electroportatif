@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="38";
+var APPVER="39";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -766,7 +766,10 @@ function startCamera(){
 function afterRender(fid,ss){
  if(fid){var el=document.getElementById(fid);if(el){el.focus();try{if(ss!=null)el.setSelectionRange(ss,ss);}catch(e){}}}
  if(sheet&&sheet.mode==="qr")drawQR();
- if(sheet&&sheet.mode==="identify"&&sheet.cam&&!sheet.frozen&&!CAM.stream)startCamera();
+ if(sheet&&sheet.mode==="identify"&&sheet.cam&&!sheet.frozen){
+  if(!CAM.stream)startCamera();
+  else{var vv=document.getElementById("cam-v");if(vv&&!vv.srcObject){vv.srcObject=CAM.stream;vv.play().catch(function(){});}}
+ }
  if(!(sheet&&sheet.mode==="identify"&&sheet.cam&&!sheet.frozen)&&CAM.stream)stopCamera();
 }
 
