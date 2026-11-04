@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="40";
+var APPVER="41";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -961,7 +961,7 @@ function renderSheet(){
   if(sheet.presentMsg)h+='<div class="notice ok" style="margin-top:10px">'+esc(sheet.presentMsg)+'</div>';
   h+='</div>';
   if(admin.on&&(TYPES[fsec.type]&&!TYPES[fsec.type].noInventory))h+='<button class="btn primary" id="fc-present" type="button" style="width:100%;margin-top:10px">✓ Pointer « présent » à l\'inventaire</button>';
-  h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button>'+(canReform?'<button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer la réforme':'Réformer')+'</button>':'')+'</div>';
+  h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button>'+(canReform?'<button class="btn ok" id="fc-conform" type="button">Conforme</button><button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer':'Réformer')+'</button>':'')+'</div>';
   h+='<button class="btn ghost full" id="fc-new" type="button" style="margin-top:10px;width:100%">Scanner / chercher un autre</button>';
   h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
  } else if(sheet.mode==="identify"){
@@ -1483,6 +1483,11 @@ app.addEventListener("click",function(e){
  if(t.id==="id-unfreeze"){sheet.frozen=null;sheet.camerr="";render();return;}
  if(t.id==="id-torch"){var tr=CAM.track;if(tr&&tr.applyConstraints){var want=!sheet.torch;tr.applyConstraints({advanced:[{torch:want}]}).then(function(){sheet.torch=want;render();}).catch(function(){sheet.torch=false;sheet.camerr="Lampe non disponible sur cet appareil.";render();});}else{sheet.camerr="Lampe non disponible sur cet appareil.";render();}return;}
  if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
+ if(t.id==="fc-conform"&&sheet.found){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  var ksid=sheet.found.sid,kid=sheet.found.id;
+  editItemIn(ksid,kid,function(i){i.statut="Conforme";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"RAS",statut:"Conforme"}]);});
+  openElement(ksid,kid);return;}
  if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";sheet.q="";render();focusId("id-icb");return;}
  if(t.id==="fc-present"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
