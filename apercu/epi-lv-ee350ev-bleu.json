@@ -74,7 +74,7 @@
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121953","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_113"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121954","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_003"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121965","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_093"},
-  {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121966","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_089"},
+  {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121966","fab":"2019","service":"2024","note":"","statut":"Conforme","history":[{"date":"04/11/2026","verif":"","obs":"RAS","statut":"Conforme"},{"date":"04/11/2026","verif":"","obs":"RAS","statut":"Conforme","reponses":{"e1":"OUI","e2":"NON","e3":"NON","e4":"OUI","e5":"NON","e6":"NON"}}],"id":"e21_089","date_ctrl":"04/11/2026"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121967","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_092"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121971","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_094"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"19B0176121974","fab":"2019","service":"2024","note":"","statut":"","history":[],"id":"e21_098"},
