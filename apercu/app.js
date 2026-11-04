@@ -329,7 +329,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="41";
+var APPVER="42";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -751,6 +751,7 @@ function startCamera(){
     zx.readBarcodes(img,{formats:["DataMatrix","QRCode"],tryHarder:true,maxNumberOfSymbols:1}).then(function(res){
      busy=false;if(!CAM.stream||!sheet||sheet.mode!=="identify")return;
      if(res&&res.length&&res[0].text){var txt=res[0].text;
+      if(CAM.lastCode===txt&&Date.now()-(CAM.lastT||0)<2500)return;CAM.lastCode=txt;CAM.lastT=Date.now();
       if(sheet.dom==="find"){var me=scanMatch(sheet.scope,txt);
        if(me){var dd=scanDupes(sheet.scope,me.i);stopCamera();sheet.cam=false;scanFeedback();
         if(dd.length>1){sheet.q=idValOf(me.i);sheet.camerr="";}else{sheet.found={sid:me.sid,id:me.i.id};sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";}render();}
@@ -875,6 +876,8 @@ function scanMatch(sids,txt){var qq=epiStrip(txt);if(qq.length<4)return null;var
  m.sort(function(a,b){return (b.exact-a.exact)||(a.vole-b.vole)||(b.len-a.len);});
  return m[0];}
 function openElement(sid,id){stopCamera();loadCtx(sid);view=sid;openG={};sheet={mode:admin.on?"edit":"view",id:id};render();}
+/* après un geste rapide (Conforme/Réformer) : on revient au scan, prêt pour le suivant */
+function scanNext(msg){if(!sheet)return;sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";sheet.q="";sheet.okMsg=msg||"";sheet.cam=true;sheet.frozen=null;sheet.camerr="";render();}
 /* retour sensoriel à la lecture d'un code */
 function scanFeedback(){try{if(navigator.vibrate)navigator.vibrate(60);}catch(e){}
  try{var AC=window.AudioContext||window.webkitAudioContext;if(AC){var c=scanFeedback.ac||(scanFeedback.ac=new AC());var o=c.createOscillator(),g=c.createGain();o.frequency.value=880;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.12,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.18);o.start();o.stop(c.currentTime+.18);}}catch(e){}}
@@ -968,6 +971,7 @@ function renderSheet(){
   var epi=sheet.dom==="find";
   h+='<h3>'+(epi?'Trouver un matériel'+(sheet.area?' — '+esc(sheet.area):''):'Réaliser un contrôle')+'</h3>';
   if(sheet.saved)h+='<div class="notice ok">Contrôle de « '+esc(sheet.saved)+' » enregistré. Scannez ou saisissez l\'outil suivant.</div>';
+  if(sheet.okMsg)h+='<div class="notice ok">'+esc(sheet.okMsg)+'</div>';
   h+='<p class="help">'+(epi?'Scannez le code (Data Matrix ou QR), ou saisissez ce que vous lisez : n° de série ou ICB même partiel, et/ou le modèle et l\'année. En combinant ces indices, on retrouve le matériel et son emplacement.':'Posez l\'outil sur la table, puis scannez son QR code EALICO, ou saisissez son numéro ICB / référence frappée.')+'</p>';
   h+='<button type="button" class="btn primary ctrlbtn" id="id-scan">'+I.cam+(sheet.cam?'Arrêter la caméra':'Scanner avec l\'appareil photo')+'</button>';
   if(sheet.cam){
@@ -1029,7 +1033,7 @@ function renderSheet(){
  } else {
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
   h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
-  if((T===TYPES.upk||T===TYPES.epi)&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle'+(T===TYPES.epi?' de conformité':'')+'</button>';
+  if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle</button>';
   if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
@@ -1485,9 +1489,9 @@ app.addEventListener("click",function(e){
  if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
  if(t.id==="fc-conform"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
-  var ksid=sheet.found.sid,kid=sheet.found.id;
+  var ksid=sheet.found.sid,kid=sheet.found.id,knom=(secItem(ksid,kid)||{}).designation||"";
   editItemIn(ksid,kid,function(i){i.statut="Conforme";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"RAS",statut:"Conforme"}]);});
-  openElement(ksid,kid);return;}
+  scanFeedback();scanNext("✓ « "+knom+" » : Conforme. Au suivant.");return;}
  if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";sheet.q="";render();focusId("id-icb");return;}
  if(t.id==="fc-present"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
@@ -1501,9 +1505,9 @@ app.addEventListener("click",function(e){
  if(t.id==="fc-reform"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
   if(!sheet.reformArm){sheet.reformArm=true;render();return;}
-  var fsid=sheet.found.sid,fid=sheet.found.id;
+  var fsid=sheet.found.sid,fid=sheet.found.id,fnom=(secItem(fsid,fid)||{}).designation||"";
   editItemIn(fsid,fid,function(i){i.statut="Réformé";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"Réformé",statut:"Réformé"}]);});
-  openElement(fsid,fid);return;
+  scanFeedback();scanNext("⚠️ « "+fnom+" » : Réformé. Au suivant.");return;
  }
  if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="find"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
@@ -1548,7 +1552,7 @@ app.addEventListener("keydown",function(e){
 });
 app.addEventListener("input",function(e){
  if(e.target.id==="q"){ui.q=e.target.value;render();return;}
- if(e.target.id==="id-icb"){sheet.q=e.target.value;if(sheet.cam&&!sheet.frozen&&e.target.value.trim()){stopCamera();sheet.cam=false;sheet.camerr="";}render();return;}
+ if(e.target.id==="id-icb"){sheet.q=e.target.value;sheet.okMsg="";if(sheet.cam&&!sheet.frozen&&e.target.value.trim()){stopCamera();sheet.cam=false;sheet.camerr="";}render();return;}
 });
 app.addEventListener("change",function(e){
  var t=e.target;

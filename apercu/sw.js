@@ -1,5 +1,5 @@
 /* Service worker EEL — réseau d'abord (toujours à jour en ligne), cache en secours hors-ligne */
-var CACHE = 'eel-v41';
+var CACHE = 'eel-v42';
 var CORE = ['./','./index.html','./app.js','./manifest.json','./logo.png',
             './zxing/reader/index.js','./zxing/share.js','./zxing_reader.wasm'];
 
