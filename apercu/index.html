@@ -250,6 +250,10 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 .full-dd{grid-column:1/-1}
 
 .ctrlbtn{width:100%;justify-content:center;margin-bottom:14px}
+.vehacts{display:flex;flex-wrap:wrap;gap:8px}
+.vehacts .ctrlbtn{flex:1 1 100%;margin-bottom:0}
+.vehacts #b-ctok,.vehacts #b-entok{flex:1 1 calc(50% - 4px)}
+.vehacts{margin-bottom:14px}
 .cfid{font-size:14px;color:var(--muted);margin:-4px 0 12px}
 .cfid .mono{color:var(--ink)}
 .qlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -304,7 +308,7 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=43"></script>
+<script src="app.js?v=44"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 </body>
 </html>

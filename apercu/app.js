@@ -316,7 +316,7 @@ SECTIONS.push(
 HOME.push("epi");
 /* ----- Véhicules ----- */
 TYPES.vehicule={
- title:["nom"],group:"categorie",groupSort:"natural",ok:"à jour",
+ title:["nom"],group:"categorie",groupSort:"natural",ok:"à jour",noCmd:1,
  groupFn:function(i){return i.categorie||"Divers";},
  fields:[
   {k:"nom",l:"Véhicule",req:1,full:1,dl:1},
@@ -327,13 +327,13 @@ TYPES.vehicule={
   {k:"ct",l:"Prochain contrôle technique",meta:"CT"},
   {k:"entretien_km",l:"Prochain entretien à (km)",t:"num",meta:"Entretien à"},
   {k:"intervalle",l:"Intervalle d'entretien (km)",t:"num"},
-  {k:"commentaire",l:"Observation",t:"area",full:1},
-  {k:"releves",l:"Relevés de compteur (fin de mois)",t:"history",full:1}
+  {k:"defaut",l:"Défaut constaté (à faire réparer)",t:"area",full:1,meta:"À réparer"},
+  {k:"history",l:"Historique du véhicule",t:"history",full:1}
  ],
  status:{derived:function(i){return vehStatus(i);},
-  opts:[["À faire","À faire","bad"],["À prévoir","À prévoir","warn"],["À jour","À jour","ok"],["","Non renseigné","none"]]},
+  opts:[["CT dépassé","CT dépassé","bad"],["Entretien à faire","Entretien à faire","bad"],["À réparer","À réparer","bad"],["CT à prévoir","CT à prévoir","warn"],["Entretien à prévoir","Entretien à prévoir","warn"],["À jour","À jour","ok"],["","Non renseigné","none"]]},
  filters:[{k:"categorie",l:"Toutes les catégories"}],
- pdf:[["nom","Véhicule",26],["immat","Immatriculation",26],["compteur","Compteur",18],["unite","Unité",12],["ct","Contrôle technique",22],["entretien_km","Entretien à",18],["$status","État",18],["commentaire","Observation",0]]
+ pdf:[["nom","Véhicule",24],["immat","Immatriculation",24],["compteur","Compteur",16],["unite","Unité",10],["ct","Contrôle technique",20],["entretien_km","Entretien à",16],["$status","État",22],["defaut","Défaut à réparer",0]]
 };
 SECTIONS.push({id:"vehicules",nom:"Véhicules",file:"vehicules.json",type:"vehicule",pre:"v",hint:"Km, contrôles techniques et entretiens de la flotte"});
 HOME.push("vehicules");
@@ -352,7 +352,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="43";
+var APPVER="44";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -408,13 +408,20 @@ function frToday(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"
 function frMonth(){var d=new Date();return String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
 /* parse « jj/mm/aaaa » ou « mm/aaaa » -> Date (ou null) */
 function vehDate(s){s=String(s||"").trim();var a=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);if(a){var y=+a[3];if(y<100)y+=2000;return new Date(y,+a[2]-1,+a[1]);}var b=s.match(/^(\d{1,2})\/(\d{4})$/);if(b)return new Date(+b[2],+b[1]-1,1);return null;}
-/* statut d'un véhicule : À faire (rouge) / À prévoir (orange) / À jour (vert) */
+/* statut d'un véhicule avec le TYPE d'alerte (CT / entretien / réparation) */
 function vehStatus(i){
- var now=new Date();now.setHours(0,0,0,0);var MONTH=30*864e5,has=false,bad=false,warn=false;
- var d=vehDate(i.ct);if(d){has=true;var df=d-now;if(df<0)bad=true;else if(df<=MONTH)warn=true;}
+ var now=new Date();now.setHours(0,0,0,0);var MONTH=30*864e5,has=false;
+ var ctBad=false,ctWarn=false,entBad=false,entWarn=false;
+ var d=vehDate(i.ct);if(d){has=true;var df=d-now;if(df<0)ctBad=true;else if(df<=MONTH)ctWarn=true;}
  var e=i.entretien_km,c=i.compteur;
- if(e!==""&&e!=null&&c!==""&&c!=null){var ne=Number(e),nc=Number(c);if(!isNaN(ne)&&!isNaN(nc)){has=true;if(nc>=ne)bad=true;else if(nc>=ne-1000)warn=true;}}
- return bad?"À faire":warn?"À prévoir":has?"À jour":"";
+ if(e!==""&&e!=null&&c!==""&&c!=null){var ne=Number(e),nc=Number(c);if(!isNaN(ne)&&!isNaN(nc)){has=true;if(nc>=ne)entBad=true;else if(nc>=ne-1000)entWarn=true;}}
+ var def=String(i.defaut||"").trim();
+ if(ctBad)return "CT dépassé";
+ if(entBad)return "Entretien à faire";
+ if(def)return "À réparer";
+ if(ctWarn)return "CT à prévoir";
+ if(entWarn)return "Entretien à prévoir";
+ return has||def?"À jour":"";
 }
 function frDate(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"/"+m[2]+"/"+m[1]:(s||"");}
 function parseD(s){s=String(s||"").trim();var m=/^(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[2],+m[1]-1,1);m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return null;}
@@ -1072,11 +1079,11 @@ function renderSheet(){
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
   h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
   if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle</button>';
-  if(T===TYPES.vehicule&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-releve">'+I.check+'Nouveau relevé (compteur)</button>';
+  if(T===TYPES.vehicule&&sheet.mode==="edit"){h+='<div class="vehacts"><button type="button" class="btn primary ctrlbtn" id="b-releve">'+I.check+'Nouveau relevé (compteur)</button><button type="button" class="btn ok ctrlbtn" id="b-ctok">'+I.check+'CT fait</button><button type="button" class="btn ok ctrlbtn" id="b-entok">'+I.check+'Entretien fait</button></div>';}
   if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
-  h+='<div class="field full cmdbox"><label class="cb"><input type="checkbox" id="f-commander"'+(it.commander?' checked':'')+'> À commander</label><input id="f-cmd_note" value="'+esc(it.cmd_note)+'" placeholder="Ex. : 2 unités, remplacer la lame…" aria-label="Note de commande"></div>';
+  if(!T.noCmd)h+='<div class="field full cmdbox"><label class="cb"><input type="checkbox" id="f-commander"'+(it.commander?' checked':'')+'> À commander</label><input id="f-cmd_note" value="'+esc(it.cmd_note)+'" placeholder="Ex. : 2 unités, remplacer la lame…" aria-label="Note de commande"></div>';
   h+='</div>'+T.fields.filter(function(f){return f.dl;}).map(function(f){return dl("dl-"+f.k,uniq(f.k));}).join("");
   h+='<div class="actions"><div class="row">';
   if(sheet.mode==="edit")h+='<button class="btn danger'+(sheet.armed?' armed':'')+'" id="s-del" type="button">'+(sheet.armed?'Confirmer la suppression':'Supprimer')+'</button><button class="btn" id="s-dup" type="button">Dupliquer</button>';
@@ -1511,6 +1518,27 @@ app.addEventListener("click",function(e){
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-releve"){sheet={mode:"releve",id:sheet.id};render();focusId("rv-val");return;}
+ if(t.id==="b-ctok"){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  var vsid=curSid,vid=sheet.id,vs=secItem(vsid,vid)||{};
+  var leger=/l.ger/i.test(vs.categorie||"");var mois=leger?24:12;
+  var base=vehDate(vs.ct);var nd=base&&base-new Date()>0?base:new Date();nd=addM(nd,mois);
+  var nds=String(nd.getDate()).padStart(2,"0")+"/"+String(nd.getMonth()+1).padStart(2,"0")+"/"+nd.getFullYear();
+  editItemIn(vsid,vid,function(i){i.ct=nds;i.history=(i.history||[]).concat([{date:frMonth(),obs:"Contrôle technique réalisé — prochain CT le "+nds,verif:lsGet(VKEY)||"",statut:""}]);});
+  scanFeedback();sheet={mode:"edit",id:vid};render();return;
+ }
+ if(t.id==="b-entok"){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  var esid=curSid,eid=sheet.id,es=secItem(esid,eid)||{},eun=es.unite==="h"?"h":"km";
+  var cpt=Number(es.compteur),itv=Number(es.intervalle);
+  if(!isNaN(cpt)&&!isNaN(itv)&&es.compteur!==""&&es.intervalle!==""){
+   var ntarget=cpt+itv;
+   editItemIn(esid,eid,function(i){i.entretien_km=ntarget;i.history=(i.history||[]).concat([{date:frMonth(),obs:"Entretien réalisé à "+cpt+" "+eun+" — prochain à "+ntarget+" "+eun,verif:lsGet(VKEY)||"",statut:""}]);});
+  } else {
+   editItemIn(esid,eid,function(i){i.history=(i.history||[]).concat([{date:frMonth(),obs:"Entretien / révision réalisé"+(es.compteur!==""?" à "+es.compteur+" "+eun:""),verif:lsGet(VKEY)||"",statut:""}]);});
+  }
+  scanFeedback();sheet={mode:"edit",id:eid};render();return;
+ }
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-find-scan"){var fsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:"tout le matériel"};render();focusId("id-icb");return;}
  if(t.id==="b-find-home"){var allsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:allsc,area:"tout le matériel"};render();focusId("id-icb");return;}
@@ -1613,7 +1641,7 @@ app.addEventListener("submit",function(e){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
   var rv=document.getElementById("rv-val").value.trim();if(rv===""){return;}
   var rsid=curSid,rid=sheet.id,rsec=secItem(rsid,rid)||{},un=rsec.unite==="h"?"h":"km";
-  editItemIn(rsid,rid,function(i){i.compteur=rv;i.releves=(i.releves||[]).concat([{date:frMonth(),obs:rv+" "+un,verif:lsGet(VKEY)||"",statut:""}]);});
+  editItemIn(rsid,rid,function(i){i.compteur=rv;i.history=(i.history||[]).concat([{date:frMonth(),obs:"Compteur : "+rv+" "+un,verif:lsGet(VKEY)||"",statut:""}]);});
   scanFeedback();sheet={mode:"edit",id:rid};render();return;
  }
  if(e.target.id!=="f-item")return;
