@@ -1,0 +1,24 @@
+{
+"config":{"titre":"Flotte véhicules","inventaire":"","maj":"2026-11-27"},
+"items":[
+  {"id":"v001","nom":"Duster","immat":"FX 160 FF","categorie":"1 · Véhicules légers","unite":"km","compteur":"141510","ct":"05/03/2027","entretien_km":"145000","intervalle":"20000","commentaire":"","releves":[]},
+  {"id":"v002","nom":"Duster","immat":"DL 269 LZ","categorie":"1 · Véhicules légers","unite":"km","compteur":"178660","ct":"24/02/2027","entretien_km":"","intervalle":"20000","commentaire":"Prochain entretien à préciser","releves":[]},
+  {"id":"v003","nom":"Duster","immat":"EJ 800 GX","categorie":"1 · Véhicules légers","unite":"km","compteur":"116100","ct":"19/01/2027","entretien_km":"117000","intervalle":"20000","commentaire":"RV + CT à prévoir","releves":[]},
+  {"id":"v004","nom":"308","immat":"DC 742 VD","categorie":"1 · Véhicules légers","unite":"km","compteur":"163600","ct":"25/02/2028","entretien_km":"168000","intervalle":"20000","commentaire":"","releves":[]},
+  {"id":"v005","nom":"4X4 2 places","immat":"EP 533 KP","categorie":"1 · Véhicules légers","unite":"km","compteur":"135430","ct":"16/07/2027","entretien_km":"145000","intervalle":"15000","commentaire":"","releves":[]},
+  {"id":"v006","nom":"4X4 2 places","immat":"FV 032 XC","categorie":"1 · Véhicules légers","unite":"km","compteur":"140000","ct":"04/12/2026","entretien_km":"","intervalle":"15000","commentaire":"CT le 04/12/26 ; prochain entretien à préciser","releves":[]},
+  {"id":"v007","nom":"4X4 5 places","immat":"EE 350 EV","categorie":"1 · Véhicules légers","unite":"km","compteur":"","ct":"27/10/2027","entretien_km":"178000","intervalle":"15000","commentaire":"Date CT à confirmer","releves":[]},
+  {"id":"v008","nom":"4X4 5 places","immat":"GC 538 GM","categorie":"1 · Véhicules légers","unite":"km","compteur":"","ct":"20/10/2027","entretien_km":"88000","intervalle":"15000","commentaire":"","releves":[]},
+  {"id":"v009","nom":"4X4 5 places","immat":"FC 627 GJ","categorie":"1 · Véhicules légers","unite":"km","compteur":"","ct":"17/11/2026","entretien_km":"128000","intervalle":"15000","commentaire":"CT au garage","releves":[]},
+  {"id":"v010","nom":"Zetros","immat":"DK 633 DH","categorie":"2 · Poids lourds & engins","unite":"h","compteur":"1875","ct":"20/04/2027","entretien_km":"","intervalle":"","commentaire":"","releves":[]},
+  {"id":"v011","nom":"Renault 6X6","immat":"HH 518 GD","categorie":"2 · Poids lourds & engins","unite":"h","compteur":"127","ct":"18/12/2026","entretien_km":"","intervalle":"","commentaire":"CT + révision 18/12/26","releves":[]},
+  {"id":"v012","nom":"Hunimog (AT)","immat":"DE 060 FE","categorie":"2 · Poids lourds & engins","unite":"h","compteur":"698","ct":"14/05/2027","entretien_km":"","intervalle":"","commentaire":"","releves":[]},
+  {"id":"v013","nom":"MAN (AT)","immat":"BB 422 BN","categorie":"2 · Poids lourds & engins","unite":"h","compteur":"1866","ct":"17/02/2027","entretien_km":"","intervalle":"","commentaire":"","releves":[]},
+  {"id":"v014","nom":"Unimog (TST)","immat":"AA 288 WX","categorie":"2 · Poids lourds & engins","unite":"h","compteur":"1686","ct":"20/01/2027","entretien_km":"","intervalle":"","commentaire":"CT + révision 20/01/27 · vérin de coffre ×2","releves":[]},
+  {"id":"v015","nom":"Chaptrack","immat":"DC 908 JY","categorie":"4 · Petits engins","unite":"h","compteur":"176","ct":"","entretien_km":"","intervalle":"","commentaire":"Révision faite à 176 h","releves":[]},
+  {"id":"v016","nom":"Poussin","immat":"","categorie":"4 · Petits engins","unite":"h","compteur":"","ct":"","entretien_km":"","intervalle":"","commentaire":"Révision faite le 18/02/2019","releves":[]},
+  {"id":"v017","nom":"Kubota","immat":"","categorie":"4 · Petits engins","unite":"h","compteur":"","ct":"","entretien_km":"","intervalle":"","commentaire":"Révision faite le 11/2019","releves":[]},
+  {"id":"v018","nom":"JCB","immat":"","categorie":"4 · Petits engins","unite":"h","compteur":"","ct":"12/2026","entretien_km":"","intervalle":"","commentaire":"Révision prévue 12/2026","releves":[]},
+  {"id":"v019","nom":"Remorque blanche","immat":"GC 906 WR","categorie":"3 · Remorques","unite":"","compteur":"","ct":"20/04/2027","entretien_km":"","intervalle":"","commentaire":"Contrôle annuel","releves":[]},
+  {"id":"v020","nom":"Remorque blanche TST","immat":"AP 125 LK","categorie":"3 · Remorques","unite":"","compteur":"","ct":"20/01/2027","entretien_km":"","intervalle":"","commentaire":"Contrôle annuel","releves":[]}
+]}

@@ -314,6 +314,29 @@ SECTIONS.push(
  {id:"epi-pc-coulisseau-tst",nom:"Coulisseau TST",parent:"epi-perche",file:"epi-pc-coulisseau-tst.json",type:"epi",pre:"q31_"}
 );
 HOME.push("epi");
+/* ----- Véhicules ----- */
+TYPES.vehicule={
+ title:["nom"],group:"categorie",groupSort:"natural",ok:"à jour",
+ groupFn:function(i){return i.categorie||"Divers";},
+ fields:[
+  {k:"nom",l:"Véhicule",req:1,full:1,dl:1},
+  {k:"immat",l:"Immatriculation",mono:1,meta:"Immat."},
+  {k:"categorie",l:"Catégorie",dl:1},
+  {k:"unite",l:"Unité (km ou h)",dl:1},
+  {k:"compteur",l:"Compteur actuel",t:"num",meta:"Compteur"},
+  {k:"ct",l:"Prochain contrôle technique",meta:"CT"},
+  {k:"entretien_km",l:"Prochain entretien à (km)",t:"num",meta:"Entretien à"},
+  {k:"intervalle",l:"Intervalle d'entretien (km)",t:"num"},
+  {k:"commentaire",l:"Observation",t:"area",full:1},
+  {k:"releves",l:"Relevés de compteur (fin de mois)",t:"history",full:1}
+ ],
+ status:{derived:function(i){return vehStatus(i);},
+  opts:[["À faire","À faire","bad"],["À prévoir","À prévoir","warn"],["À jour","À jour","ok"],["","Non renseigné","none"]]},
+ filters:[{k:"categorie",l:"Toutes les catégories"}],
+ pdf:[["nom","Véhicule",26],["immat","Immatriculation",26],["compteur","Compteur",18],["unite","Unité",12],["ct","Contrôle technique",22],["entretien_km","Entretien à",18],["$status","État",18],["commentaire","Observation",0]]
+};
+SECTIONS.push({id:"vehicules",nom:"Véhicules",file:"vehicules.json",type:"vehicule",pre:"v",hint:"Km, contrôles techniques et entretiens de la flotte"});
+HOME.push("vehicules");
 var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargement du camion, résultats, réparations"},{id:"aide",nom:"Mode d'emploi",hidden:1}];
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
@@ -329,7 +352,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="42";
+var APPVER="43";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -382,6 +405,17 @@ function lsSet(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.
 function natCmp(a,b){return String(a).localeCompare(String(b),"fr",{numeric:true,sensitivity:"base"});}
 function today(){var d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function frToday(){var d=new Date();return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
+function frMonth(){var d=new Date();return String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear();}
+/* parse « jj/mm/aaaa » ou « mm/aaaa » -> Date (ou null) */
+function vehDate(s){s=String(s||"").trim();var a=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);if(a){var y=+a[3];if(y<100)y+=2000;return new Date(y,+a[2]-1,+a[1]);}var b=s.match(/^(\d{1,2})\/(\d{4})$/);if(b)return new Date(+b[2],+b[1]-1,1);return null;}
+/* statut d'un véhicule : À faire (rouge) / À prévoir (orange) / À jour (vert) */
+function vehStatus(i){
+ var now=new Date();now.setHours(0,0,0,0);var MONTH=30*864e5,has=false,bad=false,warn=false;
+ var d=vehDate(i.ct);if(d){has=true;var df=d-now;if(df<0)bad=true;else if(df<=MONTH)warn=true;}
+ var e=i.entretien_km,c=i.compteur;
+ if(e!==""&&e!=null&&c!==""&&c!=null){var ne=Number(e),nc=Number(c);if(!isNaN(ne)&&!isNaN(nc)){has=true;if(nc>=ne)bad=true;else if(nc>=ne-1000)warn=true;}}
+ return bad?"À faire":warn?"À prévoir":has?"À jour":"";
+}
 function frDate(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"/"+m[2]+"/"+m[1]:(s||"");}
 function parseD(s){s=String(s||"").trim();var m=/^(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[2],+m[1]-1,1);m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return null;}
 function addM(d,n){var x=new Date(d.getTime());x.setMonth(x.getMonth()+n);return x;}
@@ -1022,6 +1056,10 @@ function renderSheet(){
   if(!res.conforme&&!detruit){h+='<div class="notice">À faire : attacher une étiquette rouge « NON CONFORME, NE PAS UTILISER ».'+(CT===TYPES.upk?' Pour une mâchoire, les 2 pièces appairées doivent être éliminées.':'')+'</div>';
    h+='<div class="row"><label class="cb"><input type="checkbox" data-opt="__repar"'+(repar?" checked":"")+'> Envoyé en entreprise agréée (réparation)</label></div><div class="row"><label class="cb"><input type="checkbox" data-opt="__detruit"'+(detruit?" checked":"")+'> Matériel '+esc(hsL.toLowerCase())+'</label></div>';}
   h+='<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" id="cf-save" type="button">Enregistrer le contrôle</button></div>';
+ } else if(sheet.mode==="releve"){
+  var rit=cur().items.filter(function(x){return x.id===sheet.id;})[0]||{};var ru=rit.unite==="h"?"heures":"km";
+  h+='<h3>Relevé du compteur</h3><p class="help"><b>'+esc(rit.nom||"")+'</b>'+(rit.immat?' · '+esc(rit.immat):'')+'<br>Compteur actuel : '+esc((rit.compteur!==""&&rit.compteur!=null?rit.compteur+" ":"—"))+(rit.compteur!==""&&rit.compteur!=null?ru:'')+'. Saisis le relevé de ce mois ('+frMonth()+').</p>';
+  h+='<form id="f-releve"><div class="field full"><label for="rv-val">Nouveau relevé ('+esc(ru)+')</label><input id="rv-val" type="number" inputmode="numeric" required value=""></div><div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit">Enregistrer le relevé</button></div></form>';
  } else if(sheet.mode==="login"){
   h+='<h3>Accès admin</h3><p class="help">Collez votre clé GitHub (elle commence par <span class="mono">github_pat_</span>). Elle reste enregistrée sur ce téléphone uniquement.<br>Pour une <b>démonstration</b> sans rien enregistrer, saisissez&nbsp;: <span class="mono">demo-eel</span></p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
  } else if(sheet.mode==="cfg"){
@@ -1034,6 +1072,7 @@ function renderSheet(){
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
   h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
   if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle</button>';
+  if(T===TYPES.vehicule&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-releve">'+I.check+'Nouveau relevé (compteur)</button>';
   if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
@@ -1471,6 +1510,7 @@ app.addEventListener("click",function(e){
  if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;admin.demo=false;render();return;}
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
+ if(t.id==="b-releve"){sheet={mode:"releve",id:sheet.id};render();focusId("rv-val");return;}
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-find-scan"){var fsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:"tout le matériel"};render();focusId("id-icb");return;}
  if(t.id==="b-find-home"){var allsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:allsc,area:"tout le matériel"};render();focusId("id-icb");return;}
@@ -1569,6 +1609,13 @@ app.addEventListener("change",function(e){
 app.addEventListener("submit",function(e){
  e.preventDefault();
  if(e.target.id==="f-login"){var tk=document.getElementById("l-token").value.trim();if(tk)login(tk);return;}
+ if(e.target.id==="f-releve"){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  var rv=document.getElementById("rv-val").value.trim();if(rv===""){return;}
+  var rsid=curSid,rid=sheet.id,rsec=secItem(rsid,rid)||{},un=rsec.unite==="h"?"h":"km";
+  editItemIn(rsid,rid,function(i){i.compteur=rv;i.releves=(i.releves||[]).concat([{date:frMonth(),obs:rv+" "+un,verif:lsGet(VKEY)||"",statut:""}]);});
+  scanFeedback();sheet={mode:"edit",id:rid};render();return;
+ }
  if(e.target.id!=="f-item")return;
  var f=readForm(),k0=T.fields.filter(function(x){return x.req;})[0];
  if(k0&&!f[k0.k]){focusId("f-"+k0.k);return;}
