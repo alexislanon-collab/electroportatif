@@ -352,7 +352,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="45";
+var APPVER="46";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -394,7 +394,9 @@ var I={
  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>',
  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
- ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+ ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+ cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>',
+ alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17v.5"/></svg>'
 };
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
 function norm(s){return String(s==null?"":s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();}
@@ -422,6 +424,45 @@ function vehStatus(i){
  if(ctWarn)return "CT à prévoir";
  if(entWarn)return "Entretien à prévoir";
  return has||def?"À jour":"";
+}
+/* échéances d'un véhicule : CT dans X mois / entretien dans X km */
+function vehRemind(i){
+ var out=[],now=new Date();now.setHours(0,0,0,0);
+ var d=vehDate(i.ct);
+ if(d){var days=Math.round((d-now)/864e5);
+  if(days<0)out.push({t:"bad",txt:"CT dépassé depuis "+(-days)+" j"});
+  else{var mo=Math.round(days/30);out.push({t:days<=30?"warn":"ok",txt:"CT "+(mo>=2?"dans "+mo+" mois":days<=31?"dans "+days+" j":"dans 1 mois")+" · "+esc(i.ct)});}
+ }
+ var e=i.entretien_km,c=i.compteur,un=i.unite==="h"?"h":"km";
+ if(e!==""&&e!=null&&c!==""&&c!=null){var ne=Number(e),nc=Number(c);if(!isNaN(ne)&&!isNaN(nc)){var dk=ne-nc;
+  if(dk<=0)out.push({t:"bad",txt:"Entretien dépassé de "+(-dk)+" "+un});
+  else out.push({t:dk<=1000?"warn":"ok",txt:"Entretien dans "+dk+" "+un+" · à "+ne+" "+un});}}
+ var df=String(i.defaut||"").trim();
+ if(df)out.push({t:"bad",txt:"Défaut à réparer : "+df});
+ return out;
+}
+function vehRemindHtml(i,acts){
+ var rem=vehRemind(i),h='<div class="vehremind"><div class="vr-head">Échéances</div>';
+ h+=rem.length?rem.map(function(r){return '<div class="vr-line vr-'+r.t+'">'+esc(r.txt)+'</div>';}).join(""):'<div class="vr-line vr-none">Aucune échéance renseignée</div>';
+ if(acts){h+='<div class="vr-acts">';
+  if(vehDate(i.ct))h+='<button type="button" class="btn ok" id="b-ics">'+I.cal+'Rappel au calendrier</button>';
+  h+='<button type="button" class="btn" id="b-signal">'+I.alert+'Signaler un défaut</button></div>';
+ }
+ return h+'</div>';
+}
+/* fichier .ics (événement journée + alarme 30 j avant) pour le prochain CT */
+function vehICS(i){
+ var d=vehDate(i.ct);if(!d)return null;
+ function z(n){return String(n).padStart(2,"0");}
+ function dd(x){return x.getFullYear()+z(x.getMonth()+1)+z(x.getDate());}
+ var n=new Date(),stamp=dd(n)+"T"+z(n.getHours())+z(n.getMinutes())+"00Z";
+ var sum="CT — "+(i.nom||"")+(i.immat?" "+i.immat:"");
+ return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//EEL Basse-Seine//Vehicules//FR","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+  "BEGIN:VEVENT","UID:veh-"+(i.id||Date.now())+"@eel-basse-seine","DTSTAMP:"+stamp,
+  "DTSTART;VALUE=DATE:"+dd(d),"DTEND;VALUE=DATE:"+dd(new Date(d.getTime()+864e5)),
+  "SUMMARY:"+sum,"DESCRIPTION:Échéance du contrôle technique (flotte EEL Basse-Seine).",
+  "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:"+sum,"TRIGGER:-P30D","END:VALARM",
+  "END:VEVENT","END:VCALENDAR"].join("\r\n");
 }
 function frDate(s){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||"");return m?m[3]+"/"+m[2]+"/"+m[1]:(s||"");}
 function parseD(s){s=String(s||"").trim();var m=/^(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[2],+m[1]-1,1);m=/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(s);if(m)return new Date(+m[3],+m[2]-1,+m[1]);return null;}
@@ -991,7 +1032,7 @@ function renderSheet(){
   if(T.life){var LF=T.life(vi);if(LF)h+='<dt>Fin de vie</dt><dd class="r-'+LF.tone+'"><b>'+esc(LF.txt)+'</b><br><small>'+esc(LF.rule)+'</small></dd>';}
   if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
-  h+='</dl><div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
+  h+='</dl>'+(T===TYPES.vehicule?vehRemindHtml(vi,true):'')+'<div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
 } else if(sheet.mode==="identify"&&sheet.dom==="find"&&sheet.found){
   var fi=secItem(sheet.found.sid,sheet.found.id)||{},fsec=secById(sheet.found.sid)||{},fT=TYPES[fsec.type]||{};
   var fst=fT.status?stOpt(fT,statusOfT(fT,fi,secData(fsec.id))):null;
@@ -1084,6 +1125,7 @@ function renderSheet(){
    h+='<div class="vehacts"><button type="button" class="btn primary ctrlbtn" id="b-releve">'+I.check+'Nouveau relevé (compteur)</button>'
     +'<button type="button" class="btn ctrlbtn '+(ctD?'done':'ok')+'" id="b-ctok">'+I.check+(ctD?esc(sheet.doneMsg||"CT fait ✓"):'CT fait')+'</button>'
     +'<button type="button" class="btn ctrlbtn '+(enD?'done':'ok')+'" id="b-entok">'+I.check+(enD?esc(sheet.doneMsg||"Entretien fait ✓"):'Entretien fait')+'</button></div>';
+   h+=vehRemindHtml(it,true);
   }
   if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
@@ -1544,6 +1586,24 @@ app.addEventListener("click",function(e){
    editItemIn(esid,eid,function(i){i.history=(i.history||[]).concat([{date:frMonth(),obs:"Entretien / révision réalisé"+(es.compteur!==""?" à "+es.compteur+" "+eun:""),verif:lsGet(VKEY)||"",statut:""}]);});
   }
   sheet={mode:"edit",id:eid,done:"ent",doneMsg:emsg};render();return;
+ }
+ if(t.id==="b-ics"){
+  var icsIt=secItem(curSid,sheet.id)||{},ics=vehICS(icsIt);if(!ics)return;
+  try{var blob=new Blob([ics],{type:"text/calendar"}),url=URL.createObjectURL(blob),a=document.createElement("a");
+   a.href=url;a.download="rappel-CT-"+String(icsIt.immat||icsIt.nom||"vehicule").replace(/\s+/g,"-")+".ics";
+   document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},1500);}catch(e){}
+  return;
+ }
+ if(t.id==="b-signal"){
+  var sIt=secItem(curSid,sheet.id)||{};
+  var txt=prompt("Défaut constaté sur « "+(sIt.nom||"")+(sIt.immat?" "+sIt.immat:"")+" » :",admin.on?(sIt.defaut||""):"");
+  if(txt==null)return;txt=txt.trim();if(!txt)return;
+  var msg="Défaut véhicule — "+(sIt.nom||"")+(sIt.immat?" ("+sIt.immat+")":"")+" : "+txt+" — signalé le "+frToday();
+  if(admin.on){editItemIn(curSid,sheet.id,function(i){i.defaut=txt;i.history=(i.history||[]).concat([{date:frMonth(),obs:"Défaut signalé : "+txt,verif:lsGet(VKEY)||"",statut:""}]);});}
+  if(navigator.share){navigator.share({title:"Défaut véhicule",text:msg}).catch(function(){});}
+  else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(msg).then(function(){alert("Message copié — collez-le dans un SMS, un mail ou une note pour le responsable.");}).catch(function(){prompt("Copiez ce message :",msg);});}
+  else prompt("Copiez ce message :",msg);
+  render();return;
  }
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-find-scan"){var fsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:"tout le matériel"};render();focusId("id-icb");return;}

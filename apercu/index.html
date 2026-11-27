@@ -256,6 +256,14 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 .vehacts .ctrlbtn{flex:1 1 100%;margin-bottom:0}
 .vehacts #b-ctok,.vehacts #b-entok{flex:1 1 calc(50% - 4px)}
 .vehacts{margin-bottom:14px}
+.vehremind{margin:14px 0;padding:12px 14px;border:1px solid var(--line,#ddd);border-radius:12px;background:var(--surface2,rgba(0,0,0,.02))}
+.vr-head{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px}
+.vr-line{font-size:15px;font-weight:600;padding:4px 0;display:flex;align-items:center;gap:8px}
+.vr-line::before{content:"";width:9px;height:9px;border-radius:50%;background:currentColor;flex:none}
+.vr-ok{color:var(--ok,#2e7d46)}.vr-warn{color:var(--warn,#b26a00)}.vr-bad{color:var(--bad,#c62828)}
+.vr-none{color:var(--muted);font-weight:500}
+.vr-acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.vr-acts .btn{flex:1 1 calc(50% - 4px);justify-content:center}
 .cfid{font-size:14px;color:var(--muted);margin:-4px 0 12px}
 .cfid .mono{color:var(--ink)}
 .qlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
@@ -310,7 +318,7 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=45"></script>
+<script src="app.js?v=46"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 </body>
 </html>
