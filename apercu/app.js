@@ -352,7 +352,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="44";
+var APPVER="45";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -1079,7 +1079,12 @@ function renderSheet(){
   var it=sheet.mode==="add"?(sheet.seed||defaults()):(cur().items.filter(function(x){return x.id===sheet.id;})[0]||{});
   h+='<h3>'+(sheet.mode==="add"?"Ajouter":"Modifier")+'</h3>';
   if(T===TYPES.upk&&sheet.mode==="edit")h+='<button type="button" class="btn primary ctrlbtn" id="b-controle">'+I.check+'Réaliser un contrôle</button>';
-  if(T===TYPES.vehicule&&sheet.mode==="edit"){h+='<div class="vehacts"><button type="button" class="btn primary ctrlbtn" id="b-releve">'+I.check+'Nouveau relevé (compteur)</button><button type="button" class="btn ok ctrlbtn" id="b-ctok">'+I.check+'CT fait</button><button type="button" class="btn ok ctrlbtn" id="b-entok">'+I.check+'Entretien fait</button></div>';}
+  if(T===TYPES.vehicule&&sheet.mode==="edit"){
+   var ctD=sheet.done==="ct",enD=sheet.done==="ent";
+   h+='<div class="vehacts"><button type="button" class="btn primary ctrlbtn" id="b-releve">'+I.check+'Nouveau relevé (compteur)</button>'
+    +'<button type="button" class="btn ctrlbtn '+(ctD?'done':'ok')+'" id="b-ctok">'+I.check+(ctD?esc(sheet.doneMsg||"CT fait ✓"):'CT fait')+'</button>'
+    +'<button type="button" class="btn ctrlbtn '+(enD?'done':'ok')+'" id="b-entok">'+I.check+(enD?esc(sheet.doneMsg||"Entretien fait ✓"):'Entretien fait')+'</button></div>';
+  }
   if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
@@ -1525,19 +1530,20 @@ app.addEventListener("click",function(e){
   var base=vehDate(vs.ct);var nd=base&&base-new Date()>0?base:new Date();nd=addM(nd,mois);
   var nds=String(nd.getDate()).padStart(2,"0")+"/"+String(nd.getMonth()+1).padStart(2,"0")+"/"+nd.getFullYear();
   editItemIn(vsid,vid,function(i){i.ct=nds;i.history=(i.history||[]).concat([{date:frMonth(),obs:"Contrôle technique réalisé — prochain CT le "+nds,verif:lsGet(VKEY)||"",statut:""}]);});
-  scanFeedback();sheet={mode:"edit",id:vid};render();return;
+  sheet={mode:"edit",id:vid,done:"ct",doneMsg:"CT repoussé au "+nds};render();return;
  }
  if(t.id==="b-entok"){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
   var esid=curSid,eid=sheet.id,es=secItem(esid,eid)||{},eun=es.unite==="h"?"h":"km";
   var cpt=Number(es.compteur),itv=Number(es.intervalle);
+  var emsg="Entretien enregistré";
   if(!isNaN(cpt)&&!isNaN(itv)&&es.compteur!==""&&es.intervalle!==""){
-   var ntarget=cpt+itv;
+   var ntarget=cpt+itv;emsg="Prochain entretien à "+ntarget+" "+eun;
    editItemIn(esid,eid,function(i){i.entretien_km=ntarget;i.history=(i.history||[]).concat([{date:frMonth(),obs:"Entretien réalisé à "+cpt+" "+eun+" — prochain à "+ntarget+" "+eun,verif:lsGet(VKEY)||"",statut:""}]);});
   } else {
    editItemIn(esid,eid,function(i){i.history=(i.history||[]).concat([{date:frMonth(),obs:"Entretien / révision réalisé"+(es.compteur!==""?" à "+es.compteur+" "+eun:""),verif:lsGet(VKEY)||"",statut:""}]);});
   }
-  scanFeedback();sheet={mode:"edit",id:eid};render();return;
+  sheet={mode:"edit",id:eid,done:"ent",doneMsg:emsg};render();return;
  }
  if(t.id==="b-ctrl-start"){if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}sheet={mode:"identify",q:""};render();focusId("id-icb");return;}
  if(t.id==="b-find-scan"){var fsc=SECTIONS.filter(function(s){return !s.hidden;}).map(function(s){return s.id;});sheet={mode:"identify",q:"",dom:"find",scope:fsc,area:"tout le matériel"};render();focusId("id-icb");return;}

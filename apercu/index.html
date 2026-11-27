@@ -52,6 +52,8 @@ h1{font-family:var(--display);font-weight:700;font-size:34px;line-height:1;margi
 .btn.primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
 .btn.danger{color:var(--bad);border-color:var(--bad)}
 .btn.ok{color:var(--ok,#2e7d46);border-color:var(--ok,#2e7d46)}
+.btn.done{background:var(--ok,#2e7d46);border-color:var(--ok,#2e7d46);color:#fff;animation:doneflash .35s ease}
+@keyframes doneflash{from{transform:scale(.97);opacity:.6}to{transform:scale(1);opacity:1}}
 .btn.danger.armed{background:var(--bad);color:var(--surface)}
 .btn.on{background:var(--tape);border-color:var(--tape);color:var(--tape-ink)}
 .btn svg{width:18px;height:18px;flex:none}
@@ -308,7 +310,7 @@ dd.r-bad b{color:var(--bad)}dd.r-warn b{color:var(--warn)}dd.r-ok b{color:var(--
 <body>
 <div id="app"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-<script src="app.js?v=44"></script>
+<script src="app.js?v=45"></script>
 <script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}</script>
 </body>
 </html>
