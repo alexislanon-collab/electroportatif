@@ -240,7 +240,7 @@ var GROUPS=[
  {id:"upk",nom:"UPK",parent:"materiel",hint:"Mâchoires et fourreaux"},
  {id:"tst",nom:"TST",hint:"Matériel, cordes, camion, consommables, dotation"},
  {id:"gipfs",nom:"GIPFS",hint:"6 containers : noir, jaune, orange, gris, violet, blanc"},
- {id:"dstm",nom:"DSTM",hint:"Câblettes italiennes et consommables"},
+ {id:"dstm",nom:"DSTM",hint:"Câblettes, consommables, machines et châssis"},
  {id:"camion",nom:"Camion",parent:"tst",hint:"Levage et outillage"}
 ];
 var HOME=["materiel","tst","gipfs","dstm"];
@@ -373,11 +373,30 @@ SECTIONS.push(
  {id:"maltcc-shunt",nom:"Shunts",parent:"maltcc",file:"maltcc-shunt.json",type:"maltcc",pre:"xi",hint:"Shunts pince/pince et étau/pince"}
 );
 HOME.push("maltcc");
+/* ----- DSTM : machines (treuils) + châssis ----- */
+TYPES.chassis={
+ title:["composant"],group:"chassis",groupSort:"natural",ok:"en service",
+ fields:[
+  {k:"composant",l:"Composant",req:1,full:1,dl:1},
+  {k:"chassis",l:"Châssis",dl:1,meta:"Châssis"},
+  {k:"longueur",l:"Longueur (axe)",meta:"Long."},
+  {k:"serie",l:"N° de série / ICB",mono:1,meta:"N°"},
+  {k:"etat",l:"État",t:"status"},
+  {k:"commentaire",l:"Observation",t:"area",full:1}
+ ],
+ status:{key:"etat",opts:[["En service","En service","ok"],["À vérifier","À vérifier","warn"],["À remplacer","À remplacer","warn"],["HS","Hors service","bad"],["","Non renseigné","none"]],def:"En service"},
+ filters:[{k:"chassis",l:"Tous les châssis"}],
+ pdf:[["chassis","Châssis",22],["composant","Composant",24],["longueur","Longueur",16],["serie","N° de série",26],["$status","État",20],["commentaire","Observation",0]]
+};
+SECTIONS.push(
+ {id:"dstm-machines",nom:"Machines",parent:"dstm",file:"dstm-machines.json",type:"outil",pre:"dm",hint:"Treuils TESMEC (freineuse 4,5 t, 3,5 t)"},
+ {id:"dstm-chassis",nom:"Châssis",parent:"dstm",file:"dstm-chassis.json",type:"chassis",pre:"dx",hint:"Châssis 10 t et 7,5 t · moteur, flexible, axe, frein à disque"}
+);
 var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargement du camion, résultats, réparations"},{id:"aide",nom:"Mode d'emploi",hidden:1}];
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
 function childrenOf(gid){var out=[];SECTIONS.forEach(function(s){if(s.parent===gid&&!s.hidden)out.push(s);});GROUPS.forEach(function(g){if(g.parent===gid)out.push(g);});VIEWS.forEach(function(v){if(v.parent===gid)out.push(v);});
- /* ordre d'affichage dans TST */var ord=["electroportatif","upk","upk-machoires","upk-fourreaux","dstm-cablette","dstm-conso","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
+ /* ordre d'affichage dans TST */var ord=["electroportatif","upk","upk-machoires","upk-fourreaux","dstm-cablette","dstm-conso","dstm-machines","dstm-chassis","gipfs-noir","gipfs-jaune","gipfs-orange","gipfs-gris","gipfs-violet","gipfs-blanc","tst-materiel","tst-cordes","campagne","camion","tst-conso","tst-dotation","tst-levage","tst-camion"];out.sort(function(a,b){return ord.indexOf(a.id)-ord.indexOf(b.id);});return out;}
 function sectionsUnder(gid){var out=[];childrenOf(gid).forEach(function(c){if(secById(c.id))out.push(c);else if(grpById(c.id))out=out.concat(sectionsUnder(c.id));});return out;}
 function secById(id){return SECTIONS.filter(function(s){return s.id===id;})[0]||null;}
 
@@ -388,7 +407,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="47";
+var APPVER="48";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};

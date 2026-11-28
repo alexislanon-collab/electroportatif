@@ -1,0 +1,35 @@
+{
+ "config": {
+  "titre": "Machines DSTM",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "dm1",
+   "designation": "Treuil freineuse TESMEC 4,5 t",
+   "marque": "TESMEC",
+   "ref": "",
+   "energie": "4,5 t",
+   "nb": 1,
+   "annee": "",
+   "serie": "",
+   "statut": "dispo",
+   "localisation": "",
+   "commentaire": ""
+  },
+  {
+   "id": "dm2",
+   "designation": "Treuil TESMEC 3,5 t",
+   "marque": "TESMEC",
+   "ref": "",
+   "energie": "3,5 t",
+   "nb": 1,
+   "annee": "",
+   "serie": "",
+   "statut": "dispo",
+   "localisation": "",
+   "commentaire": ""
+  }
+ ]
+}

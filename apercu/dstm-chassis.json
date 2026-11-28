@@ -1,0 +1,117 @@
+{
+ "config": {
+  "titre": "Châssis DSTM",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "dxb1",
+   "composant": "Moteur",
+   "chassis": "Bleu · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxb2",
+   "composant": "Flexible",
+   "chassis": "Bleu · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxb3",
+   "composant": "Axe",
+   "chassis": "Bleu · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxb4",
+   "composant": "Frein à disque",
+   "chassis": "Bleu · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxv1",
+   "composant": "Moteur",
+   "chassis": "Vert · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxv2",
+   "composant": "Flexible",
+   "chassis": "Vert · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxv3",
+   "composant": "Axe",
+   "chassis": "Vert · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxv4",
+   "composant": "Frein à disque",
+   "chassis": "Vert · 10 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxg1",
+   "composant": "Moteur",
+   "chassis": "Gris · 7,5 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxg2",
+   "composant": "Flexible",
+   "chassis": "Gris · 7,5 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxg3",
+   "composant": "Axe",
+   "chassis": "Gris · 7,5 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "dxg4",
+   "composant": "Frein à disque",
+   "chassis": "Gris · 7,5 t",
+   "longueur": "",
+   "serie": "",
+   "etat": "En service",
+   "commentaire": ""
+  }
+ ]
+}
