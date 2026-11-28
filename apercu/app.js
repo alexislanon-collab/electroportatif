@@ -412,7 +412,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="49";
+var APPVER="50";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -427,7 +427,32 @@ var view="home",curSid=null,T=null;
 var DATA=null,SHA=null,INV=null,openG={};
 var DKEY="",IKEY="",OKEY="";
 var ui=freshUi();
-var admin={on:false,demo:false,token:"",draft:null,busy:false,msg:"",ok:"",arm:""};
+var admin={on:false,demo:false,token:"",draft:null,busy:false,msg:"",ok:"",arm:"",scope:null,name:""};
+/* clés individuelles (côté appli) : passphrase -> {nom, périmètre modifiable}.
+   scope null = admin complet (Alexis). Le jeton GitHub de publication est fourni
+   dans la clé après « ~ » (jamais stocké dans le code public). */
+var KEYS={
+ "miguel-rd47":{nom:"Miguel",scope:["upk","dstm","vehicules"]},
+ "david-kp28":{nom:"David",scope:["upk"]},
+ "remy-nv54":{nom:"Remy",scope:["upk","tst"]},
+ "james-gf19":{nom:"James",scope:["upk","gipfs"]},
+ "franck-ep63":{nom:"Franck",scope:["upk","epi"]},
+ "mathieu-ha86":{nom:"Mathieu",scope:["upk","epi"]},
+ "fabrice-ro11":{nom:"Fabrice",scope:[]}
+};
+var DOMLABEL={electro:"Électroportatif",upk:"UPK",tst:"TST",gipfs:"GIPFS",dstm:"DSTM",epi:"EPI",vehicules:"Véhicules",maltcc:"MALT/CC"};
+function domOf(sid){
+ if(sid==="electroportatif")return "electro";
+ if(/^upk/.test(sid))return "upk";
+ if(/^gipfs/.test(sid))return "gipfs";
+ if(/^dstm/.test(sid))return "dstm";
+ if(/^epi/.test(sid))return "epi";
+ if(sid==="vehicules")return "vehicules";
+ if(/^maltcc/.test(sid))return "maltcc";
+ return "tst";
+}
+function canEditSec(sid){return !!(admin.on&&(admin.scope==null||(sid&&admin.scope.indexOf(domOf(sid))>=0)));}
+function scopeLabel(sc){return (sc&&sc.length)?sc.map(function(d){return DOMLABEL[d]||d;}).join(", "):"consultation seule";}
 var sheet=null;
 var app=document.getElementById("app");
 function freshUi(){return {q:"",st:"all",f:{},ry:"",rv:"",lf:"",ct:""};}
@@ -605,7 +630,7 @@ function saveDraft(){lsSet(DKEY,changeCount()?JSON.stringify(admin.draft):null);
 function touch(){admin.draft.config.maj=today();}
 
 /* ---------- inventaire ---------- */
-function invOn(){return !!(admin.on&&INV&&secById(view)&&!T.noInventory);}
+function invOn(){return !!(admin.on&&canEditSec(view)&&INV&&secById(view)&&!T.noInventory);}
 function invStats(){var n=0,s=0;cur().items.forEach(function(i){n++;if(INV.seen[i.id])s++;});return {n:n,s:s};}
 function endInventory(){
  ensureDraft();var found=0,miss=0,inv=T.inv,d=today();
@@ -654,7 +679,7 @@ function header(title,sub,isSection,backLabel){
  h+='<div class="hrow"><div class="htitle">'+(view==="home"?'<img class="hlogo" src="logo.png" alt="" width="58" height="66">':'')+'<div><h1>'+esc(title)+'</h1>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div></div><div class="hbtns">';
  h+='<button class="btn" id="b-help" type="button" aria-label="Mode d\'emploi">?</button><button class="btn" id="b-qr" type="button">'+I.qr+'QR code</button>';
  if(isSection)h+='<button class="btn" id="b-pdf" type="button">'+I.pdf+'PDF</button>';
- h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?(admin.demo?'Mode démo':'Mode admin'):'Admin')+'</button>';
+ h+='<button class="btn'+(admin.on?' on':'')+'" id="b-admin" type="button" aria-pressed="'+admin.on+'">'+I.key+(admin.on?(admin.name&&admin.scope?esc(admin.name):admin.demo?'Mode démo':'Mode admin'):'Admin')+'</button>';
  return h+'</div></div></div><div class="tape" aria-hidden="true"></div></header>';
 }
 function previewBanner(){return PREVIEW?'<div class="preview"><div class="wrap">Aperçu <b>version '+esc(APPVER)+'</b> : les données ici sont une copie, la vraie page n\'est pas modifiée.</div></div>':'';}
@@ -746,6 +771,7 @@ function adminBar(sec){
   return h+'</section>';
  }
  if(!admin.on)return "";
+ if(!canEditSec(view))return '<section class="adminbar"><h3>Consultation · '+esc(sec.nom)+'</h3><p>Cette partie n\'est pas dans votre périmètre : vous pouvez tout voir et scanner, mais pas la modifier.</p></section>';
  var hasRes=T.fields.some(function(f){return f.t==="results";});
  h+='<section class="adminbar"><h3>Administration · '+esc(sec.nom)+'</h3><p>Touchez une ligne pour la modifier. Vos changements restent en brouillon sur cet appareil jusqu\'à ce que vous les publiiez. L\'équipe les voit environ 1 minute après.</p>';
  h+='<div class="row"><button class="btn primary" id="b-add" type="button">'+I.plus+'Ajouter</button>';
@@ -872,7 +898,7 @@ function renderSection(){
  }
  h+='</main>'+footer();
  var cc=changeCount();
- if(admin.on&&cc)h+='<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+(admin.demo?'Mode démo · '+cc+' modif. (non enregistrée'+(cc>1?'s':'')+')':cc+' modification'+(cc>1?'s':'')+' en brouillon')+'</span><div class="row"><button class="btn ghost" id="b-discard" type="button">Annuler tout</button>'+(admin.demo?'<button class="btn" type="button" disabled>Démo — non enregistré</button>':'<button class="btn" id="b-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button>')+'</div></div></div>';
+ if(admin.on&&cc&&canEditSec(view))h+='<div class="spacer"></div><div class="pub" role="region" aria-label="Publication"><div class="wrap"><span>'+(admin.demo?'Mode démo · '+cc+' modif. (non enregistrée'+(cc>1?'s':'')+')':cc+' modification'+(cc>1?'s':'')+' en brouillon')+'</span><div class="row"><button class="btn ghost" id="b-discard" type="button">Annuler tout</button>'+(admin.demo?'<button class="btn" type="button" disabled>Démo — non enregistré</button>':'<button class="btn" id="b-pub" type="button"'+(admin.busy?' disabled':'')+'>'+(admin.busy?'Publication…':'Publier pour l\'équipe')+'</button>')+'</div></div></div>';
  if(sheet)h+=renderSheet();
  app.innerHTML=h;
 }
@@ -1034,7 +1060,7 @@ function scanMatch(sids,txt){var qq=epiStrip(txt);if(qq.length<4)return null;var
  if(!m.length)return null;
  m.sort(function(a,b){return (b.exact-a.exact)||(a.vole-b.vole)||(b.len-a.len);});
  return m[0];}
-function openElement(sid,id){stopCamera();loadCtx(sid);view=sid;openG={};sheet={mode:admin.on?"edit":"view",id:id};render();}
+function openElement(sid,id){stopCamera();loadCtx(sid);view=sid;openG={};sheet={mode:canEditSec(sid)?"edit":"view",id:id};render();}
 /* après un geste rapide (Conforme/Réformer) : on revient au scan, prêt pour le suivant */
 function scanNext(msg){if(!sheet)return;sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";sheet.q="";sheet.okMsg=msg||"";sheet.cam=true;sheet.frozen=null;sheet.camerr="";render();}
 /* retour sensoriel à la lecture d'un code */
@@ -1113,7 +1139,7 @@ function renderSheet(){
 } else if(sheet.mode==="identify"&&sheet.dom==="find"&&sheet.found){
   var fi=secItem(sheet.found.sid,sheet.found.id)||{},fsec=secById(sheet.found.sid)||{},fT=TYPES[fsec.type]||{};
   var fst=fT.status?stOpt(fT,statusOfT(fT,fi,secData(fsec.id))):null;
-  var canReform=fsec.type==="epi";
+  var canReform=fsec.type==="epi"&&canEditSec(sheet.found.sid);
   h+='<h3>Élément trouvé</h3>';
   h+='<div class="foundcard"><div class="fc-name">'+esc(fi.designation||fi.description||"")+'</div><div class="fc-sub">'+esc(findIdText(fi)||"sans n°")+(fi.marque?' · '+esc(fi.marque):'')+(fi.cmu?' · CMU '+esc(fi.cmu):'')+(fi.ft?' · FT '+esc(fi.ft):'')+'</div>';
   h+='<div class="fc-range">'+(canReform?'À ranger dans':'Emplacement')+'</div><div class="fc-dest">'+esc(epiGroupLabel(fsec)+' · '+fsec.nom)+'</div>';
@@ -1122,7 +1148,7 @@ function renderSheet(){
   if(sheet.reformArm)h+='<div class="notice" style="margin-top:10px">L\'élément passera « Réformé » et sera marqué dans son historique. Touchez encore « Confirmer » pour valider.</div>';
   if(sheet.presentMsg)h+='<div class="notice ok" style="margin-top:10px">'+esc(sheet.presentMsg)+'</div>';
   h+='</div>';
-  if(admin.on&&(TYPES[fsec.type]&&!TYPES[fsec.type].noInventory))h+='<button class="btn primary" id="fc-present" type="button" style="width:100%;margin-top:10px">✓ Pointer « présent » à l\'inventaire</button>';
+  if(canEditSec(sheet.found.sid)&&(TYPES[fsec.type]&&!TYPES[fsec.type].noInventory))h+='<button class="btn primary" id="fc-present" type="button" style="width:100%;margin-top:10px">✓ Pointer « présent » à l\'inventaire</button>';
   h+='<div class="row fc-actions"><button class="btn" id="fc-open" type="button">Ouvrir la fiche</button>'+(canReform?'<button class="btn ok" id="fc-conform" type="button">Conforme</button><button class="btn danger'+(sheet.reformArm?' armed':'')+'" id="fc-reform" type="button">'+(sheet.reformArm?'Confirmer':'Réformer')+'</button>':'')+'</div>';
   h+='<button class="btn ghost full" id="fc-new" type="button" style="margin-top:10px;width:100%">Scanner / chercher un autre</button>';
   h+='<div class="actions"><span></span><button class="btn" id="s-close" type="button">Fermer</button></div>';
@@ -1186,7 +1212,7 @@ function renderSheet(){
   h+='<h3>Relevé du compteur</h3><p class="help"><b>'+esc(rit.nom||"")+'</b>'+(rit.immat?' · '+esc(rit.immat):'')+'<br>Compteur actuel : '+esc((rit.compteur!==""&&rit.compteur!=null?rit.compteur+" ":"—"))+(rit.compteur!==""&&rit.compteur!=null?ru:'')+'. Saisis le relevé de ce mois ('+frMonth()+').</p>';
   h+='<form id="f-releve"><div class="field full"><label for="rv-val">Nouveau relevé ('+esc(ru)+')</label><input id="rv-val" type="number" inputmode="numeric" required value=""></div><div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit">Enregistrer le relevé</button></div></form>';
  } else if(sheet.mode==="login"){
-  h+='<h3>Accès admin</h3><p class="help">Collez votre clé GitHub (elle commence par <span class="mono">github_pat_</span>). Elle reste enregistrée sur ce téléphone uniquement.<br>Pour une <b>démonstration</b> sans rien enregistrer, saisissez&nbsp;: <span class="mono">demo-eel</span></p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
+  h+='<h3>Accès admin</h3><p class="help">Collez votre <b>clé perso</b> (reçue par SMS) ou la clé GitHub admin. Elle reste enregistrée sur ce téléphone uniquement.<br>Pour une <b>démonstration</b> sans rien enregistrer, saisissez&nbsp;: <span class="mono">demo-eel</span></p><form id="f-login"><div class="field"><label for="l-token">Clé GitHub</label><input id="l-token" type="password" autocomplete="off" spellcheck="false" required></div>'+(sheet.err?'<div class="notice" style="margin-top:10px">'+esc(sheet.err)+'</div>':'')+'<div class="actions"><button class="btn" id="s-close" type="button">Annuler</button><button class="btn primary" type="submit"'+(sheet.busy?' disabled':'')+'>'+(sheet.busy?'Vérification…':'Valider')+'</button></div></form>';
  } else if(sheet.mode==="cfg"){
   var cfg=cur().config;
   h+='<h3>Réglages</h3><div class="fgrid"><div class="field full"><label for="c-inv">Date du dernier inventaire</label><input id="c-inv" value="'+esc(cfg.inventaire)+'" placeholder="21/10/2026"></div>';
@@ -1402,13 +1428,30 @@ function publish(){
  }).catch(function(e){admin.busy=false;admin.msg=ghErr(e);render();});
 }
 function login(token){
- if(token===DEMOKEY){admin.demo=true;admin.token="";admin.on=true;sheet=null;admin.msg="";admin.ok="Mode démonstration : vous pouvez tout essayer (ajouter, modifier, contrôler). Rien n'est enregistré ni envoyé à l'équipe.";loadAll();return;}
+ token=String(token||"").trim();
+ if(token===DEMOKEY){admin.demo=true;admin.token="";admin.scope=null;admin.name="";admin.on=true;sheet=null;admin.msg="";admin.ok="Mode démonstration : vous pouvez tout essayer (ajouter, modifier, contrôler). Rien n'est enregistré ni envoyé à l'équipe.";loadAll();return;}
+ var sep=token.indexOf("~"),pass=(sep>=0?token.slice(0,sep):token).trim().toLowerCase(),ght=sep>=0?token.slice(sep+1).trim():"";
+ var K=KEYS[pass];
+ if(K){
+  admin.name=K.nom;admin.scope=K.scope.slice();lsSet(VKEY,K.nom);
+  if(!K.scope.length){admin.demo=true;admin.token="";admin.on=true;sheet=null;admin.msg="";admin.ok="Bonjour "+K.nom+" — accès consultation : vous pouvez tout voir et scanner, aucune modification possible.";loadAll();return;}
+  if(!ght){admin.scope=null;admin.name="";sheet.err="Cette clé ne contient pas le jeton de publication. Demandez à Alexis de vous renvoyer la clé complète.";render();return;}
+  sheet.busy=true;sheet.err="";admin.token=ght;render();
+  gh("GET",null,BASE+SECTIONS[0].file).then(function(){
+   lsSet(TKEY,token);admin.on=true;sheet=null;admin.ok="Bonjour "+K.nom+" — vous pouvez modifier : "+scopeLabel(K.scope)+". Le reste est en consultation.";loadAll();
+  }).catch(function(e){
+   admin.token="";admin.scope=null;admin.name="";sheet.busy=false;
+   sheet.err=e.status===401?"Clé refusée par GitHub. Vérifiez qu'elle a été copiée en entier.":(e.status===403||e.status===404)?"Cette clé n'a pas accès au dépôt.":"Vérification impossible ("+e.message+").";
+   render();
+  });
+  return;
+ }
  sheet.busy=true;sheet.err="";render();
- admin.token=token;
+ admin.token=token;admin.scope=null;admin.name="Admin";
  gh("GET",null,BASE+SECTIONS[0].file).then(function(){
   lsSet(TKEY,token);admin.on=true;sheet=null;loadAll();
  }).catch(function(e){
-  admin.token="";sheet.busy=false;
+  admin.token="";admin.scope=null;admin.name="";sheet.busy=false;
   sheet.err=e.status===401?"Clé refusée par GitHub. Vérifiez que vous l'avez copiée en entier.":(e.status===403||e.status===404)?"Cette clé n'a pas accès au dépôt electroportatif.":"Vérification impossible ("+e.message+").";
   render();
  });
@@ -1641,7 +1684,7 @@ app.addEventListener("click",function(e){
   if(admin.token){admin.on=true;render();return;}
   sheet={mode:"login"};render();focusId("l-token");return;
  }
- if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;admin.demo=false;render();return;}
+ if(t.id==="b-logout"){lsSet(TKEY,null);admin.token="";admin.on=false;admin.demo=false;admin.scope=null;admin.name="";render();return;}
  if(t.id==="b-add"){sheet={mode:"add"};render();focusId("f-"+T.fields[0].k);return;}
  if(t.id==="b-controle"){sheet={mode:"controle",id:sheet.id,sid:curSid,ans:{}};render();return;}
  if(t.id==="b-releve"){sheet={mode:"releve",id:sheet.id};render();focusId("rv-val");return;}
@@ -1708,12 +1751,14 @@ app.addEventListener("click",function(e){
  if(t.id==="fc-open"&&sheet.found){openElement(sheet.found.sid,sheet.found.id);return;}
  if(t.id==="fc-conform"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  if(!canEditSec(sheet.found.sid))return;
   var ksid=sheet.found.sid,kid=sheet.found.id,knom=(secItem(ksid,kid)||{}).designation||"";
   editItemIn(ksid,kid,function(i){i.statut="Conforme";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"RAS",statut:"Conforme"}]);});
   scanFeedback();scanNext("✓ « "+knom+" » : Conforme. Au suivant.");return;}
  if(t.id==="fc-new"){sheet.found=null;sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";sheet.q="";render();focusId("id-icb");return;}
  if(t.id==="fc-present"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  if(!canEditSec(sheet.found.sid))return;
   var psid=sheet.found.sid,pid=sheet.found.id,ps=store[psid];
   if(!ps.INV)ps.INV={start:today(),seen:{},onlyTodo:false};
   ps.INV.seen[pid]=1;try{localStorage.setItem(keysFor(psid).i,JSON.stringify(ps.INV));}catch(e){}
@@ -1723,6 +1768,7 @@ app.addEventListener("click",function(e){
   render();return;}
  if(t.id==="fc-reform"&&sheet.found){
   if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  if(!canEditSec(sheet.found.sid))return;
   if(!sheet.reformArm){sheet.reformArm=true;render();return;}
   var fsid=sheet.found.sid,fid=sheet.found.id,fnom=(secItem(fsid,fid)||{}).designation||"";
   editItemIn(fsid,fid,function(i){i.statut="Réformé";i.date_ctrl=frToday();i.history=(i.history||[]).concat([{date:frToday(),verif:lsGet(VKEY)||"",obs:"Réformé",statut:"Réformé"}]);});
@@ -1731,6 +1777,7 @@ app.addEventListener("click",function(e){
  if(t.dataset&&t.dataset.sid&&t.dataset.id&&t.classList.contains("idrow")){if(t.dataset.dom==="find"){stopCamera();sheet.found={sid:t.dataset.sid,id:t.dataset.id};sheet.reformArm=false;sheet.reformMsg="";sheet.presentMsg="";render();return;}stopCamera();sheet={mode:"controle",id:t.dataset.id,sid:t.dataset.sid,ans:{},fromScan:true};render();return;}
  if(sheet&&sheet.mode==="controle"&&t.dataset&&t.dataset.q&&t.dataset.v){syncControl();sheet.ans[t.dataset.q]=t.dataset.v;render();return;}
  if(t.id==="cf-save"){
+  var csid0=sheet.sid||curSid;if(!canEditSec(csid0)){sheet=null;admin.msg="Cette partie n'est pas dans votre périmètre : contrôle non enregistré.";render();return;}
   syncControl();var a=sheet.ans,verif=(a.__verif||"").trim(),date=(a.__date||"").trim()||frToday();
   if(verif)lsSet(VKEY,verif);
   var csid=sheet.sid||curSid;
@@ -1855,7 +1902,12 @@ dbar.addEventListener("pointerdown",function(e){if(e.pointerType==="touch")retur
 dbar.addEventListener("mousedown",function(e){e.preventDefault();});
 dbar.addEventListener("touchstart",function(e){e.preventDefault();dPress(e);},{passive:false});
 
-admin.token=lsGet(TKEY)||"";
+(function restoreKey(){var t=lsGet(TKEY)||"";if(!t){admin.token="";return;}
+ var sep=t.indexOf("~"),pass=(sep>=0?t.slice(0,sep):t).trim().toLowerCase(),ght=sep>=0?t.slice(sep+1).trim():"";
+ var K=KEYS[pass];
+ if(K){admin.name=K.nom;admin.scope=K.scope.slice();admin.token=K.scope.length?ght:"";lsSet(VKEY,K.nom);if(!K.scope.length){admin.demo=true;}}
+ else{admin.token=t;admin.scope=null;admin.name="Admin";}
+})();
 route();
 loadAll();
 })();
