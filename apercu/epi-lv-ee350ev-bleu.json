@@ -1,5 +1,5 @@
 {
-"config":{"titre":"EE350EV Bleu","equipe":"Équipe : Equipe Ligne","nom":"vehicule EE 350 EV","inventaire":"","maj":"2026-11-02"},
+"config":{"titre":"EE350EV Bleu","equipe":"Équipe : Equipe Ligne","nom":"vehicule EE 350 EV","inventaire":"","maj":"2026-11-28"},
 "items":[
   {"designation":"Ligne de vie 100M","norme":"EN353-2","marque":"PETZL","ref":"A10,5","serie":"20I0273654682","fab":"2020","service":"2024","note":"","statut":"","history":[],"id":"e21_001"},
   {"designation":"MOUSQUETON POULIE","norme":"EN362","marque":"Petzl","ref":"ROLLCLIP","serie":"17BO061230378","fab":"2017","service":"2018","note":"","statut":"","history":[],"id":"e21_002"},
@@ -69,7 +69,7 @@
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23H0510392085","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_066"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23H0510392082","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_067"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23G0503476052","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_068"},
-  {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23G0503476071","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_069"},
+  {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23G0503476071","fab":"2023","service":"2024","note":"","statut":"Conforme","history":[{"date":"05/11/2026","verif":"","obs":"RAS","statut":"Conforme"}],"id":"e21_069","date_ctrl":"05/11/2026"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23G0503476070","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_070"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23G0503476056","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_071"},
   {"designation":"SANGLE","norme":"EN795B 2012","marque":"Petzl","ref":"PUR'ANNEAU","serie":"23G0503476053","fab":"2023","service":"2024","note":"","statut":"","history":[],"id":"e21_072"},
