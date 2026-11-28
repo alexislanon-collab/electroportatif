@@ -96,7 +96,8 @@ var TYPES={
    {k:"statut",l:"Statut du matériel",t:"status"},
    {k:"commentaire",l:"Commentaire",t:"area",full:1}
   ],
-  status:{key:"statut",opts:[["Conforme","Conforme","ok"],["À réformer","À réformer","warn"],["À réparer","À réparer","warn"],["Manquant","Manquant","bad"],["Réformé","Réformé","off"],["Prêt de matériel","Prêt de matériel","out"],["","Non renseigné","none"]],def:""},
+  status:{key:"statut",opts:[["Conforme","Conforme","ok"],["À recontrôler","À recontrôler","warn"],["À réformer","À réformer","warn"],["À réparer","À réparer","warn"],["Manquant","Manquant","bad"],["Réformé","Réformé","off"],["Prêt de matériel","Prêt de matériel","out"],["","Non renseigné","none"]],def:""},
+  revalid:{months:6,ok:["Conforme"]},
   filters:[{k:"ctrl",l:"Tous les contrôles",flags:1}],
   pdf:[["icb","ICB",30],["description","Description",62],["carac","Caract.",24],["serie","N° série",22],["cesar","CESAR",14],["date_ctrl","Date contrôle",20],["$flags","Contrôle",26],["$status","Statut",22],["$com","Commentaire",0]]
  },
@@ -194,7 +195,8 @@ var TYPES={
    {k:"commentaire",l:"Observations",t:"area",full:1},
    {k:"history",l:"Historique des contrôles",t:"history",full:1}
   ],
-  status:{key:"statut",opts:[["Conforme","Conforme","ok"],["Non conforme","Non conforme","bad"],["À contrôler","À contrôler","warn"],["Détruit","Détruit","off"],["","Non renseigné","none"]],def:"À contrôler"},
+  status:{key:"statut",opts:[["Conforme","Conforme","ok"],["À recontrôler","À recontrôler","warn"],["Non conforme","Non conforme","bad"],["À contrôler","À contrôler","warn"],["Détruit","Détruit","off"],["","Non renseigné","none"]],def:"À contrôler"},
+  revalid:{months:12,ok:["Conforme"]},
   filters:[{k:"cable",l:"Toutes les réf. câble",sort:"natural"},{missing:"icb",l:"Tous les ICB",lm:"ICB à saisir"}],
   pdf:[["designation","Désignation",34],["cable","Réf. câble",24],["icb","ICB",28],["frappe","Frappé",18],["cesar","CESAR",12],["date_ctrl","Contrôle",18],["$status","Conformité",24],["$com","Observations",0]]
  },
@@ -261,7 +263,8 @@ TYPES.epi={
   {k:"note",l:"Observations",t:"area",full:1},
   {k:"history",l:"Historique des contrôles",t:"history",full:1}
  ],
- status:{key:"statut",opts:[["Conforme","Conforme","ok"],["Non conforme","Non conforme","bad"],["À vérifier","À vérifier","warn"],["Réformé","Réformé","off"],["","Non renseigné","none"]],def:"À vérifier"},
+ status:{key:"statut",opts:[["Conforme","Conforme","ok"],["À recontrôler","À recontrôler","warn"],["Non conforme","Non conforme","bad"],["À vérifier","À vérifier","warn"],["Réformé","Réformé","off"],["","Non renseigné","none"]],def:"À vérifier"},
+ revalid:{months:12,ok:["Conforme"]},
  filters:[{k:"marque",l:"Toutes les marques"},{missing:"serie",l:"Tous les n° de série",lm:"N° de série à saisir"}],
  pdf:[["designation","Désignation",32],["norme","Norme",20],["marque","Marque",18],["ref","Réf.",20],["serie","N° de série",28],["service","Service",14],["date_ctrl","Contrôle",16],["$status","Conformité",22],["note","Observations",0]]
 };
@@ -348,10 +351,12 @@ TYPES.maltcc={
   {k:"section",l:"Section",dl:1,meta:"Section"},
   {k:"icb",l:"Numéro ICB",mono:1,meta:"ICB"},
   {k:"localisation",l:"Localisation / stockage",full:1,dl:1,meta:"Lieu"},
+  {k:"date_ctrl",l:"Dernière vérification",meta:"Vérifié"},
   {k:"etat",l:"État",t:"status"},
   {k:"commentaire",l:"Observation",t:"area",full:1}
  ],
- status:{key:"etat",opts:[["En service","En service","ok"],["HS","Hors service","bad"],["À commander","À commander","warn"],["À créer ICB","À créer ICB","warn"],["","Non renseigné","none"]],def:"En service"},
+ status:{key:"etat",opts:[["En service","En service","ok"],["À recontrôler","À recontrôler","warn"],["HS","Hors service","bad"],["À commander","À commander","warn"],["À créer ICB","À créer ICB","warn"],["","Non renseigné","none"]],def:"En service"},
+ revalid:{months:12,ok:["En service"]},
  autoCmd:function(i,st){return st==="À commander"?"À commander":"";},
  filters:[{k:"famille",l:"Toutes les familles"},{k:"longueur",l:"Toutes les longueurs"},{missing:"icb",l:"Tous les ICB",lm:"ICB à créer"}],
  pdf:[["designation","Désignation",30],["famille","Famille",18],["tension","Tension",14],["longueur","Longueur",12],["section","Section",14],["icb","ICB",16],["localisation","Localisation",0],["$status","État",18]]
@@ -407,7 +412,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="48";
+var APPVER="49";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};
@@ -528,11 +533,28 @@ function flagLabel(k){var f=T.fields.filter(function(x){return x.t==="flags";})[
 function years(d){return ((d||cur()).config.years||[]).slice().sort();}
 
 /* ---------- logique par type ---------- */
+/* contrôle périmé ? (date « jj/mm/aaaa » + périodicité en mois) */
+function ctrlExpired(s,months){var d=parseD(s);if(!d)return false;return addM(d,months)<new Date();}
 function statusOfT(t,i,d){
  if(!t.status)return null;
- if(t.status.derived)return t.status.derived(i);
- if(t.status.fromResults){var ys=((d&&d.config.years)||[]).slice().sort().reverse();for(var n=0;n<ys.length;n++){var v=i.res&&i.res[ys[n]];if(v)return v;}return "";}
- return i[t.status.key]==null?"":i[t.status.key];
+ var v;
+ if(t.status.derived)v=t.status.derived(i);
+ else if(t.status.fromResults){v="";var ys=((d&&d.config.years)||[]).slice().sort().reverse();for(var n=0;n<ys.length;n++){var rv=i.res&&i.res[ys[n]];if(rv){v=rv;break;}}}
+ else v=i[t.status.key]==null?"":i[t.status.key];
+ if(t.revalid&&t.revalid.ok.indexOf(v)>=0&&ctrlExpired(i[t.revalid.from||"date_ctrl"],t.revalid.months))return "À recontrôler";
+ return v;
+}
+/* bloc « validité du contrôle » affiché en fiche */
+function ctrlRemindHtml(i,T){
+ if(!T.revalid)return "";
+ var base=parseD(i[T.revalid.from||"date_ctrl"]);
+ var h='<div class="vehremind"><div class="vr-head">Validité du contrôle · tous les '+T.revalid.months+' mois</div>';
+ if(!base)h+='<div class="vr-line vr-none">Pas de date de contrôle renseignée</div>';
+ else{var end=addM(base,T.revalid.months),days=Math.round((end-new Date())/864e5),ds=String(end.getDate()).padStart(2,"0")+"/"+String(end.getMonth()+1).padStart(2,"0")+"/"+end.getFullYear();
+  if(days<0)h+='<div class="vr-line vr-bad">À recontrôler — dépassé depuis '+(-days)+' j</div>';
+  else{var mo=Math.round(days/30);h+='<div class="vr-line vr-'+(days<=30?"warn":"ok")+'">Valable jusqu\'au '+ds+' · '+(mo>=2?"dans "+mo+" mois":"dans "+days+" j")+'</div>';}
+ }
+ return h+'</div>';
 }
 function statusOf(i){return statusOfT(T,i,cur());}
 function stOpt(t,v){if(!t.status)return null;var o=t.status.opts.filter(function(x){return x[0]===v;})[0];return o||[v,v||"Non renseigné","none"];}
@@ -1087,7 +1109,7 @@ function renderSheet(){
   if(T.life){var LF=T.life(vi);if(LF)h+='<dt>Fin de vie</dt><dd class="r-'+LF.tone+'"><b>'+esc(LF.txt)+'</b><br><small>'+esc(LF.rule)+'</small></dd>';}
   if(vi.suivi&&vi.suivi.c){h+='<dt>Dernière campagne</dt><dd>'+esc(campLabelKey(vi.suivi.c))+' : '+esc(ETAPES[vi.suivi.e||""][0])+(vi.suivi.r?' ('+esc(vi.suivi.r)+')':'')+(vi.suivi.dest?' · envoyé à '+esc(vi.suivi.dest):'')+'</dd>';}
   if(vi.vu)h+='<dt>Vu pour la dernière fois</dt><dd>'+esc(frDate(vi.vu))+'</dd>';
-  h+='</dl>'+(T===TYPES.vehicule?vehRemindHtml(vi,true):'')+'<div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
+  h+='</dl>'+(T===TYPES.vehicule?vehRemindHtml(vi,true):'')+(T.revalid?ctrlRemindHtml(vi,T):'')+'<div class="actions"><span></span><button class="btn primary" id="s-close" type="button">Fermer</button></div>';
 } else if(sheet.mode==="identify"&&sheet.dom==="find"&&sheet.found){
   var fi=secItem(sheet.found.sid,sheet.found.id)||{},fsec=secById(sheet.found.sid)||{},fT=TYPES[fsec.type]||{};
   var fst=fT.status?stOpt(fT,statusOfT(fT,fi,secData(fsec.id))):null;
@@ -1182,6 +1204,9 @@ function renderSheet(){
     +'<button type="button" class="btn ctrlbtn '+(enD?'done':'ok')+'" id="b-entok">'+I.check+(enD?esc(sheet.doneMsg||"Entretien fait ✓"):'Entretien fait')+'</button></div>';
    h+=vehRemindHtml(it,true);
   }
+  if(T===TYPES.maltcc&&sheet.mode==="edit"){var vfD=sheet.done==="verif";
+   h+='<button type="button" class="btn ctrlbtn '+(vfD?'done':'ok')+'" id="b-verif">'+I.check+(vfD?esc(sheet.doneMsg||"Vérifié ✓"):'Vérifié aujourd\'hui')+'</button>';
+   h+=ctrlRemindHtml(it,T);}
   if(T===TYPES.epi&&sheet.mode==="edit")h+=epiMoveHtml(curSid);
   h+='<form id="f-item"><div class="fgrid">';
   h+=T.fields.map(function(f){return formField(f,it);}).join("");
@@ -1641,6 +1666,11 @@ app.addEventListener("click",function(e){
    editItemIn(esid,eid,function(i){i.history=(i.history||[]).concat([{date:frMonth(),obs:"Entretien / révision réalisé"+(es.compteur!==""?" à "+es.compteur+" "+eun:""),verif:lsGet(VKEY)||"",statut:""}]);});
   }
   sheet={mode:"edit",id:eid,done:"ent",doneMsg:emsg};render();return;
+ }
+ if(t.id==="b-verif"){
+  if(!admin.on){if(admin.token){admin.on=true;}else{sheet={mode:"login"};render();focusId("l-token");return;}}
+  var vfid=sheet.id;editItemIn(curSid,vfid,function(i){i.date_ctrl=frToday();if(i.etat!=="En service")i.etat="En service";});
+  sheet={mode:"edit",id:vfid,done:"verif",doneMsg:"Vérifié le "+frToday()};render();return;
  }
  if(t.id==="b-ics"){
   var icsIt=secItem(curSid,sheet.id)||{},ics=vehICS(icsIt);if(!ics)return;
