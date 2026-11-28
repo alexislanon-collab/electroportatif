@@ -1,0 +1,93 @@
+{
+ "config": {
+  "titre": "Terres à rouleaux",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xe1",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Treuil sur remorque TESMEC",
+   "etat": "En service",
+   "commentaire": "ICB à créer"
+  },
+  {
+   "id": "xe2",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Dérouleuse 4,5t TESMEC",
+   "etat": "En service",
+   "commentaire": "ICB à créer"
+  },
+  {
+   "id": "xe3",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Caisse RIDGID \"EEL BS\"",
+   "etat": "En service",
+   "commentaire": "ICB à créer"
+  },
+  {
+   "id": "xe4",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Caisse RIDGID \"EEL BS\"",
+   "etat": "En service",
+   "commentaire": "ICB à créer"
+  },
+  {
+   "id": "xe5",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Caisse RIDGID \"EEL BS\"",
+   "etat": "En service",
+   "commentaire": "ICB à créer"
+  },
+  {
+   "id": "xe6",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Support de Malt/CC dans le garage",
+   "etat": "À commander",
+   "commentaire": "À commander"
+  },
+  {
+   "id": "xe7",
+   "designation": "Terre à rouleaux",
+   "famille": "Étaux / rouleaux",
+   "tension": "90 / 225 / 400",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "",
+   "localisation": "Support de Malt/CC dans le garage",
+   "etat": "À commander",
+   "commentaire": "À commander"
+  }
+ ]
+}

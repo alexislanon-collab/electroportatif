@@ -1,0 +1,213 @@
+{
+ "config": {
+  "titre": "MALT/CC 90 kV",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xa1",
+   "designation": "MALT/CC à bâton 6 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17093",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa2",
+   "designation": "MALT/CC à bâton 6 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17064",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa3",
+   "designation": "MALT/CC à bâton 6 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17054",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa4",
+   "designation": "MALT/CC à crochet 6 m",
+   "famille": "À crochet",
+   "tension": "90 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17056",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": "tresse a remplacer par 5m"
+  },
+  {
+   "id": "xa5",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17065",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa6",
+   "designation": "MALT/CC à crochet 5 m",
+   "famille": "À crochet",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17082",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": "tresse a remplacer par 5m"
+  },
+  {
+   "id": "xa7",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17088",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa8",
+   "designation": "MALT/CC à crochet 5 m",
+   "famille": "À crochet",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17094",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa9",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17186",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa10",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17033",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa11",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17165",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa12",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17152",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa13",
+   "designation": "MALT/CC à bâton 5 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17190",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa14",
+   "designation": "MALT/CC à crochet 5 m",
+   "famille": "À crochet",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17173",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa15",
+   "designation": "MALT/CC à crochet 6 m",
+   "famille": "À crochet",
+   "tension": "90 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "170185",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa16",
+   "designation": "MALT/CC à crochet 5 m",
+   "famille": "À crochet",
+   "tension": "90 kV",
+   "longueur": "5 m",
+   "section": "95 mm²",
+   "icb": "17163",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xa17",
+   "designation": "MALT/CC à bâton 6 m",
+   "famille": "À bâton",
+   "tension": "90 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17130",
+   "localisation": "",
+   "etat": "En service",
+   "commentaire": ""
+  }
+ ]
+}

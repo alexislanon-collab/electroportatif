@@ -1,0 +1,21 @@
+{
+ "config": {
+  "titre": "MALT/CC pour RNL",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xd1",
+   "designation": "MALT/CC RNL — pieuvre",
+   "famille": "RNL",
+   "tension": "90 kV",
+   "longueur": "",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support des LeQ",
+   "etat": "À commander",
+   "commentaire": "Étaux / tournevis · pieuvre · à commander puis créer l'ICB"
+  }
+ ]
+}

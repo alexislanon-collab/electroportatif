@@ -1,0 +1,93 @@
+{
+ "config": {
+  "titre": "LeQ DSTM",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xh1",
+   "designation": "LeQ DSTM — Chassis bloc béton 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Chassis bloc béton"
+  },
+  {
+   "id": "xh2",
+   "designation": "LeQ DSTM — Chassis bloc béton 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Chassis bloc béton"
+  },
+  {
+   "id": "xh3",
+   "designation": "LeQ DSTM — Chassis bloc béton 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Chassis bloc béton"
+  },
+  {
+   "id": "xh4",
+   "designation": "LeQ DSTM — Chassis bloc béton 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Chassis bloc béton"
+  },
+  {
+   "id": "xh5",
+   "designation": "LeQ DSTM — Chassis bloc béton 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Chassis bloc béton"
+  },
+  {
+   "id": "xh6",
+   "designation": "LeQ DSTM — Chassis bloc béton 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Chassis bloc béton"
+  },
+  {
+   "id": "xh7",
+   "designation": "LeQ DSTM — Porte touret 2 m",
+   "famille": "DSTM",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Caisse de déroulage RIDGID",
+   "etat": "À créer ICB",
+   "commentaire": "Porte touret"
+  }
+ ]
+}

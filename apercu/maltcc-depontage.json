@@ -1,0 +1,69 @@
+{
+ "config": {
+  "titre": "MALT/CC pour dépontage",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xc1",
+   "designation": "Collecteur de terre 6 m",
+   "famille": "Collecteur de terre",
+   "tension": "90 / 225 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17060",
+   "localisation": "Garage EEL",
+   "etat": "En service",
+   "commentaire": "Avec MALT comprise"
+  },
+  {
+   "id": "xc2",
+   "designation": "Collecteur de terre 6 m",
+   "famille": "Collecteur de terre",
+   "tension": "90 / 225 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17063",
+   "localisation": "Garage EEL",
+   "etat": "En service",
+   "commentaire": "Avec MALT comprise"
+  },
+  {
+   "id": "xc3",
+   "designation": "Collecteur de terre 6 m",
+   "famille": "Collecteur de terre",
+   "tension": "90 / 225 kV",
+   "longueur": "6 m",
+   "section": "95 mm²",
+   "icb": "17077",
+   "localisation": "Garage EEL",
+   "etat": "En service",
+   "commentaire": "Avec MALT comprise"
+  },
+  {
+   "id": "xc4",
+   "designation": "MALT / CC à crochet 10 m",
+   "famille": "À crochet",
+   "tension": "90 / 225 kV",
+   "longueur": "10 m",
+   "section": "95 mm²",
+   "icb": "RC5",
+   "localisation": "Garage EEL",
+   "etat": "En service",
+   "commentaire": ""
+  },
+  {
+   "id": "xc5",
+   "designation": "MALT / CC à crochet 14 m",
+   "famille": "À crochet",
+   "tension": "90 / 225 kV",
+   "longueur": "14 m",
+   "section": "95 mm²",
+   "icb": "4",
+   "localisation": "Garage EEL",
+   "etat": "En service",
+   "commentaire": ""
+  }
+ ]
+}

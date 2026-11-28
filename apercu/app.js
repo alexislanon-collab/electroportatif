@@ -337,6 +337,42 @@ TYPES.vehicule={
 };
 SECTIONS.push({id:"vehicules",nom:"Véhicules",file:"vehicules.json",type:"vehicule",pre:"v",hint:"Km, contrôles techniques et entretiens de la flotte"});
 HOME.push("vehicules");
+/* ----- MALT/CC (mises à la terre, LeQ, shunts) ----- */
+TYPES.maltcc={
+ title:["designation"],group:"famille",groupSort:"natural",ok:"en service",
+ fields:[
+  {k:"designation",l:"Désignation",req:1,full:1,dl:1},
+  {k:"famille",l:"Famille",dl:1,meta:"Famille"},
+  {k:"tension",l:"Tension",dl:1,meta:"Tension"},
+  {k:"longueur",l:"Longueur",dl:1,meta:"Long."},
+  {k:"section",l:"Section",dl:1,meta:"Section"},
+  {k:"icb",l:"Numéro ICB",mono:1,meta:"ICB"},
+  {k:"localisation",l:"Localisation / stockage",full:1,dl:1,meta:"Lieu"},
+  {k:"etat",l:"État",t:"status"},
+  {k:"commentaire",l:"Observation",t:"area",full:1}
+ ],
+ status:{key:"etat",opts:[["En service","En service","ok"],["HS","Hors service","bad"],["À commander","À commander","warn"],["À créer ICB","À créer ICB","warn"],["","Non renseigné","none"]],def:"En service"},
+ autoCmd:function(i,st){return st==="À commander"?"À commander":"";},
+ filters:[{k:"famille",l:"Toutes les familles"},{k:"longueur",l:"Toutes les longueurs"},{missing:"icb",l:"Tous les ICB",lm:"ICB à créer"}],
+ pdf:[["designation","Désignation",30],["famille","Famille",18],["tension","Tension",14],["longueur","Longueur",12],["section","Section",14],["icb","ICB",16],["localisation","Localisation",0],["$status","État",18]]
+};
+GROUPS.push(
+ {id:"maltcc",nom:"MALT/CC",hint:"Mises à la terre, LeQ et shunts"},
+ {id:"maltcc-malt",nom:"MALT / CC",parent:"maltcc",hint:"90 kV, 225/400 kV, dépontage, RNL, rouleaux"},
+ {id:"maltcc-leq",nom:"LeQ",parent:"maltcc",hint:"Liaisons équipotentielles débrochables, véhicules, DSTM"}
+);
+SECTIONS.push(
+ {id:"maltcc-90",nom:"90 kV",parent:"maltcc-malt",file:"maltcc-90.json",type:"maltcc",pre:"xa",hint:"MALT/CC avec APE 90 kV"},
+ {id:"maltcc-225",nom:"225 / 400 kV",parent:"maltcc-malt",file:"maltcc-225.json",type:"maltcc",pre:"xb",hint:"MALT/CC avec APE 225 et 400 kV"},
+ {id:"maltcc-depontage",nom:"Dépontage",parent:"maltcc-malt",file:"maltcc-depontage.json",type:"maltcc",pre:"xc",hint:"Collecteurs de terre et MALT à crochet"},
+ {id:"maltcc-rnl",nom:"RNL",parent:"maltcc-malt",file:"maltcc-rnl.json",type:"maltcc",pre:"xd",hint:"MALT pour RNL"},
+ {id:"maltcc-rouleaux",nom:"Terres à rouleaux",parent:"maltcc-malt",file:"maltcc-rouleaux.json",type:"maltcc",pre:"xe",hint:"Treuils, dérouleuses, caisses DSTM"},
+ {id:"maltcc-leq-debrochable",nom:"Débrochable",parent:"maltcc-leq",file:"maltcc-leq-debrochable.json",type:"maltcc",pre:"xf",hint:"LeQ débrochable (nacelle)"},
+ {id:"maltcc-leq-vehicules",nom:"Véhicules",parent:"maltcc-leq",file:"maltcc-leq-vehicules.json",type:"maltcc",pre:"xg",hint:"LeQ des véhicules et engins"},
+ {id:"maltcc-leq-dstm",nom:"DSTM",parent:"maltcc-leq",file:"maltcc-leq-dstm.json",type:"maltcc",pre:"xh",hint:"LeQ de la caisse de déroulage"},
+ {id:"maltcc-shunt",nom:"Shunts",parent:"maltcc",file:"maltcc-shunt.json",type:"maltcc",pre:"xi",hint:"Shunts pince/pince et étau/pince"}
+);
+HOME.push("maltcc");
 var VIEWS=[{id:"campagne",nom:"Campagne de contrôle",parent:"tst",hint:"Chargement du camion, résultats, réparations"},{id:"aide",nom:"Mode d'emploi",hidden:1}];
 function viewById(id){return VIEWS.filter(function(v){return v.id===id;})[0]||null;}
 function grpById(id){return GROUPS.filter(function(g){return g.id===id;})[0]||null;}
@@ -352,7 +388,7 @@ var REPO={owner:"alexislanon-collab",repo:"electroportatif",path:"",branch:"main
 var PAGE_URL=location.origin+location.pathname;
 var TKEY="electro-gh-token";
 var DEMOKEY="demo-eel";
-var APPVER="46";
+var APPVER="47";
 function keysFor(sid){
  if(sid==="electroportatif"&&!PREVIEW)return {d:"electro-draft-v2",i:"electro-inv",o:"electro-open"};
  return {d:KP+"inv-"+sid+"-draft",i:KP+"inv-"+sid+"-inv",o:KP+"inv-"+sid+"-open"};

@@ -1,0 +1,57 @@
+{
+ "config": {
+  "titre": "LeQ débrochable",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xf1",
+   "designation": "LeQ débrochable 2 m",
+   "famille": "Débrochable",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ",
+   "etat": "À créer ICB",
+   "commentaire": "FUSIBLE LEQ35DB"
+  },
+  {
+   "id": "xf2",
+   "designation": "LeQ débrochable 2 m",
+   "famille": "Débrochable",
+   "tension": "",
+   "longueur": "2 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ",
+   "etat": "À créer ICB",
+   "commentaire": "FUSIBLE LEQ35DB"
+  },
+  {
+   "id": "xf3",
+   "designation": "LeQ débrochable 7 m",
+   "famille": "Débrochable",
+   "tension": "",
+   "longueur": "7 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ",
+   "etat": "À créer ICB",
+   "commentaire": "FUSIBLE LEQ35DB"
+  },
+  {
+   "id": "xf4",
+   "designation": "LeQ débrochable 10 m",
+   "famille": "Débrochable",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ",
+   "etat": "À créer ICB",
+   "commentaire": "FUSIBLE LEQ35DB"
+  }
+ ]
+}

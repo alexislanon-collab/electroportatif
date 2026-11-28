@@ -1,0 +1,177 @@
+{
+ "config": {
+  "titre": "LeQ véhicules",
+  "inventaire": "",
+  "maj": "2026-11-28"
+ },
+ "items": [
+  {
+   "id": "xg1",
+   "designation": "LeQ Camion TST",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Camion TST",
+   "etat": "À créer ICB",
+   "commentaire": "ETAU AVEC POIGNEE NB8M / ETAU NB33S / TEQ3510DD / SABOT DE TERRE STA2147DP"
+  },
+  {
+   "id": "xg2",
+   "designation": "LeQ Camion UNIMOG",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Camion UNIMOG",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg3",
+   "designation": "LeQ Camion MAN",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Camion MAN",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg4",
+   "designation": "LeQ Zetros",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Zetros",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg5",
+   "designation": "LeQ Camion grue \"HYAB\"",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Camion grue \"HYAB\"",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg6",
+   "designation": "LeQ CDO TST",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "CDO TST",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg7",
+   "designation": "LeQ Kubota",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Kubota",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg8",
+   "designation": "LeQ Treuil TESMEC",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Treuil TESMEC",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg9",
+   "designation": "LeQ Dérouleuse TESMEC",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Dérouleuse TESMEC",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg10",
+   "designation": "LeQ Chaptrack",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Chaptrack",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg11",
+   "designation": "LeQ Support de LeQ (Location de grue, merlo, nacelle…)",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ (Location de grue, merlo, nacelle…)",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg12",
+   "designation": "LeQ Support de LeQ (Location de grue, merlo, nacelle…)",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ (Location de grue, merlo, nacelle…)",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg13",
+   "designation": "LeQ Support de LeQ (Location de grue, merlo, nacelle…)",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ (Location de grue, merlo, nacelle…)",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  },
+  {
+   "id": "xg14",
+   "designation": "LeQ Support de LeQ (Location de grue, merlo, nacelle…)",
+   "famille": "Véhicules / engins",
+   "tension": "",
+   "longueur": "10 m",
+   "section": "35 mm²",
+   "icb": "",
+   "localisation": "Support de LeQ (Location de grue, merlo, nacelle…)",
+   "etat": "À créer ICB",
+   "commentaire": ""
+  }
+ ]
+}
